@@ -6,7 +6,7 @@ One link that curates every public project — grouped by domain, each with a
 one-line summary, the verification/trust angle, tech tags, and links to the code
 (and a live demo where deployed).
 
-**Live:** _(add your Vercel URL here after deploy)_
+**Live:** https://jigonyoo.vercel.app
 
 ## The through-line
 
