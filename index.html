@@ -129,17 +129,17 @@
     <div class="grid">
       <div class="card">
         <div class="c-top"><span class="c-name">invoice-to-structured</span><span class="badge pub">Public</span></div>
-        <p class="c-desc">Invoices (PDF or scanned) → structured JSON/CSV through a deterministic verification engine: line math, totals, required fields, a confidence score, and a human-review queue. Optional AWS Textract path for scans.</p>
+        <p class="c-desc">Documents (invoices, purchase orders, bank statements — PDF or scanned) → structured JSON/CSV through a deterministic verification engine: line math, balance reconciliation, totals, required fields, confidence scores, and a cross-document human-review gate. Optional AWS Textract path for scans.</p>
         <div class="c-moat">The trust layer is the point — it flags <em>which rows you can believe</em>, not just extract-and-hope.</div>
-        <div class="tags"><span class="tag">python</span><span class="tag">idp</span><span class="tag">textract</span><span class="tag">validation</span></div>
-        <div class="links"><a class="btn" href="https://github.com/jigonyoo/invoice-to-structured" target="_blank" rel="noopener">Code ↗</a></div>
+        <div class="tags"><span class="tag">python</span><span class="tag">idp</span><span class="tag">textract</span><span class="tag">reconciliation</span><span class="tag">validation</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/invoice-to-structured" target="_blank" rel="noopener">Code ↗</a><a class="btn primary" href="showcase/invoice-to-structured.html">Demo ↗</a></div>
       </div>
       <div class="card">
         <div class="c-top"><span class="c-name">rag-grounded-qa</span><span class="badge pub">Public</span></div>
         <p class="c-desc">Grounded document Q&amp;A that cites its sources, <em>refuses when unsure</em> (no hallucinations), and ships with an evaluation harness — recall@k, refusal accuracy, and grounding rate.</p>
         <div class="c-moat">Not naïve RAG: the durable value is citation, refusal, and evaluation — scored, not hand-waved.</div>
         <div class="tags"><span class="tag">python</span><span class="tag">rag</span><span class="tag">retrieval</span><span class="tag">eval</span></div>
-        <div class="links"><a class="btn" href="https://github.com/jigonyoo/rag-grounded-qa" target="_blank" rel="noopener">Code ↗</a></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/rag-grounded-qa" target="_blank" rel="noopener">Code ↗</a><a class="btn primary" href="showcase/rag-grounded-qa.html">Demo ↗</a></div>
       </div>
       <div class="card">
         <div class="c-top"><span class="c-name">rag-multidoc-crosscheck</span><span class="badge pub">Public</span></div>
@@ -167,7 +167,7 @@
         <p class="c-desc">Messy CSV → cleaned data (with a quality log) → KPIs and month-over-month analysis → an automated report with charts. Includes anomaly detection: outliers, revenue mismatches, MoM spikes.</p>
         <div class="c-moat">Data-quality checks and anomaly flags are baked into the report — not a pretty-but-blind dashboard.</div>
         <div class="tags"><span class="tag">python</span><span class="tag">pandas</span><span class="tag">reporting</span><span class="tag">anomaly</span></div>
-        <div class="links"><a class="btn" href="https://github.com/jigonyoo/analytics-pipeline" target="_blank" rel="noopener">Code ↗</a></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/analytics-pipeline" target="_blank" rel="noopener">Code ↗</a><a class="btn primary" href="showcase/analytics-pipeline.html">Demo ↗</a></div>
       </div>
       <div class="card">
         <div class="c-top"><span class="c-name">ml-churn-pipeline</span><span class="badge pub">Public</span></div>

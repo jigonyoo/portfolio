@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Invoice to Structured — Verified Document Pipeline</title>
+<meta name="description" content="Synthetic invoice, purchase-order, and bank-statement extraction with deterministic validation and human review routing.">
+<style>
+:root{--bg:#0a0e0d;--panel:#10171a;--panel-2:#0d1315;--line:#1c2a2b;--txt:#e7f0ee;--muted:#869a97;--dim:#5f7370;--green:#22c55e;--green-dim:#15803d;--green-soft:rgba(34,197,94,.12);--amber:#f5b544;--red:#fb7185}*{box-sizing:border-box}html,body{margin:0}body{background:radial-gradient(1100px 600px at 85% -8%,rgba(34,197,94,.09),transparent 60%),var(--bg);color:var(--txt);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Arial,sans-serif}.wrap{max-width:980px;margin:auto;padding:34px 24px 64px}a{color:inherit;text-decoration:none}.top,.actions,.stats{display:flex;gap:10px;flex-wrap:wrap}.top{justify-content:space-between;align-items:flex-start}.eyebrow{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase}h1{font-size:clamp(28px,5vw,46px);line-height:1.1;margin:9px 0}.lead{color:#cdd8d5;font-size:17px;max-width:720px}.badge,.btn{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:8px;padding:7px 11px;font-size:12px;font-weight:750}.badge{color:var(--green);background:var(--green-soft)}.btn:hover{border-color:var(--green)}section{margin-top:34px}.label{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;border-bottom:1px solid var(--line);padding-bottom:8px}h2{font-size:22px;margin:13px 0 8px}.card{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:18px;margin-top:13px}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}@media(max-width:720px){.grid{grid-template-columns:1fr}}pre{white-space:pre-wrap;overflow:auto;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:15px;color:#cdd8d5}.issue{border-left:3px solid var(--red)}.ok{border-left:3px solid var(--green)}.amber{color:var(--amber)}.route{font-weight:800;color:var(--red)}table{width:100%;border-collapse:collapse}th,td{text-align:left;border-bottom:1px solid var(--line);padding:10px 8px}th{color:var(--muted);font-size:12px}.foot{margin-top:42px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}.foot a{color:var(--green)}
+</style>
+</head>
+<body><main class="wrap">
+<header class="top"><div><div class="eyebrow">Document AI · verified extraction</div><h1>invoice-to-structured</h1><p class="lead">Invoices, purchase orders, and bank statements become structured records only after deterministic math and reconciliation checks.</p><span class="badge">Public · synthetic demo</span></div><nav class="actions"><a class="btn" href="https://github.com/jigonyoo/invoice-to-structured" target="_blank" rel="noopener">GitHub Code ↗</a><a class="btn" href="../index.html">← Back to hub</a></nav></header>
+
+<section><div class="label">The problem</div><h2>Extraction is easy; trusting the extracted numbers is not.</h2><p>A model can copy a printed total into JSON even when the document arithmetic is wrong. Posting that output without a gate turns a parsing success into a payment or reconciliation error.</p></section>
+
+<section><div class="label">Input</div><h2>A fictional purchase order, exactly as bundled</h2><pre>{
+  "po_number": "PO-3002",
+  "vendor": "Fictional Office Supply Co.",
+  "line_items": [
+    {"sku":"DESK-02", "qty":2, "unit_price":480, "line_total":900}
+  ],
+  "subtotal": 1860, "tax": 148.8, "shipping": 75,
+  "grand_total": 2083.8
+}</pre></section>
+
+<section><div class="label">The money shot</div><h2>The trust layer catches what the extractor copied</h2><div class="grid">
+<article class="card issue"><strong>PO-3002 · line math</strong><p><code>900 != 2 × 480 = 960</code></p><p class="route">→ needs_review</p><small>The changed line also makes the printed subtotal disagree with the extracted line-item sum.</small></article>
+<article class="card issue"><strong>BANK-4002 · closing balance</strong><p><code>opening + credits − debits = 2975</code><br><code>printed closing = 2875</code></p><p class="route">→ needs_review</p><small>The running transaction balances remain visible, so a reviewer can locate the discrepancy.</small></article>
+</div><div class="card ok"><strong>Cross-document HITL routing</strong><table><thead><tr><th>Record</th><th>Decision</th><th>Why</th></tr></thead><tbody><tr><td>INV-DEMO</td><td style="color:var(--green)">auto_accept</td><td>All deterministic gates passed</td></tr><tr><td>PO-3002</td><td class="route">needs_review</td><td>line_math + subtotal_mismatch</td></tr><tr><td>Bank sample</td><td class="route">needs_review</td><td>duplicate/date/running-balance rules fired</td></tr></tbody></table><p>Bundled HITL batch: <strong>33.3% auto-accept</strong>, <strong>66.7% review</strong>, <strong>0% reject</strong> across three synthetic records.</p></div></section>
+
+<section><div class="label">How it's verified</div><h2>Rules—not an LLM—make the decision.</h2><p>Line totals, subtotals, grand totals, date ordering, running balances, duplicates, and required fields are checked in deterministic Python. Extraction confidence is calibrated with the validation signal; every flag carries a reason and timestamped audit entry.</p></section>
+
+<section><div class="label">Honest limitations</div><div class="card"><ul><li>Offline PO and bank-statement extraction accepts normalized JSON; arbitrary scans need the optional LLM/OCR front end and human QC.</li><li>Currency validation checks one uppercase ISO-style code and does not convert exchange rates.</li><li>Duplicate detection is exact: date + amount + description. Fuzzy duplicates need domain-specific rules.</li><li>Synthetic samples demonstrate the method, not production accuracy on a customer's document distribution.</li></ul></div></section>
+
+<footer class="foot">This is a synthetic sample demonstrating the method. <a href="https://github.com/jigonyoo/invoice-to-structured" target="_blank" rel="noopener">Inspect the code and committed outputs ↗</a></footer>
+</main></body></html>
