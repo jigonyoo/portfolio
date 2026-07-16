@@ -118,7 +118,7 @@
         <p class="c-desc">Raw lead / form submissions → normalized, classified, and scored (hot / warm / cold) → a staff summary and reply draft → routed by a verification gate: trustworthy leads auto-flow to the CRM, uncertain ones go to a human-review queue. Runs fully offline (deterministic) or with OpenAI.</p>
         <div class="c-moat">An LLM can label a lead; the value is knowing which to auto-route and which a human must see first — unreachable "hot" leads and ambiguous spam get caught, not dropped.</div>
         <div class="tags"><span class="tag">python</span><span class="tag">lead scoring</span><span class="tag">routing</span><span class="tag">qa gate</span></div>
-        <div class="links"><a class="btn" href="https://github.com/jigonyoo/ai-intake-qualifier" target="_blank" rel="noopener">Code ↗</a><a class="btn" href="https://www.loom.com/share/70296fb33bc9496fab540f085fdfd4ca" target="_blank" rel="noopener">Walkthrough ↗</a></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/ai-intake-qualifier" target="_blank" rel="noopener">Code ↗</a><a class="btn" href="https://www.loom.com/share/70296fb33bc9496fab540f085fdfd4ca" target="_blank" rel="noopener">Walkthrough ↗</a><a class="btn primary" href="showcase/ai-intake-qualifier.html">Demo ↗</a></div>
       </div>
     </div>
   </div>
@@ -146,14 +146,14 @@
         <p class="c-desc">Cross-document Q&amp;A that surfaces <em>every</em> source's claim and flags <em>contradictions</em> — old vs new policy, US vs EU handbook — routing conflicts to human review instead of hiding them.</p>
         <div class="c-moat">In policy &amp; compliance, a hidden contradiction between sources is the expensive failure. Consensus/conflict detection is the trust layer.</div>
         <div class="tags"><span class="tag">python</span><span class="tag">rag</span><span class="tag">compliance</span><span class="tag">conflict-detection</span></div>
-        <div class="links"><a class="btn" href="https://github.com/jigonyoo/rag-multidoc-crosscheck" target="_blank" rel="noopener">Code ↗</a></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/rag-multidoc-crosscheck" target="_blank" rel="noopener">Code ↗</a><a class="btn primary" href="showcase/rag-multidoc-crosscheck.html">Demo ↗</a></div>
       </div>
       <div class="card">
         <div class="c-top"><span class="c-name">rag-hybrid-rerank</span><span class="badge pub">Public</span></div>
         <p class="c-desc">Hybrid retrieval — BM25 + semantic, fused with Reciprocal Rank Fusion and reranked — with an evaluation harness that <em>measures</em> the lift (recall@k, MRR, nDCG) over any single retriever.</p>
         <div class="c-moat">Retrieval quality is where RAG lives or dies. Here it is a measured number across four configs, not a claim.</div>
         <div class="tags"><span class="tag">python</span><span class="tag">rag</span><span class="tag">hybrid-search</span><span class="tag">rerank</span></div>
-        <div class="links"><a class="btn" href="https://github.com/jigonyoo/rag-hybrid-rerank" target="_blank" rel="noopener">Code ↗</a></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/rag-hybrid-rerank" target="_blank" rel="noopener">Code ↗</a><a class="btn primary" href="showcase/rag-hybrid-rerank.html">Demo ↗</a></div>
       </div>
     </div>
   </div>
@@ -174,21 +174,21 @@
         <p class="c-desc">Customer-churn prediction with an <em>honest</em> evaluation: leakage-safe splits, a baseline to beat, 5-fold cross-validation, and a model card that states the limits. Logistic regression implemented in NumPy.</p>
         <div class="c-moat">Leakage guard + baseline + CV + model card = the difference between a demo notebook and something you can rely on.</div>
         <div class="tags"><span class="tag">python</span><span class="tag">numpy</span><span class="tag">ml</span><span class="tag">model card</span></div>
-        <div class="links"><a class="btn" href="https://github.com/jigonyoo/ml-churn-pipeline" target="_blank" rel="noopener">Code ↗</a></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/ml-churn-pipeline" target="_blank" rel="noopener">Code ↗</a><a class="btn primary" href="showcase/ml-churn-pipeline.html">Demo ↗</a></div>
       </div>
       <div class="card">
         <div class="c-top"><span class="c-name">data-mining-retail</span><span class="badge pub">Public</span></div>
         <p class="c-desc">Market-basket association rules (Apriori, lift-based) + RFM customer segmentation — surfacing real cross-sell signals and at-risk customers, with explainable segments.</p>
         <div class="c-moat">Lift-based real signal (not just co-occurrence) and segments a marketer can actually act on.</div>
         <div class="tags"><span class="tag">python</span><span class="tag">apriori</span><span class="tag">rfm</span><span class="tag">segmentation</span></div>
-        <div class="links"><a class="btn" href="https://github.com/jigonyoo/data-mining-retail" target="_blank" rel="noopener">Code ↗</a></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/data-mining-retail" target="_blank" rel="noopener">Code ↗</a><a class="btn primary" href="showcase/data-mining-retail.html">Demo ↗</a></div>
       </div>
       <div class="card">
         <div class="c-top"><span class="c-name">field-inspection-report</span><span class="badge pub">Public</span></div>
         <p class="c-desc">Site photo → object detection → checklist verification → a PASS / REVIEW / FAIL report with annotated images. A confidence gate routes uncertain calls to human review; the detector is swappable (offline or a production vision model).</p>
         <div class="c-moat">The detector is replaceable; the verification + human-review layer is the moat.</div>
         <div class="tags"><span class="tag">python</span><span class="tag">computer vision</span><span class="tag">numpy</span><span class="tag">qa gate</span></div>
-        <div class="links"><a class="btn" href="https://github.com/jigonyoo/field-inspection-report" target="_blank" rel="noopener">Code ↗</a></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/field-inspection-report" target="_blank" rel="noopener">Code ↗</a><a class="btn primary" href="showcase/field-inspection-report.html">Demo ↗</a></div>
       </div>
     </div>
   </div>
