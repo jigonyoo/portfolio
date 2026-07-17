@@ -187,7 +187,7 @@
   <!-- DOCUMENT AI -->
   <div class="sec" id="devtools">
     <div class="sec-h">
-      <div class="row"><h2>Developer &amp; AI tooling</h2><span class="cnt">2</span></div>
+      <div class="row"><h2>Developer &amp; AI tooling</h2><span class="cnt">3</span></div>
       <div class="desc">Making a codebase something an AI agent can actually work in — generated context, kept fresh, and verified.</div>
     </div>
     <div class="grid">
@@ -204,6 +204,13 @@
         <div class="c-moat">The moat isn't the metric — it's a CI gate that catches silent regressions, an LLM-as-judge that recovers correct-but-non-exact answers, and a judge that's itself checked against human labels. Offline, no keys.</div>
         <div class="tags"><span class="tag">python</span><span class="tag">eval</span><span class="tag">llm-as-judge</span><span class="tag">ci gate</span><span class="tag">regression</span></div>
         <div class="links"><a class="btn" href="https://github.com/jigonyoo/eval-harness" target="_blank" rel="noopener">Code ↗</a><a class="btn primary" href="showcase/eval-harness.html">Demo ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">mcp-server-prod</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">A hardened MCP server exposing read-only order tools to an AI agent — treating every tool argument as untrusted, because it's LLM-generated. Validated, parameterized, read-only. A naive concat server leaks the whole table on a classic OR-1=1 injection; this one blocks 5/5 with zero functionality lost.</p>
+        <div class="c-moat">The moat is the security posture most MCP demos skip: tool args are a network boundary, so validation + parameterized SQL + a read-only connection — proven by a contract suite that also shows the naive version really leaks.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">mcp</span><span class="tag">security</span><span class="tag">sql-injection</span><span class="tag">sqlite</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/mcp-server-prod" target="_blank" rel="noopener">Code ↗</a><a class="btn primary" href="showcase/mcp-server-prod.html">Demo ↗</a></div>
       </div>
     </div>
   </div>
