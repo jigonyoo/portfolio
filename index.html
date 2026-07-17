@@ -293,7 +293,7 @@
   <!-- DATA ENGINEERING -->
   <div class="sec" id="dataeng">
     <div class="sec-h">
-      <div class="row"><h2>Data engineering &amp; extraction</h2><span class="cnt">3</span></div>
+      <div class="row"><h2>Data engineering &amp; extraction</h2><span class="cnt">4</span></div>
       <div class="desc">Reproducible pipelines that clean, normalize, and load — idempotently, with per-row confidence where it matters.</div>
     </div>
     <div class="grid">
@@ -317,6 +317,13 @@
         <div class="c-moat">The data engine behind the PROPBOARD demo — source-verifiable, reproducible.</div>
         <div class="tags"><span class="tag">python</span><span class="tag">sports data</span><span class="tag">pipeline</span></div>
         <div class="links"><a class="btn" href="https://github.com/jigonyoo/wnba-player-vs-defense" target="_blank" rel="noopener">Code ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">data-contract-guard</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">A schema + range + enum contract with drift detection for tabular &amp; sensor (rosbag) batches. Catches the batch that still parses but whose meaning changed — a firmware unit switch (°C→°F), a new category, a sensor dropout — that a naive "did it parse?" gate ships.</p>
+        <div class="c-moat">Names the cause, not the symptom: 0 issues on the naive check vs 36 violations + drift (joint_temp mean 45→112, z=14.9) on the same batch. Runs as a CI gate; the clean batch passes untouched.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">data contract</span><span class="tag">drift</span><span class="tag">rosbag</span><span class="tag">data quality</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/data-contract-guard" target="_blank" rel="noopener">Code ↗</a><a class="btn primary" href="showcase/data-contract-guard.html">Demo ↗</a></div>
       </div>
     </div>
   </div>
