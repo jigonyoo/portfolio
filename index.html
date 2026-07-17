@@ -187,7 +187,7 @@
   <!-- DOCUMENT AI -->
   <div class="sec" id="devtools">
     <div class="sec-h">
-      <div class="row"><h2>Developer &amp; AI tooling</h2><span class="cnt">3</span></div>
+      <div class="row"><h2>Developer &amp; AI tooling</h2><span class="cnt">4</span></div>
       <div class="desc">Making a codebase something an AI agent can actually work in — generated context, kept fresh, and verified.</div>
     </div>
     <div class="grid">
@@ -211,6 +211,13 @@
         <div class="c-moat">The moat is the security posture most MCP demos skip: tool args are a network boundary, so validation + parameterized SQL + a read-only connection — proven by a contract suite that also shows the naive version really leaks.</div>
         <div class="tags"><span class="tag">python</span><span class="tag">mcp</span><span class="tag">security</span><span class="tag">sql-injection</span><span class="tag">sqlite</span></div>
         <div class="links"><a class="btn" href="https://github.com/jigonyoo/mcp-server-prod" target="_blank" rel="noopener">Code ↗</a><a class="btn primary" href="showcase/mcp-server-prod.html">Demo ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">llm-cost-optimizer</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">A FinOps pass over an LLM usage log: reads a month of calls + a pricing table and reports how much spend is recoverable, with the dollars behind every recommendation. Model right-sizing + prompt-cache savings, runnable as a spend gate.</p>
+        <div class="c-moat">Turns "we should use a cheaper model" into a number: 38.9% of a synthetic month recoverable, the biggest win priced ($16.28 from moving classify off gpt-4o). Every figure derives from pricing.json — auditable, reproducible.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">finops</span><span class="tag">llm cost</span><span class="tag">observability</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/llm-cost-optimizer" target="_blank" rel="noopener">Code ↗</a><a class="btn primary" href="showcase/llm-cost-optimizer.html">Demo ↗</a></div>
       </div>
     </div>
   </div>
