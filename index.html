@@ -187,7 +187,7 @@
   <!-- DOCUMENT AI -->
   <div class="sec" id="devtools">
     <div class="sec-h">
-      <div class="row"><h2>Developer &amp; AI tooling</h2><span class="cnt">1</span></div>
+      <div class="row"><h2>Developer &amp; AI tooling</h2><span class="cnt">2</span></div>
       <div class="desc">Making a codebase something an AI agent can actually work in — generated context, kept fresh, and verified.</div>
     </div>
     <div class="grid">
@@ -197,6 +197,13 @@
         <div class="c-moat">The moat isn't the generated file — it's drift detection + a deterministic readiness check that keeps the context honest, and says plainly what it does not measure.</div>
         <div class="tags"><span class="tag">python</span><span class="tag">ai-tooling</span><span class="tag">claude.md</span><span class="tag">verification</span></div>
         <div class="links"><a class="btn" href="https://github.com/jigonyoo/ai-ready-repo-setup" target="_blank" rel="noopener">Code ↗</a><a class="btn primary" href="showcase/ai-ready-repo-setup.html">Demo ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">eval-harness</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">Golden-set regression testing for LLM / extraction pipelines: scores a pipeline, judges the fields where exact match is unfair, and fails CI when quality regresses. A real amount-parsing bug drops row-correct 100% → 48% and the gate blocks it.</p>
+        <div class="c-moat">The moat isn't the metric — it's a CI gate that catches silent regressions, an LLM-as-judge that recovers correct-but-non-exact answers, and a judge that's itself checked against human labels. Offline, no keys.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">eval</span><span class="tag">llm-as-judge</span><span class="tag">ci gate</span><span class="tag">regression</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/eval-harness" target="_blank" rel="noopener">Code ↗</a><a class="btn primary" href="showcase/eval-harness.html">Demo ↗</a></div>
       </div>
     </div>
   </div>

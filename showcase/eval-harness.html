@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>eval-harness — Golden-Set Regression Testing, Gated in CI</title>
+<style>
+  :root{--bg:#0a0e0d;--panel:#10171a;--panel-2:#0d1315;--line:#1c2a2b;--txt:#e7f0ee;--muted:#869a97;--dim:#5f7370;--green:#22c55e;--green-dim:#15803d;--green-soft:rgba(34,197,94,.12);--amber:#f5b544;--red:#fb7185}
+  *{box-sizing:border-box}html,body{margin:0}
+  body{background:radial-gradient(1100px 600px at 85% -8%,rgba(34,197,94,.09),transparent 60%),var(--bg);color:var(--txt);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Arial,sans-serif}
+  .wrap{max-width:1000px;margin:auto;padding:34px 24px 64px}
+  a{color:inherit;text-decoration:none}
+  .top,.actions,.stats{display:flex;gap:10px;flex-wrap:wrap}.top{justify-content:space-between;align-items:flex-start}
+  .eyebrow{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase}
+  h1{font-size:clamp(28px,5vw,46px);line-height:1.1;margin:9px 0}
+  .lead{color:#cdd8d5;font-size:17px;max-width:760px}
+  .badge,.btn{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:8px;padding:7px 11px;font-size:12px;font-weight:750}
+  .badge{color:var(--green);background:var(--green-soft)}.btn:hover{border-color:var(--green)}
+  section{margin-top:34px}
+  .label{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;border-bottom:1px solid var(--line);padding-bottom:8px}
+  h2{font-size:22px;margin:13px 0 8px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:18px;margin-top:13px}
+  .step{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase}
+  pre{white-space:pre-wrap;overflow:auto;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:15px;color:#cdd8d5;font-size:13px}
+  .issue{border-left:3px solid var(--red)}.ok{border-left:3px solid var(--green)}
+  .stats .stat{flex:1;min-width:150px;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:14px 16px}
+  .stat b{display:block;font-size:26px;color:var(--green)}
+  .stat span{color:var(--muted);font-size:13px}
+  table{width:100%;border-collapse:collapse}th,td{text-align:left;border-bottom:1px solid var(--line);padding:9px 8px;font-size:14px}th{color:var(--muted);font-size:12px}
+  .pass{color:var(--green);font-weight:700}.fail{color:var(--red);font-weight:700}
+  .foot{margin-top:42px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}.foot a{color:var(--green)}
+  .note{color:var(--muted);font-size:13px;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <div class="eyebrow">Developer tooling · Eval &amp; regression</div>
+      <h1>eval-harness</h1>
+    </div>
+    <div class="actions">
+      <a class="btn" href="https://github.com/jigonyoo/eval-harness" target="_blank" rel="noopener">GitHub Code ↗</a>
+      <a class="btn" href="index.html">← Back to hub</a>
+    </div>
+  </div>
+  <p class="lead">A golden-set harness that <b>scores an LLM / extraction pipeline, judges the fields where exact match is unfair, and fails CI when quality regresses.</b> Offline, reproducible, no keys required — <code>docker compose up</code> and go.</p>
+  <span class="badge">Public · synthetic demo</span>
+
+  <section>
+    <div class="label">The problem</div>
+    <h2>You changed a prompt, a regex, a model version. Did quality go up or down?</h2>
+    <p class="lead">"It looks fine on a few examples" is how silent regressions ship. A pipeline that quietly drops from 100% to 48% passes every eyeball test. The fix is to turn <em>"looks fine"</em> into a number, and turn that number into a build gate.</p>
+  </section>
+
+  <section>
+    <div class="label">Input</div>
+    <h2>A 25-row golden set + a tiny extractor as the system under test</h2>
+    <pre>data/goldenset.jsonl   (25 labeled rows)
+{"raw": "2024-03-14 STARBUCKS #1234 SEATTLE WA $6.75",
+ "date": "2024-03-14", "vendor": "STARBUCKS",
+ "amount": "6.75", "category": "Meals"}
+
+System under test: an expense-line extractor (date · vendor · amount · category).
+Swap in your own pipeline by replacing one function — the harness only sees inputs and outputs.</pre>
+  </section>
+
+  <section>
+    <div class="label">The money shot</div>
+    <h2>Catch the regression → judge fairly → gate the build</h2>
+
+    <div class="card issue">
+      <div class="step">① The gate catches a real bug</div>
+      <p>A defect we actually hit: the amount parser grabbed the <b>first number</b> in the line — a store #, ZIP, or order id — instead of the dollar amount.</p>
+      <pre>g01: "2024-03-14 STARBUCKS #1234 ... $6.75"
+     got amount = 1234.00   (grabbed the store #)   want 6.75</pre>
+      <div class="stats" style="margin:10px 0">
+        <div class="stat"><b>48% → 100%</b><span>row-correct (before → after)</span></div>
+        <div class="stat"><b>48% → 100%</b><span>amount field accuracy</span></div>
+        <div class="stat"><b>13</b><span>rows the harness flagged</span></div>
+      </div>
+      <p class="note">A human eyeballing five rows misses this. The harness sees it — and the CI gate (≥ 90%) blocks the buggy build from shipping.</p>
+    </div>
+
+    <div class="card">
+      <div class="step">② Exact match is unfair — so a judge grades it</div>
+      <p>The pipeline emits colloquial labels (<code>Dining</code>, <code>Grocery</code>) while the golden set uses canon (<code>Meals</code>, <code>Groceries</code>). Exact string match punishes a <em>correct</em> answer:</p>
+      <table>
+        <tr><th>category scored by…</th><th>accuracy</th></tr>
+        <tr><td>exact string match</td><td class="fail">0.0%</td></tr>
+        <tr><td>LLM-as-judge (semantic)</td><td class="pass">100.0%</td></tr>
+      </table>
+      <p class="note">Default judge is a deterministic synonym table (zero deps, reproducible CI). Set <code>EVAL_JUDGE=llm</code> + an API key to use a real model for synonyms the table has never seen.</p>
+    </div>
+
+    <div class="card ok">
+      <div class="step">③ A gate that holds — and a judge that's checked too</div>
+      <div class="stats" style="margin:10px 0">
+        <div class="stat"><b>PASS ✅</b><span>fixed pipeline, gate ≥ 90%</span></div>
+        <div class="stat"><b>FAIL ❌</b><span>buggy pipeline (correctly blocked)</span></div>
+        <div class="stat"><b>90%</b><span>judge self-check agreement</span></div>
+        <div class="stat"><b>4/4</b><span>contract tests pass</span></div>
+      </div>
+      <table>
+        <tr><th>CI step</th><th>What it proves</th><th>Result</th></tr>
+        <tr><td>pytest</td><td>the gate contract holds</td><td class="pass">4/4</td></tr>
+        <tr><td>gate on golden set</td><td>row-correct ≥ 90%</td><td class="pass">100%</td></tr>
+        <tr><td>bug still caught</td><td>buggy run must fail the gate</td><td class="pass">✓</td></tr>
+      </table>
+      <p class="note">The judge self-check is honestly &lt; 100%: the offline judge misses <code>Java</code>=coffee. That miss is <em>why</em> the real LLM judge exists — shown, not hidden.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="label">How it's verified</div>
+    <h2>Deterministic, offline, tested.</h2>
+    <p class="lead">Scoring is plain code (regex + set logic), so results are reproducible and reviewable. <code>docker compose up</code> and CI run with <b>no API key and no network</b>. <code>pytest</code> encodes the gate as a contract — and if a buggy pipeline ever slips past the gate, CI itself fails, because a blind harness is worse than none.</p>
+  </section>
+
+  <section>
+    <div class="label">Honest limitations</div>
+    <pre>· The golden set is small (25 rows) — a demonstrator, not a benchmark. Real coverage means dozens–hundreds of labeled rows per failure mode.
+· The offline judge only knows seeded synonyms; novel phrasings need EVAL_JUDGE=llm (tokens, latency, non-determinism — mitigate with temperature=0 + caching).
+· LLM-as-judge has known biases (verbosity, self-preference). Judged scores are a signal, not ground truth; structured fields stay on exact match.
+· The shipped bug is a realistic defect deliberately included so the before/after is reproducible — not scraped from a client repo.</pre>
+  </section>
+
+  <div class="foot">This is a synthetic sample demonstrating the method. <a href="https://github.com/jigonyoo/eval-harness" target="_blank" rel="noopener">Inspect the code, golden set, and CI gate ↗</a></div>
+</div>
+</body>
+</html>
