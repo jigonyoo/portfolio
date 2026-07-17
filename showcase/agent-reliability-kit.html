@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>agent-reliability-kit — Retry, Timeout, Breaker, Idempotency With the Numbers</title>
+<style>
+  :root{--bg:#0a0e0d;--panel:#10171a;--panel-2:#0d1315;--line:#1c2a2b;--txt:#e7f0ee;--muted:#869a97;--dim:#5f7370;--green:#22c55e;--green-dim:#15803d;--green-soft:rgba(34,197,94,.12);--amber:#f5b544;--red:#fb7185}
+  *{box-sizing:border-box}html,body{margin:0}
+  body{background:radial-gradient(1100px 600px at 85% -8%,rgba(34,197,94,.09),transparent 60%),var(--bg);color:var(--txt);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Arial,sans-serif}
+  .wrap{max-width:1000px;margin:auto;padding:34px 24px 64px}
+  a{color:inherit;text-decoration:none}
+  .top,.actions,.stats{display:flex;gap:10px;flex-wrap:wrap}.top{justify-content:space-between;align-items:flex-start}
+  .eyebrow{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase}
+  h1{font-size:clamp(28px,5vw,46px);line-height:1.1;margin:9px 0}
+  .lead{color:#cdd8d5;font-size:17px;max-width:760px}
+  .badge,.btn{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:8px;padding:7px 11px;font-size:12px;font-weight:750}
+  .badge{color:var(--green);background:var(--green-soft)}.btn:hover{border-color:var(--green)}
+  section{margin-top:34px}
+  .label{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;border-bottom:1px solid var(--line);padding-bottom:8px}
+  h2{font-size:22px;margin:13px 0 8px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:18px;margin-top:13px}
+  .step{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase}
+  pre{white-space:pre-wrap;overflow:auto;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:15px;color:#cdd8d5;font-size:13px}
+  .issue{border-left:3px solid var(--red)}.ok{border-left:3px solid var(--green)}
+  .stats .stat{flex:1;min-width:150px;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:14px 16px}
+  .stat b{display:block;font-size:26px;color:var(--green)}
+  .stat span{color:var(--muted);font-size:13px}
+  table{width:100%;border-collapse:collapse}th,td{text-align:left;border-bottom:1px solid var(--line);padding:9px 8px;font-size:14px}th{color:var(--muted);font-size:12px}
+  .pass{color:var(--green);font-weight:700}.fail{color:var(--red);font-weight:700}
+  .foot{margin-top:42px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}.foot a{color:var(--green)}
+  .note{color:var(--muted);font-size:13px;margin-top:8px}
+  .red{color:var(--red)}.grn{color:var(--green)}.amb{color:var(--amber)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <div class="eyebrow">Developer tooling · AgentOps</div>
+      <h1>agent-reliability-kit</h1>
+    </div>
+    <div class="actions">
+      <a class="btn" href="https://github.com/jigonyoo/agent-reliability-kit" target="_blank" rel="noopener">GitHub Code ↗</a>
+      <a class="btn" href="index.html">← Back to hub</a>
+    </div>
+  </div>
+  <p class="lead">The reliability layer an agent's tool calls need — <b>retry, timeout, circuit breaker, idempotency</b> — with the numbers showing what each one buys. Runs the same workload through <em>naive</em>, <em>retry-only</em>, and <em>reliable</em> so the tradeoffs are visible, not asserted. Offline, deterministic, zero dependencies.</p>
+  <span class="badge">Public · synthetic demo</span>
+
+  <section>
+    <div class="label">The problem</div>
+    <h2>An agent that calls tools will hit flaky dependencies. Every naive reaction has a failure mode.</h2>
+    <p class="lead">Do nothing → one transient blip fails the task. Just add retries → recovers blips, but a call whose <em>side effect landed but response was lost</em> runs <b>twice</b> (double charge), and during an outage every task <b>hammers</b> the service that's already down. The fix is retry <em>plus</em> idempotency, timeout, and a breaker — and this measures each.</p>
+  </section>
+
+  <section>
+    <div class="label">The money shot</div>
+    <h2>Same workload, three configurations · 80 tasks (40 payments incl. 6 flaps + 5 ghosts, 40 search incl. 16 down)</h2>
+
+    <div class="card ok">
+      <div class="step">Before / after</div>
+      <pre>  config       success        calls  search-calls  dup-charges
+  --------------------------------------------------------------
+  naive        53/80     66%     80       40         0
+  retry-only   64/80     80%    139       88      <span class="red">   5</span>
+  reliable     63/80     79%     81    <span class="grn">   30</span>      <span class="grn">   0</span></pre>
+      <div class="stats" style="margin:10px 0 0">
+        <div class="stat"><b>5 → 0</b><span>duplicate charges (idempotency)</span></div>
+        <div class="stat"><b>88 → 30</b><span>calls to the down service (breaker)</span></div>
+        <div class="stat"><b>+10</b><span>tasks recovered vs naive</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="step">Reading the row that matters — retry-only vs reliable</div>
+      <p class="note"><b class="grn">Retry recovers transient faults</b> — naive 53 → 64/63. Worth it. &nbsp;·&nbsp; <b class="red">But retry without idempotency double-charges</b>: 5 duplicate side effects (real money) when a "ghost" call — charge lands, response lost — gets retried. Reliable adds an idempotency key → <b class="grn">0</b>. &nbsp;·&nbsp; <b class="grn">The breaker stops hammering a down service</b>: 88 → 30 calls, <b>66% less load</b>. &nbsp;·&nbsp; <b class="amb">Honest cost</b>: reliable 63 vs 64 — the breaker rejects ~1 request right after recovery (half-open probe), a deliberate availability-vs-load tradeoff.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="label">The three bugs it stops</div>
+    <div class="card issue">
+      <pre><span class="red">Bug #1</span> — retry WITHOUT idempotency double-charges the customer
+  retry-only (no idempotency): server charged the card 2x  <-- DOUBLE CHARGE
+  reliable  (idempotency key): server charged the card 1x  <-- correct
+
+<span class="red">Bug #2</span> — a slow dependency hangs the agent (no timeout)
+  1.0s budget on a 5.0s call: aborted at 1.0s instead of hanging.
+
+<span class="red">Bug #3</span> — no breaker: every task hammers a service that's already down
+  12 tasks against a down service: upstream calls sent 3, short-circuited 9.</pre>
+    </div>
+  </section>
+
+  <section>
+    <div class="label">The primitives</div>
+    <h2>Small, composable, each testable in isolation.</h2>
+    <pre>RetryPolicy    exponential backoff + deterministic equal-jitter (no PYTHONHASHSEED dependence)
+CircuitBreaker CLOSED → OPEN → HALF_OPEN — fail-fast while open, one probe on recovery
+invoke(timeout=)  client-side timeout: a call slower than the budget is aborted, spends only the budget
+idempotency key   a retried side effect is de-duplicated server-side to exactly one execution</pre>
+    <p class="note">Time is a <b>logical clock</b> — no sleep, no threads — so every run is byte-identical and CI can pin the numbers.</p>
+  </section>
+
+  <section>
+    <div class="label">Verified, not asserted</div>
+    <div class="stats" style="margin:2px 0 0">
+      <div class="stat"><b>12/12</b><span>pytest — retry·idempotency·timeout·breaker·determinism</span></div>
+      <div class="stat"><b>0 / 5</b><span>dup-charges: reliable / retry-only</span></div>
+      <div class="stat"><b>--gate</b><span>CI fails if reliability regresses</span></div>
+    </div>
+    <p class="note">Tests pin that retry recovers a transient fault, idempotency turns a retried ghost into one side effect, the timeout spends only its budget, and the breaker opens, short-circuits, and recovers half-open. CI regenerates the workload from a seed and fails if it isn't byte-identical.</p>
+  </section>
+
+  <section>
+    <div class="label">Honest limitations</div>
+    <pre>· The dependency and its faults are simulated on a logical clock — a demonstrator of the behaviors,
+  not a benchmark of your infra. Point the primitives at real calls for real numbers.
+· Single-threaded sim, so jitter's thundering-herd benefit is modeled but not measured here. The
+  double-charge, timeout, and breaker effects are real and reproduced.
+· Idempotency assumes the server honors the key. If your downstream can't dedup, the key must live
+  in your own write path — the kit shows where it goes, it isn't a substitute for it.
+· Real timeouts race a wall clock and can leave a call half-done — that's the 'ghost' case, which
+  is exactly why idempotency pairs with timeout.</pre>
+  </section>
+
+  <div class="foot">This is a synthetic sample demonstrating the method. <a href="https://github.com/jigonyoo/agent-reliability-kit" target="_blank" rel="noopener">Inspect the primitives, the sim, and the tests ↗</a></div>
+</div>
+</body>
+</html>

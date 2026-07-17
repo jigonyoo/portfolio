@@ -187,7 +187,7 @@
   <!-- DOCUMENT AI -->
   <div class="sec" id="devtools">
     <div class="sec-h">
-      <div class="row"><h2>Developer &amp; AI tooling</h2><span class="cnt">5</span></div>
+      <div class="row"><h2>Developer &amp; AI tooling</h2><span class="cnt">6</span></div>
       <div class="desc">Making a codebase something an AI agent can actually work in — generated context, kept fresh, and verified.</div>
     </div>
     <div class="grid">
@@ -225,6 +225,13 @@
         <div class="c-moat">The moat is the honesty of the numbers: weighted multi-signal detection that knows use from mention (0 false positives), a Luhn-checked redactor that never mangles clean text, and a CI gate that fails if protection regresses. Offline, no keys.</div>
         <div class="tags"><span class="tag">python</span><span class="tag">llm security</span><span class="tag">prompt-injection</span><span class="tag">owasp-llm</span><span class="tag">pii-redaction</span></div>
         <div class="links"><a class="btn" href="https://github.com/jigonyoo/llm-guardrails" target="_blank" rel="noopener">Code ↗</a><a class="btn primary" href="showcase/llm-guardrails.html">Demo ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">agent-reliability-kit</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">The reliability layer an agent’s tool calls need — retry, timeout, circuit breaker, idempotency — with the numbers showing what each buys. Same workload through naive / retry-only / reliable: naive 53/80 → reliable 63/80, double-charges 5 → 0, load on a down service 88 → 30 calls.</p>
+        <div class="c-moat">The moat is the honest tradeoff table: it shows retry-only’s double-charge footgun (5 duplicate side effects) and the breaker’s ~1-request post-recovery cost, not just the wins. Logical clock = byte-identical runs. Offline, no keys.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">agentops</span><span class="tag">reliability</span><span class="tag">circuit-breaker</span><span class="tag">idempotency</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/agent-reliability-kit" target="_blank" rel="noopener">Code ↗</a><a class="btn primary" href="showcase/agent-reliability-kit.html">Demo ↗</a></div>
       </div>
     </div>
   </div>
