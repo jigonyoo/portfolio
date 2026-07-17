@@ -187,7 +187,7 @@
   <!-- DOCUMENT AI -->
   <div class="sec" id="devtools">
     <div class="sec-h">
-      <div class="row"><h2>Developer &amp; AI tooling</h2><span class="cnt">5</span></div>
+      <div class="row"><h2>Developer &amp; AI tooling</h2><span class="cnt">4</span></div>
       <div class="desc">Making a codebase something an AI agent can actually work in — generated context, kept fresh, and verified.</div>
     </div>
     <div class="grid">
@@ -218,13 +218,6 @@
         <div class="c-moat">Turns "we should use a cheaper model" into a number: 38.9% of a synthetic month recoverable, the biggest win priced ($16.28 from moving classify off gpt-4o). Every figure derives from pricing.json — auditable, reproducible.</div>
         <div class="tags"><span class="tag">python</span><span class="tag">finops</span><span class="tag">llm cost</span><span class="tag">observability</span></div>
         <div class="links"><a class="btn" href="https://github.com/jigonyoo/llm-cost-optimizer" target="_blank" rel="noopener">Code ↗</a><a class="btn primary" href="showcase/llm-cost-optimizer.html">Demo ↗</a></div>
-      </div>
-      <div class="card">
-        <div class="c-top"><span class="c-name">llm-guardrails</span><span class="badge pub">Public</span></div>
-        <p class="c-desc">A drop-in input/output guardrail layer for LLM apps: blocks prompt injection and jailbreaks before they reach the model, and redacts leaked secrets/PII before they reach the user. Naive lets 33/33 attacks+leaks through; guarded stops all 33 — with zero false positives on 17 benign lookalikes.</p>
-        <div class="c-moat">The moat is the honesty of the numbers: weighted multi-signal detection that knows use from mention (0 false positives), a Luhn-checked redactor that never mangles clean text, and a CI gate that fails if protection regresses. Offline, no keys.</div>
-        <div class="tags"><span class="tag">python</span><span class="tag">llm security</span><span class="tag">prompt-injection</span><span class="tag">owasp-llm</span><span class="tag">pii-redaction</span></div>
-        <div class="links"><a class="btn" href="https://github.com/jigonyoo/llm-guardrails" target="_blank" rel="noopener">Code ↗</a><a class="btn primary" href="showcase/llm-guardrails.html">Demo ↗</a></div>
       </div>
     </div>
   </div>
