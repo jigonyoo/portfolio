@@ -321,7 +321,7 @@
   <!-- DATA ENGINEERING -->
   <div class="sec" id="dataeng">
     <div class="sec-h">
-      <div class="row"><h2>Data engineering &amp; extraction</h2><span class="cnt">5</span></div>
+      <div class="row"><h2>Data engineering &amp; extraction</h2><span class="cnt">4</span></div>
       <div class="desc">Reproducible pipelines that clean, normalize, and load — idempotently, with per-row confidence where it matters.</div>
     </div>
     <div class="grid">
@@ -352,13 +352,6 @@
         <div class="c-moat">Names the cause, not the symptom: 0 issues on the naive check vs 36 violations + drift (joint_temp mean 45→112, z=14.9) on the same batch. Runs as a CI gate; the clean batch passes untouched.</div>
         <div class="tags"><span class="tag">python</span><span class="tag">data contract</span><span class="tag">drift</span><span class="tag">rosbag</span><span class="tag">data quality</span></div>
         <div class="links"><a class="btn" href="https://github.com/jigonyoo/data-contract-guard" target="_blank" rel="noopener">Code ↗</a><a class="btn primary" href="showcase/data-contract-guard.html">Demo ↗</a></div>
-      </div>
-      <div class="card">
-        <div class="c-top"><span class="c-name">ros2-bag-data-audit</span><span class="badge pub">Public</span></div>
-        <p class="c-desc">A (synthetic) ROS2 rosbag export of robot telemetry → a structured anomaly audit: per-topic publish-rate deviations, dropout gaps, header-vs-receive clock skew, out-of-range sensor values, TF frame gaps, and a cmd_vel-vs-odom stall signal — organized by how sure the evidence is.</p>
-        <div class="c-moat">Honest by construction: findings split into Confirmed evidence / Likely causes / Unverified hypotheses / Additional data required — it narrows candidate causes and says what data would confirm them, never asserting a root cause from a single bag.</div>
-        <div class="tags"><span class="tag">python</span><span class="tag">ros2</span><span class="tag">rosbag</span><span class="tag">robotops</span><span class="tag">anomaly detection</span></div>
-        <div class="links"><a class="btn" href="https://github.com/jigonyoo/ros2-bag-data-audit" target="_blank" rel="noopener">Code ↗</a></div>
       </div>
     </div>
   </div>
