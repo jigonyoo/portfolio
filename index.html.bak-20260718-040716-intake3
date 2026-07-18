@@ -170,7 +170,7 @@
   <!-- WORKFLOW -->
   <div class="sec" id="workflow">
     <div class="sec-h">
-      <div class="row"><h2>Workflow &amp; intake automation</h2><span class="cnt">2</span></div>
+      <div class="row"><h2>Workflow &amp; intake automation</h2><span class="cnt">1</span></div>
       <div class="desc">Turning raw inbound into routed, reviewed, CRM-ready records — with the uncertain cases caught, not dropped.</div>
     </div>
     <div class="grid">
@@ -180,13 +180,6 @@
         <div class="c-moat">An LLM can label a lead; the value is knowing which to auto-route and which a human must see first — unreachable "hot" leads and ambiguous spam get caught, not dropped.</div>
         <div class="tags"><span class="tag">python</span><span class="tag">lead scoring</span><span class="tag">routing</span><span class="tag">qa gate</span></div>
         <div class="links"><a class="btn" href="https://github.com/jigonyoo/ai-intake-qualifier" target="_blank" rel="noopener">Code ↗</a><a class="btn" href="https://www.loom.com/share/70296fb33bc9496fab540f085fdfd4ca" target="_blank" rel="noopener">Walkthrough ↗</a><a class="btn primary" href="showcase/ai-intake-qualifier.html">Demo ↗</a></div>
-      </div>
-      <div class="card">
-        <div class="c-top"><span class="c-name">intake-router-multisource</span><span class="badge pub">Public</span></div>
-        <p class="c-desc">Leads arrive from four differently-shaped sources (web form, Facebook Lead Ads, inbound email, CSV) → normalized to one schema → cross-source identity resolution merges the same person across channels → deterministic routing / SLA → a review gate for anything uncertain. Runs fully offline (deterministic) or with OpenAI.</p>
-        <div class="c-moat">Merging is a risk, not a convenience: only an exact email / phone match auto-merges — same name + same company but different contacts is flagged for a human, never silently combined. Full provenance and audit trail on every merge.</div>
-        <div class="tags"><span class="tag">python</span><span class="tag">identity resolution</span><span class="tag">dedup</span><span class="tag">routing</span><span class="tag">qa gate</span></div>
-        <div class="links"><a class="btn" href="https://github.com/jigonyoo/intake-router-multisource" target="_blank" rel="noopener">Code ↗</a></div>
       </div>
     </div>
   </div>
