@@ -444,6 +444,34 @@
         <div class="tags"><span class="tag">python</span><span class="tag">agentops</span><span class="tag">observability</span><span class="tag">reliability</span></div>
         <div class="links"><a class="btn" href="https://github.com/jigonyoo/agentops-trace-cost-guard" target="_blank" rel="noopener">Code ↗</a></div>
       </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">lerobot-dataset-migrate</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">A LeRobot v2.1 dataset → a validated migration to the v3 layout: documented field/layout mapping, then integrity checks (frame counts, features, index continuity, stats) so nothing is silently dropped.</p>
+        <div class="c-moat">Migration + validation, not a black box — it models the publicly documented format and reports what it preserved vs what still needs checking against real datasets.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">robotics</span><span class="tag">lerobot</span><span class="tag">data migration</span><span class="tag">robotops</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/lerobot-dataset-migrate" target="_blank" rel="noopener">Code ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">policy-eval-harness</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">Robot policy rollout logs → success rate with Wilson confidence intervals, per-task breakdowns, and A/B comparison (difference CI + two-proportion test), with small-sample flags.</p>
+        <div class="c-moat">Same training loss &ne; same real success rate: it compares measured success with uncertainty, and never reports a rate without its n and CI.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">robotics</span><span class="tag">evaluation</span><span class="tag">statistics</span><span class="tag">robotops</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/policy-eval-harness" target="_blank" rel="noopener">Code ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">dataset-curation-dedup</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">A robot/ML dataset manifest → near-duplicate detection (Hamming/cosine on provided hashes), quality gates, a coverage/imbalance report, and a curated manifest with a justified rejection log.</p>
+        <div class="c-moat">Every drop has a reason and borderline duplicates go to human review, never silent auto-deletion; it operates on manifests + hashes, not raw pixels.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">robotics</span><span class="tag">dataset</span><span class="tag">dedup</span><span class="tag">robotops</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/dataset-curation-dedup" target="_blank" rel="noopener">Code ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">domain-rand-sweep</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">A parameter-space spec → a domain-randomization sweep (grid / random / Latin-hypercube) plus coverage and pairwise-gap analysis, ready to feed a simulator.</p>
+        <div class="c-moat">Designs and analyzes the sweep only — it runs no simulator and makes no sim-to-real transfer claim: broad coverage is not evidence of real-world robustness.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">robotics</span><span class="tag">domain randomization</span><span class="tag">sim</span><span class="tag">robotops</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/domain-rand-sweep" target="_blank" rel="noopener">Code ↗</a></div>
+      </div>
     </div>
   </div>
 
