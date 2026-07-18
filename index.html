@@ -472,6 +472,27 @@
         <div class="tags"><span class="tag">python</span><span class="tag">robotics</span><span class="tag">domain randomization</span><span class="tag">sim</span><span class="tag">robotops</span></div>
         <div class="links"><a class="btn" href="https://github.com/jigonyoo/domain-rand-sweep" target="_blank" rel="noopener">Code ↗</a></div>
       </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">crossembodiment-align</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">Multiple robot demonstration datasets (different embodiments, action spaces, control rates, gripper conventions) → a mixability assessment: normalize, flag frequency/gripper conflicts and missing embodiment metadata, and a per-pair mix / mix-subset / do-not-mix report.</p>
+        <div class="c-moat">The metadata needed to mix robot datasets is often missing — even NVIDIA&#39;s BridgeData v3 has an empty robot_type. This finds it from manifests, trains nothing, and every verdict cites its measured reasons.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">robotics</span><span class="tag">cross-embodiment</span><span class="tag">dataset</span><span class="tag">robotops</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/crossembodiment-align" target="_blank" rel="noopener">Code ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">agent-trace-triage</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">Agent execution traces → a rule-based failure taxonomy (tool-selection error, loop, timeout, malformed args, wrong answer…), a failure distribution, and a labeled eval-ready dataset with a human-review queue for ambiguous cases.</p>
+        <div class="c-moat">The missing link between observability (89% adoption) and evaluation (52%): it turns raw traces into eval data deterministically, and sends ambiguous cases to a human rather than guessing.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">agentops</span><span class="tag">evaluation</span><span class="tag">observability</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/agent-trace-triage" target="_blank" rel="noopener">Code ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">robotdata-pipeline</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">Raw operator/rosbag logs → a training-ready ML dataset (RLDS/LeRobot-style) with episode-level splits, a data contract that fails the build on bad data, and an RLDS-vs-LeRobot format recommendation.</p>
+        <div class="c-moat">The &quot;make it&quot; that follows an audit&#39;s &quot;it&#39;s broken&quot;: a contract violation blocks a bad dataset from being produced instead of silently shipping one.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">robotics</span><span class="tag">etl</span><span class="tag">data contract</span><span class="tag">robotops</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/robotdata-pipeline" target="_blank" rel="noopener">Code ↗</a></div>
+      </div>
     </div>
   </div>
 
