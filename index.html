@@ -367,6 +367,83 @@
         <div class="tags"><span class="tag">python</span><span class="tag">ros2</span><span class="tag">docker</span><span class="tag">ci/cd</span><span class="tag">robotops</span></div>
         <div class="links"><a class="btn" href="https://github.com/jigonyoo/ros2-ci-bridge" target="_blank" rel="noopener">Code ↗</a></div>
       </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">analytics-scheduled-report</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">A raw event/transaction log → scheduled daily/weekly reports with period-over-period deltas, threshold + statistical-outlier alerts, and idempotent re-runs.</p>
+        <div class="c-moat">Every alert carries its triggering rule and measured value — flags for a human to confirm, not a black-box &quot;something&#39;s wrong&quot;.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">analytics</span><span class="tag">scheduling</span><span class="tag">alerting</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/analytics-scheduled-report" target="_blank" rel="noopener">Code ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">demand-forecast-pipeline</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">A demand time series → forecasts with prediction intervals from a rolling-origin backtest, honest error metrics, and an explicit &quot;when NOT to trust this&quot; section.</p>
+        <div class="c-moat">Uncertainty is the product: intervals come from observed backtest residuals and widen with horizon — no accuracy overclaim, stdlib-only math.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">forecasting</span><span class="tag">time series</span><span class="tag">ml</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/demand-forecast-pipeline" target="_blank" rel="noopener">Code ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">retail-sequence-mining</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">A transaction log → sequential purchase patterns, cohort retention, and churn associations, with Wilson intervals so small groups aren&#39;t over-read.</p>
+        <div class="c-moat">Associations are labeled correlational, carry counts + confidence intervals, and recommend an experiment before anyone acts on them.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">data mining</span><span class="tag">retail</span><span class="tag">churn</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/retail-sequence-mining" target="_blank" rel="noopener">Code ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">ros2-urdf-smoke-test</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">A robot URDF → static structural audit (link/joint tree integrity, missing meshes, inertial sanity, joint limits) → a four-section smoke-test report.</p>
+        <div class="c-moat">Honest by construction: Confirmed / Likely / Unverified / Additional data — a pass means &quot;likely loads&quot;, never &quot;works&quot; or &quot;safe&quot;.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">ros2</span><span class="tag">urdf</span><span class="tag">robotics</span><span class="tag">robotops</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/ros2-urdf-smoke-test" target="_blank" rel="noopener">Code ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">analytics-significance</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">Experiment/metric data → honest significance testing: two-proportion z-test and Welch&#39;s t-test (stdlib), confidence intervals, multiple-comparison correction (Bonferroni + Benjamini-Hochberg), and minimum detectable effect.</p>
+        <div class="c-moat">&quot;Not significant&quot; is reported with the effect it *could* have detected, not as &quot;no effect&quot;; family-wide correction flips naive false positives.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">statistics</span><span class="tag">ab testing</span><span class="tag">analytics</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/analytics-significance" target="_blank" rel="noopener">Code ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">site-progress-report</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">Tagged site-photo metadata (EXIF) + an inspection checklist → a construction progress report: percent complete per area/phase, a timeline, and missing / out-of-sequence / stale-area detection.</p>
+        <div class="c-moat">Metadata + checklist only — never claims to see image content; answers &quot;is every required shot present, in order, and recent&quot;, not &quot;is the work good&quot;.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">automation</span><span class="tag">construction</span><span class="tag">reporting</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/site-progress-report" target="_blank" rel="noopener">Code ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">plan-vs-actual-recon</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">A plan/spec with tolerances vs a measured inspection log → a reconciliation report: matched items, missing, extra, and out-of-tolerance deviations, each with the numbers.</p>
+        <div class="c-moat">Structured reconciliation, not CAD/vision; ambiguous matches are surfaced for a human instead of being silently auto-resolved.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">qa</span><span class="tag">reconciliation</span><span class="tag">tolerance</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/plan-vs-actual-recon" target="_blank" rel="noopener">Code ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">mlb-matchup-infosheet</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">MLB game logs → a reproducible batter-vs-pitcher info sheet: season/L5/L10, home-away and vs-hand splits, and head-to-head history, every number traceable to its sample size.</p>
+        <div class="c-moat">Information, not betting advice — no edge/EV claims and small samples flagged. Same reproducible pipeline as the WNBA sheet, second sport.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">sports data</span><span class="tag">pipeline</span><span class="tag">mlb</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/mlb-matchup-infosheet" target="_blank" rel="noopener">Code ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">agentops-tool-orchestrator</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">A single-agent loop — planner → guardrail validation → executor → eval harness. Tool registry with arg schemas, allow/deny + approval gates for side-effecting tools, step caps, and loop detection.</p>
+        <div class="c-moat">The safety + evaluation scaffolding around an LLM agent, not a model: side-effecting tools never run without an approval gate, and every block logs its rule.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">agentops</span><span class="tag">guardrails</span><span class="tag">evaluation</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/agentops-tool-orchestrator" target="_blank" rel="noopener">Code ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">agentops-multiagent-supervisor</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">A supervisor decomposes a task and routes subtasks to specialized worker agents over a message bus + shared blackboard, with coordination guardrails.</p>
+        <div class="c-moat">Multi-agent coordination plumbing with cycle/deadlock detection, delegation-depth caps, and per-agent budgets — deterministic and observable, not emergent magic.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">agentops</span><span class="tag">multi-agent</span><span class="tag">orchestration</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/agentops-multiagent-supervisor" target="_blank" rel="noopener">Code ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">agentops-trace-cost-guard</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">Wraps an agent run to produce a structured trace (steps, tokens, latency), cost accounting from a pricing table, hard token/$ budget guards, and failure policies (retry, circuit-breaker, fallback).</p>
+        <div class="c-moat">Makes agent runs observable, budgeted, and fail-safe; costs from a static illustrative table and a logical clock keep it deterministic and honest.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">agentops</span><span class="tag">observability</span><span class="tag">reliability</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/agentops-trace-cost-guard" target="_blank" rel="noopener">Code ↗</a></div>
+      </div>
     </div>
   </div>
 
