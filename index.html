@@ -409,7 +409,7 @@
   <!-- DATA ENGINEERING -->
   <div class="sec" id="dataeng">
     <div class="sec-h">
-      <div class="row"><h2>Data engineering &amp; extraction</h2><span class="cnt">16</span></div>
+      <div class="row"><h2>Data engineering &amp; extraction</h2><span class="cnt">17</span></div>
       <div class="desc">Reproducible pipelines that clean, normalize, and load — idempotently, with per-row confidence where it matters.</div>
     </div>
     <div class="grid">
@@ -433,6 +433,13 @@
         <div class="c-moat">The expensive scraping failure is not a crash &mdash; it is a job that keeps succeeding while the prices come back empty. The report states how many planted breakages were caught, how many were missed, and how many were false alarms.</div>
         <div class="tags"><span class="tag">python</span><span class="tag">web scraping</span><span class="tag">drift</span><span class="tag">monitoring</span><span class="tag">data quality</span></div>
         <div class="links"><a class="btn" href="https://github.com/jigonyoo/scraper-canary" target="_blank" rel="noopener">Code &#8599;</a><a class="btn primary" href="showcase/scraper-canary.html">Demo &#8599;</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">pipeline-heartbeat</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">An offline run-ledger monitor for scheduled pipelines &mdash; liveness, missed schedules, empty success, median+MAD volume and runtime bands, schema and watermark drift, partial sources, duplicate batches, persistent finding state, and a period digest.</p>
+        <div class="c-moat">A pipeline can exit 0 while emitting 0 rows, or stop running without throwing anything. The committed fixture catches 8 of 8 planted fault patterns while the healthy control produces 0 findings.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">data pipeline</span><span class="tag">monitoring</span><span class="tag">median+MAD</span><span class="tag">data quality</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/pipeline-heartbeat" target="_blank" rel="noopener">Code &#8599;</a><a class="btn primary" href="showcase/pipeline-heartbeat.html">Demo &#8599;</a></div>
       </div>
       <div class="card">
         <div class="c-top"><span class="c-name">wnba-player-vs-defense</span><span class="badge pub">Public</span></div>
