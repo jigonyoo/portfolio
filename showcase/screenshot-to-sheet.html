@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Screenshot to Sheet &mdash; Verified OCR into a Spreadsheet</title>
+<meta name="description" content="Screenshots become spreadsheet rows only after confidence gates, type checks, and a totals reconciliation. Reports how many OCR errors were caught and how many got through.">
+<style>
+:root{--bg:#0a0e0d;--panel:#10171a;--panel-2:#0d1315;--line:#1c2a2b;--txt:#e7f0ee;--muted:#869a97;--dim:#5f7370;--green:#22c55e;--green-dim:#15803d;--green-soft:rgba(34,197,94,.12);--amber:#f5b544;--red:#fb7185}*{box-sizing:border-box}html,body{margin:0}body{background:radial-gradient(1100px 600px at 85% -8%,rgba(34,197,94,.09),transparent 60%),var(--bg);color:var(--txt);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Arial,sans-serif}.wrap{max-width:980px;margin:auto;padding:34px 24px 64px}a{color:inherit;text-decoration:none}.top,.actions,.stats{display:flex;gap:10px;flex-wrap:wrap}.top{justify-content:space-between;align-items:flex-start}.eyebrow{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase}h1{font-size:clamp(28px,5vw,46px);line-height:1.1;margin:9px 0}.lead{color:#cdd8d5;font-size:17px;max-width:720px}.badge,.btn{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:8px;padding:7px 11px;font-size:12px;font-weight:750}.badge{color:var(--green);background:var(--green-soft)}.btn:hover{border-color:var(--green)}section{margin-top:34px}.label{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;border-bottom:1px solid var(--line);padding-bottom:8px}h2{font-size:22px;margin:13px 0 8px}.card{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:18px;margin-top:13px}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}@media(max-width:720px){.grid{grid-template-columns:1fr}}pre{white-space:pre-wrap;overflow:auto;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:15px;color:#cdd8d5}.issue{border-left:3px solid var(--red)}.ok{border-left:3px solid var(--green)}.amber{color:var(--amber)}.route{font-weight:800;color:var(--red)}table{width:100%;border-collapse:collapse}th,td{text-align:left;border-bottom:1px solid var(--line);padding:10px 8px}th{color:var(--muted);font-size:12px}.foot{margin-top:42px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}.foot a{color:var(--green)}
+</style>
+</head>
+<body><main class="wrap">
+<header class="top"><div><div class="eyebrow">Document AI &middot; screenshots to spreadsheet</div><h1>screenshot-to-sheet</h1><p class="lead">Screenshots become spreadsheet rows only after per-field confidence gates, type checks, and a totals reconciliation.</p><span class="badge">Public &middot; synthetic demo &middot; stdlib only</span></div><nav class="actions"><a class="btn" href="https://github.com/jigonyoo/screenshot-to-sheet" target="_blank" rel="noopener">GitHub Code &#8599;</a><a class="btn" href="../index.html">&larr; Back to hub</a></nav></header>
+
+<section><div class="label">The problem</div><h2>A missing row is visible. A wrong row is not.</h2><p>OCR misreads things. That is the premise, not the failure. When a row goes missing, someone notices; when a digit is misread, the number lands in the sheet, gets summed, and nobody looks at it again. So the question worth asking of an OCR pipeline is not how accurate the engine is &mdash; it is how many of the engine's mistakes were stopped before they reached the clean data, and how many got through anyway.</p></section>
+
+<section><div class="label">Input</div><h2>Twelve fictional order-confirmation screenshots</h2><p>Drawn by the repo itself and committed as PNGs, so a fresh clone runs with no dependencies. Every field is checked against a ground-truth file that the pipeline is structurally forbidden to read.</p>
+<table>
+<tr><th>Capture condition</th><th>Count</th><th>What it does to the OCR</th></tr>
+<tr><td>Clean, high contrast</td><td>4</td><td>Occasional single-character slips</td></tr>
+<tr><td>Low contrast (grey on grey)</td><td>3</td><td>Confidence drops; more slips</td></tr>
+<tr><td>Downscaled capture</td><td>3</td><td>Text edges lost; most confidence-gate failures</td></tr>
+<tr><td>Cropped before scrolling</td><td>2</td><td>A label is genuinely off-frame &mdash; no value exists</td></tr>
+</table>
+<p style="color:var(--muted);font-size:13px;margin-top:12px">Fields per screenshot: <code>order_id</code>, <code>order_date</code>, <code>customer</code>, <code>item_count</code>, <code>subtotal</code>, <code>tax</code>, <code>total</code>. No real company, customer, or order appears anywhere in the repository.</p></section>
+
+<section><div class="label">The money shot</div><h2>Both halves of the truth, from the committed run</h2>
+<div class="grid">
+<div class="card ok"><div style="color:var(--muted);font-size:13px">Caught before the clean sheet</div><div style="font-size:34px;font-weight:800;color:var(--green);margin-top:6px">7 <span style="font-size:16px;color:var(--muted)">of 8</span></div><div style="color:var(--muted);font-size:13px;margin-top:6px">6 named by a rule, 1 held for another reason</div></div>
+<div class="card issue"><div style="color:var(--muted);font-size:13px">Reached the clean sheet</div><div style="font-size:34px;font-weight:800;color:var(--red);margin-top:6px">1</div><div style="color:var(--muted);font-size:13px;margin-top:6px">silent error &mdash; listed below, not rounded away</div></div>
+</div>
+<pre>Screenshots read:            12
+Rows on the clean sheet:     3
+Rows held for review:        9
+Review entries written:      25
+
+Wrong values in total:       8
+  caught, rule named it:     6
+  caught, row held anyway:   1
+  reached the clean sheet:   1   &lt;- silent errors
+Fields with no value at all: 8   (cropped screenshots)</pre>
+<p>Exit code is <code>1</code> whenever anything was held, because a run that needs a person is not a run that succeeded.</p></section>
+
+<section><div class="label">How it's verified</div><h2>Six per-field rules, and one that earns its keep</h2>
+<table>
+<tr><th>Rule</th><th>Catches</th></tr>
+<tr><td><code>required</code></td><td>the label is missing entirely &mdash; cropped off, renamed, or misread</td></tr>
+<tr><td><code>conf_gate</code></td><td>the engine itself was unsure (confidence below 0.75)</td></tr>
+<tr><td><code>type_parse</code></td><td><code>84.5O</code> is not an amount; <code>2O26-07-09</code> is not a date</td></tr>
+<tr><td><code>pattern</code></td><td><code>ORD-l017</code> is not an order id</td></tr>
+<tr><td><code>range</code></td><td>an item count of 400, an amount of 0</td></tr>
+<tr><td><code>reconcile</code></td><td><strong>a confidently misread digit that passes all five above</strong></td></tr>
+</table>
+<div class="card issue"><div style="color:var(--muted);font-size:13px">order_001.png &mdash; caught only by reconciliation</div><pre style="margin-top:10px">subtotal 245.01 + tax 18.60 = 263.61 but total reads 264.61</pre><p style="margin:10px 0 0"><code>19.60</code> was misread as <code>18.60</code>. Two decimal places. Positive. Inside every plausible range. Returned with high confidence. Every per-field rule passes it. Only the cross-field identity contradicts it.</p></div>
+<p style="margin-top:16px">Values are located by <strong>label anchor</strong>, not by position index: find the printed label, take the tokens sharing its line to the right. A label that cannot be found returns nothing &mdash; and nothing is a real answer. On a cropped capture the label genuinely is off-frame, and grabbing a nearby number would be worse than saying so.</p></section>
+
+<section><div class="label">Deployment</div><h2>The client drops screenshots in a folder and reads two tabs</h2><p>The repo ships a Google Apps Script implementation of the same six rules and the same reconciliation, calling Cloud Vision <code>DOCUMENT_TEXT_DETECTION</code>. It authenticates with the script's own OAuth token rather than an API key, so the Cloud project, the quota and the bill all stay in the client's account &mdash; and no key is ever pasted into the code.</p>
+<div class="grid">
+<div class="card"><div style="font-weight:750">Clean</div><p style="color:var(--muted);font-size:14px;margin:8px 0 0">One row per screenshot that passed every check, with a link back to the source image.</p></div>
+<div class="card"><div style="font-weight:750">Needs review</div><p style="color:var(--muted);font-size:14px;margin:8px 0 0">Which field, what the OCR read, its confidence, which rule failed, and a sentence in plain English saying why &mdash; plus the image link, so a person settles it in about ten seconds.</p></div>
+</div>
+<p style="margin-top:14px">A file is marked done only after it is processed, so a transient Vision error is retried on the next tick instead of being lost. Six-step setup in <code>deploy/README.md</code>.</p></section>
+
+<section><div class="label">Honest limitations</div><h2>What this demo does not prove</h2>
+<div class="card issue"><p style="margin:0"><strong>The one that got through.</strong> On <code>order_007.png</code>, <code>Copperfield Supply</code> reached the clean sheet as <code>Copperfield Supp1y</code> &mdash; a lowercase <code>l</code> read as a <code>1</code> inside a free-text field. No identity constrains a customer name, so nothing in this repo can catch it. It is in the report, by name.</p></div>
+<p style="margin-top:14px"><strong>The OCR backend is synthetic.</strong> It replays recorded word boxes and applies a fixed, seeded set of character corruptions. Crucially, not every corruption lowers the confidence score &mdash; some stay high on purpose, because a confidently wrong digit is the entire reason a totals check has to exist. If corrupted tokens always arrived with low confidence, the confidence gate alone would look perfect and this page would be a lie. A real <code>--backend tesseract</code> is included and optional. <strong>The verification layer is the transferable part; the OCR is swappable.</strong></p>
+<p><strong>Twelve screenshots is a small sample, from one layout.</strong> Field anchoring is the part most likely to break on a real client's captures, and that cannot be assessed without them.</p>
+<p><strong>The reconciliation rule is layout-specific.</strong> <code>subtotal + tax = total</code> holds here. Discounts, shipping, rounding rules and multiple currencies all break that identity, and it has to be rewritten to match the client's data before it means anything at all.</p>
+<p><strong>Nothing can see the answers.</strong> The ground-truth file is used for scoring only; no module in the pipeline reads it, and the run loads it only after every routing decision is made. A test fails the build if that ever stops being true.</p></section>
+
+<div class="foot">Synthetic data throughout &mdash; no real company, customer, or order. Standard library only on the demo path. <a href="https://jigonyoo.com">jigonyoo.com</a> &middot; <a href="../index.html">Back to hub</a></div>
+</main></body></html>

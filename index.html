@@ -253,7 +253,7 @@
 
   <div class="sec" id="docai">
     <div class="sec-h">
-      <div class="row"><h2>Document &amp; knowledge AI</h2><span class="cnt">4</span></div>
+      <div class="row"><h2>Document &amp; knowledge AI</h2><span class="cnt">5</span></div>
       <div class="desc">Extraction and retrieval that cite their sources, reconcile the numbers, and refuse when the evidence isn't there.</div>
     </div>
     <div class="grid">
@@ -263,6 +263,13 @@
         <div class="c-moat">The trust layer is the point — it flags <em>which rows you can believe</em>, not just extract-and-hope.</div>
         <div class="tags"><span class="tag">python</span><span class="tag">idp</span><span class="tag">textract</span><span class="tag">reconciliation</span><span class="tag">validation</span></div>
         <div class="links"><a class="btn" href="https://github.com/jigonyoo/invoice-to-structured" target="_blank" rel="noopener">Code ↗</a><a class="btn primary" href="showcase/invoice-to-structured.html">Demo ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">screenshot-to-sheet</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">Screenshots &rarr; a spreadsheet, with a verification layer between them: per-field confidence gates, type and pattern checks, and a <em>subtotal + tax = total</em> reconciliation that catches OCR errors which parse cleanly. Ships with a Google Apps Script + Cloud Vision deployment path, so the client never touches the code.</p>
+        <div class="c-moat">OCR always misreads something. The number that matters is how many misreads were caught before the clean sheet &mdash; and the report states how many slipped through.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">ocr</span><span class="tag">apps-script</span><span class="tag">google-sheets</span><span class="tag">validation</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/screenshot-to-sheet" target="_blank" rel="noopener">Code &#8599;</a><a class="btn primary" href="showcase/screenshot-to-sheet.html">Demo &#8599;</a></div>
       </div>
       <div class="card">
         <div class="c-top"><span class="c-name">rag-grounded-qa</span><span class="badge pub">Public</span></div>
