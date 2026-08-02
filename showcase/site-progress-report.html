@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>site-progress-report &mdash; Photo Coverage Without Pixel Claims</title>
+<meta name="description" content="Synthetic photo metadata and a checklist become site progress, coverage gaps, stale areas, and ordering checks.">
+<style>
+:root{--bg:#0a0e0d;--panel:#10171a;--panel-2:#0d1315;--line:#1c2a2b;--txt:#e7f0ee;--muted:#869a97;--dim:#5f7370;--green:#22c55e;--green-dim:#15803d;--green-soft:rgba(34,197,94,.12);--amber:#f5b544;--red:#fb7185}*{box-sizing:border-box}html,body{margin:0}body{background:radial-gradient(1100px 600px at 85% -8%,rgba(34,197,94,.09),transparent 60%),var(--bg);color:var(--txt);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Arial,sans-serif}.wrap{max-width:980px;margin:auto;padding:34px 24px 64px}a{color:inherit;text-decoration:none}.top,.actions,.stats{display:flex;gap:10px;flex-wrap:wrap}.top{justify-content:space-between;align-items:flex-start}.eyebrow{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase}h1{font-size:clamp(28px,5vw,46px);line-height:1.1;margin:9px 0}.lead{color:#cdd8d5;font-size:17px;max-width:720px}.badge,.btn{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:8px;padding:7px 11px;font-size:12px;font-weight:750}.badge{color:var(--green);background:var(--green-soft)}.btn:hover{border-color:var(--green)}section{margin-top:34px}.label{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;border-bottom:1px solid var(--line);padding-bottom:8px}h2{font-size:22px;margin:13px 0 8px}.card{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:18px;margin-top:13px}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}@media(max-width:720px){.grid{grid-template-columns:1fr}}pre{white-space:pre-wrap;overflow:auto;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:15px;color:#cdd8d5}.issue{border-left:3px solid var(--red)}.ok{border-left:3px solid var(--green)}.amber{color:var(--amber)}.route{font-weight:800;color:var(--red)}table{width:100%;border-collapse:collapse}th,td{text-align:left;border-bottom:1px solid var(--line);padding:10px 8px}th{color:var(--muted);font-size:12px}.foot{margin-top:42px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}.foot a{color:var(--green)}
+</style>
+</head>
+<body><main class="wrap">
+<header class="top"><div><div class="eyebrow">Field automation · construction reporting</div><h1>site-progress-report</h1><p class="lead">A tagged photo can prove that coverage exists. It cannot prove that the photographed work is correct.</p><span class="badge">Public &middot; synthetic demo</span></div><nav class="actions"><a class="btn" href="https://github.com/jigonyoo/site-progress-report" target="_blank" rel="noopener">GitHub Code &#8599;</a><a class="btn" href="../index.html">&larr; Back to hub</a></nav></header>
+
+<section><div class="label">The problem</div><h2>A folder of photos does not show which required evidence is missing.</h2><p>Teams need checklist coverage, recency, and phase order before a human opens the images. Claiming to inspect the pixels would answer a different question.</p></section>
+<section><div class="label">Input</div><h2>Tagged metadata for a fictional site.</h2><pre>Site: Maple Ridge - Building B
+Photos ingested: 28
+Areas: 3
+Phases: 4
+
+Fields used:
+timestamp
+GPS
+area
+phase
+inspection item</pre></section>
+<section><div class="label">The money shot</div><h2>Coverage gaps become a concrete review list.</h2><div class="grid"><article class="card ok"><div style="color:var(--muted);font-size:13px">Gaps found</div><div style="font-size:34px;font-weight:800;color:var(--green)">13</div></article><article class="card ok"><div style="color:var(--muted);font-size:13px">Missing items</div><div style="font-size:34px;font-weight:800;color:var(--green)">10</div></article><article class="card ok"><div style="color:var(--muted);font-size:13px">Missing GPS</div><div style="font-size:34px;font-weight:800;color:var(--green)">1</div></article><article class="card ok"><div style="color:var(--muted);font-size:13px">Duplicate tags</div><div style="font-size:34px;font-weight:800;color:var(--green)">2</div></article></div><div class="card"><p>Area completion is A1 100.0%, A2 91.7%, and A3 25.0%. The run also identifies one out-of-sequence photo and one stale area.</p></div></section>
+<section><div class="label">How it's verified</div><h2>Every percentage reconciles to required and covered items.</h2><table><thead><tr><th>Area / phase</th><th>Required</th><th>Covered</th><th>Complete</th></tr></thead><tbody><tr><td>A1 / framing</td><td>3</td><td>3</td><td>100.0%</td></tr><tr><td>A2 / framing</td><td>3</td><td>2</td><td>66.7%</td></tr><tr><td>A3 / framing</td><td>3</td><td>0</td><td>0.0%</td></tr></tbody></table><p>A3's last photo is 20 days old against a threshold of 14. Photo P0013 is listed because framing appeared after a later phase.</p></section>
+<section><div class="label">Honest limitations</div><h2>Presence is not workmanship, safety, or compliance.</h2><div class="card"><ul><li>The pipeline never opens or interprets image pixels.</li><li>It trusts timestamps, GPS, and human-authored tags.</li><li>A mistagged photo can produce a false coverage result.</li><li>A qualified inspector must still examine the photos and the site.</li></ul></div></section>
+<div class="foot">The report answers whether evidence is present, ordered, and recent. <a href="https://jigonyoo.com">jigonyoo.com</a> &middot; <a href="../index.html">Back to hub</a></div>
+</main></body></html>
