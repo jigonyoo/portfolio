@@ -139,7 +139,6 @@
       <a href="#devtools">Developer tooling</a>
       <a href="#docai">Document &amp; knowledge AI</a>
       <a href="#analytics">Analytics, ML &amp; mining</a>
-      <a href="#robotics">Robotics &amp; robot data</a>
       <a href="#dataeng">Data engineering</a>
     </div>
   </div>
@@ -319,83 +318,10 @@
     </div>
   </div>
 
-  <!-- ROBOTICS -->
-  <div class="sec" id="robotics">
-    <div class="sec-h">
-      <div class="row"><h2>Robotics &amp; robot data</h2><span class="cnt">9</span></div>
-      <div class="desc">Data and verification infrastructure around robot programs — bag audits, dataset contracts, migration, evaluation. I build the data layer, not the robot: every tool here states what it measured and refuses to claim more.</div>
-    </div>
-    <div class="grid">
-      <div class="card">
-        <div class="c-top"><span class="c-name">ros2-bag-data-audit</span><span class="badge pub">Public</span></div>
-        <p class="c-desc">A (synthetic) ROS2 rosbag export of robot telemetry → a structured anomaly audit: per-topic publish-rate deviations, dropout gaps, header-vs-receive clock skew, out-of-range sensor values, TF frame gaps, and a cmd_vel-vs-odom stall signal — organized by how sure the evidence is.</p>
-        <div class="c-moat">Honest by construction: findings split into Confirmed evidence / Likely causes / Unverified hypotheses / Additional data required — it narrows candidate causes and says what data would confirm them, never asserting a root cause from a single bag.</div>
-        <div class="tags"><span class="tag">python</span><span class="tag">ros2</span><span class="tag">rosbag</span><span class="tag">robotops</span><span class="tag">anomaly detection</span></div>
-        <div class="links"><a class="btn" href="https://github.com/jigonyoo/ros2-bag-data-audit" target="_blank" rel="noopener">Code ↗</a><a class="btn primary" href="showcase/ros2-bag-data-audit.html">Demo ↗</a></div>
-      </div>
-      <div class="card">
-        <div class="c-top"><span class="c-name">ros2-ci-bridge</span><span class="badge pub">Public</span></div>
-        <p class="c-desc">A ROS2 colcon workspace → a reproducible Docker build + GitHub Actions CI (colcon build/test) → an offline Python layer that parses the build/test logs into an evidence-graded build-health report.</p>
-        <div class="c-moat">Honest by construction: findings split into Confirmed evidence / Likely causes / Unverified hypotheses / Additional data required — the heavy build runs in CI, the demo verifies the analysis layer offline, and reproducibility is reported as signals, never a false &quot;reproducible: yes&quot;.</div>
-        <div class="tags"><span class="tag">python</span><span class="tag">ros2</span><span class="tag">docker</span><span class="tag">ci/cd</span><span class="tag">robotops</span></div>
-        <div class="links"><a class="btn" href="https://github.com/jigonyoo/ros2-ci-bridge" target="_blank" rel="noopener">Code ↗</a><a class="btn primary" href="showcase/ros2-ci-bridge.html">Demo ↗</a></div>
-      </div>
-      <div class="card">
-        <div class="c-top"><span class="c-name">ros2-urdf-smoke-test</span><span class="badge pub">Public</span></div>
-        <p class="c-desc">A robot URDF → static structural audit (link/joint tree integrity, missing meshes, inertial sanity, joint limits) → a four-section smoke-test report.</p>
-        <div class="c-moat">Honest by construction: Confirmed / Likely / Unverified / Additional data — a pass means &quot;likely loads&quot;, never &quot;works&quot; or &quot;safe&quot;.</div>
-        <div class="tags"><span class="tag">python</span><span class="tag">ros2</span><span class="tag">urdf</span><span class="tag">robotics</span><span class="tag">robotops</span></div>
-        <div class="links"><a class="btn" href="https://github.com/jigonyoo/ros2-urdf-smoke-test" target="_blank" rel="noopener">Code ↗</a><a class="btn primary" href="showcase/ros2-urdf-smoke-test.html">Demo ↗</a></div>
-      </div>
-      <div class="card">
-        <div class="c-top"><span class="c-name">robotdata-pipeline</span><span class="badge pub">Public</span></div>
-        <p class="c-desc">Raw operator/rosbag logs → a training-ready ML dataset (RLDS/LeRobot-style) with episode-level splits, a data contract that fails the build on bad data, and an RLDS-vs-LeRobot format recommendation.</p>
-        <div class="c-moat">The &quot;make it&quot; that follows an audit&#39;s &quot;it&#39;s broken&quot;: a contract violation blocks a bad dataset from being produced instead of silently shipping one.</div>
-        <div class="tags"><span class="tag">python</span><span class="tag">robotics</span><span class="tag">etl</span><span class="tag">data contract</span><span class="tag">robotops</span></div>
-        <div class="links"><a class="btn" href="https://github.com/jigonyoo/robotdata-pipeline" target="_blank" rel="noopener">Code ↗</a><a class="btn primary" href="showcase/robotdata-pipeline.html">Demo ↗</a></div>
-      </div>
-      <div class="card">
-        <div class="c-top"><span class="c-name">lerobot-dataset-migrate</span><span class="badge pub">Public</span></div>
-        <p class="c-desc">A LeRobot v2.1 dataset → a validated migration to the v3 layout: documented field/layout mapping, then integrity checks (frame counts, features, index continuity, stats) so nothing is silently dropped.</p>
-        <div class="c-moat">Migration + validation, not a black box — it models the publicly documented format and reports what it preserved vs what still needs checking against real datasets.</div>
-        <div class="tags"><span class="tag">python</span><span class="tag">robotics</span><span class="tag">lerobot</span><span class="tag">data migration</span><span class="tag">robotops</span></div>
-        <div class="links"><a class="btn" href="https://github.com/jigonyoo/lerobot-dataset-migrate" target="_blank" rel="noopener">Code ↗</a><a class="btn primary" href="showcase/lerobot-dataset-migrate.html">Demo ↗</a></div>
-      </div>
-      <div class="card">
-        <div class="c-top"><span class="c-name">dataset-curation-dedup</span><span class="badge pub">Public</span></div>
-        <p class="c-desc">A robot/ML dataset manifest → near-duplicate detection (Hamming/cosine on provided hashes), quality gates, a coverage/imbalance report, and a curated manifest with a justified rejection log.</p>
-        <div class="c-moat">Every drop has a reason and borderline duplicates go to human review, never silent auto-deletion; it operates on manifests + hashes, not raw pixels.</div>
-        <div class="tags"><span class="tag">python</span><span class="tag">robotics</span><span class="tag">dataset</span><span class="tag">dedup</span><span class="tag">robotops</span></div>
-        <div class="links"><a class="btn" href="https://github.com/jigonyoo/dataset-curation-dedup" target="_blank" rel="noopener">Code ↗</a><a class="btn primary" href="showcase/dataset-curation-dedup.html">Demo ↗</a></div>
-      </div>
-      <div class="card">
-        <div class="c-top"><span class="c-name">policy-eval-harness</span><span class="badge pub">Public</span></div>
-        <p class="c-desc">Robot policy rollout logs → success rate with Wilson confidence intervals, per-task breakdowns, and A/B comparison (difference CI + two-proportion test), with small-sample flags.</p>
-        <div class="c-moat">Same training loss &ne; same real success rate: it compares measured success with uncertainty, and never reports a rate without its n and CI.</div>
-        <div class="tags"><span class="tag">python</span><span class="tag">robotics</span><span class="tag">evaluation</span><span class="tag">statistics</span><span class="tag">robotops</span></div>
-        <div class="links"><a class="btn" href="https://github.com/jigonyoo/policy-eval-harness" target="_blank" rel="noopener">Code ↗</a><a class="btn primary" href="showcase/policy-eval-harness.html">Demo ↗</a></div>
-      </div>
-      <div class="card">
-        <div class="c-top"><span class="c-name">crossembodiment-align</span><span class="badge pub">Public</span></div>
-        <p class="c-desc">Multiple robot demonstration datasets (different embodiments, action spaces, control rates, gripper conventions) → a mixability assessment: normalize, flag frequency/gripper conflicts and missing embodiment metadata, and a per-pair mix / mix-subset / do-not-mix report.</p>
-        <div class="c-moat">The metadata needed to mix robot datasets is often missing — even NVIDIA&#39;s BridgeData v3 has an empty robot_type. This finds it from manifests, trains nothing, and every verdict cites its measured reasons.</div>
-        <div class="tags"><span class="tag">python</span><span class="tag">robotics</span><span class="tag">cross-embodiment</span><span class="tag">dataset</span><span class="tag">robotops</span></div>
-        <div class="links"><a class="btn" href="https://github.com/jigonyoo/crossembodiment-align" target="_blank" rel="noopener">Code ↗</a><a class="btn primary" href="showcase/crossembodiment-align.html">Demo ↗</a></div>
-      </div>
-      <div class="card">
-        <div class="c-top"><span class="c-name">domain-rand-sweep</span><span class="badge pub">Public</span></div>
-        <p class="c-desc">A parameter-space spec → a domain-randomization sweep (grid / random / Latin-hypercube) plus coverage and pairwise-gap analysis, ready to feed a simulator.</p>
-        <div class="c-moat">Designs and analyzes the sweep only — it runs no simulator and makes no sim-to-real transfer claim: broad coverage is not evidence of real-world robustness.</div>
-        <div class="tags"><span class="tag">python</span><span class="tag">robotics</span><span class="tag">domain randomization</span><span class="tag">sim</span><span class="tag">robotops</span></div>
-        <div class="links"><a class="btn" href="https://github.com/jigonyoo/domain-rand-sweep" target="_blank" rel="noopener">Code ↗</a><a class="btn primary" href="showcase/domain-rand-sweep.html">Demo ↗</a></div>
-      </div>
-    </div>
-  </div>
-
   <!-- DATA ENGINEERING -->
   <div class="sec" id="dataeng">
     <div class="sec-h">
-      <div class="row"><h2>Data engineering &amp; extraction</h2><span class="cnt">15</span></div>
+      <div class="row"><h2>Data engineering &amp; extraction</h2><span class="cnt">5</span></div>
       <div class="desc">Reproducible pipelines that clean, normalize, and load — idempotently, with per-row confidence where it matters.</div>
     </div>
     <div class="grid">
@@ -428,6 +354,20 @@
         <div class="links"><a class="btn" href="https://github.com/jigonyoo/data-contract-guard" target="_blank" rel="noopener">Code ↗</a><a class="btn primary" href="showcase/data-contract-guard.html">Demo ↗</a></div>
       </div>
       <div class="card">
+        <div class="c-top"><span class="c-name">ros2-bag-data-audit</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">A (synthetic) ROS2 rosbag export of robot telemetry → a structured anomaly audit: per-topic publish-rate deviations, dropout gaps, header-vs-receive clock skew, out-of-range sensor values, TF frame gaps, and a cmd_vel-vs-odom stall signal — organized by how sure the evidence is.</p>
+        <div class="c-moat">Honest by construction: findings split into Confirmed evidence / Likely causes / Unverified hypotheses / Additional data required — it narrows candidate causes and says what data would confirm them, never asserting a root cause from a single bag.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">ros2</span><span class="tag">rosbag</span><span class="tag">robotops</span><span class="tag">anomaly detection</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/ros2-bag-data-audit" target="_blank" rel="noopener">Code ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">ros2-ci-bridge</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">A ROS2 colcon workspace → a reproducible Docker build + GitHub Actions CI (colcon build/test) → an offline Python layer that parses the build/test logs into an evidence-graded build-health report.</p>
+        <div class="c-moat">Honest by construction: findings split into Confirmed evidence / Likely causes / Unverified hypotheses / Additional data required — the heavy build runs in CI, the demo verifies the analysis layer offline, and reproducibility is reported as signals, never a false &quot;reproducible: yes&quot;.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">ros2</span><span class="tag">docker</span><span class="tag">ci/cd</span><span class="tag">robotops</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/ros2-ci-bridge" target="_blank" rel="noopener">Code ↗</a></div>
+      </div>
+      <div class="card">
         <div class="c-top"><span class="c-name">analytics-scheduled-report</span><span class="badge pub">Public</span></div>
         <p class="c-desc">A raw event/transaction log → scheduled daily/weekly reports with period-over-period deltas, threshold + statistical-outlier alerts, and idempotent re-runs.</p>
         <div class="c-moat">Every alert carries its triggering rule and measured value — flags for a human to confirm, not a black-box &quot;something&#39;s wrong&quot;.</div>
@@ -447,6 +387,13 @@
         <div class="c-moat">Associations are labeled correlational, carry counts + confidence intervals, and recommend an experiment before anyone acts on them.</div>
         <div class="tags"><span class="tag">python</span><span class="tag">data mining</span><span class="tag">retail</span><span class="tag">churn</span></div>
         <div class="links"><a class="btn" href="https://github.com/jigonyoo/retail-sequence-mining" target="_blank" rel="noopener">Code ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">ros2-urdf-smoke-test</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">A robot URDF → static structural audit (link/joint tree integrity, missing meshes, inertial sanity, joint limits) → a four-section smoke-test report.</p>
+        <div class="c-moat">Honest by construction: Confirmed / Likely / Unverified / Additional data — a pass means &quot;likely loads&quot;, never &quot;works&quot; or &quot;safe&quot;.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">ros2</span><span class="tag">urdf</span><span class="tag">robotics</span><span class="tag">robotops</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/ros2-urdf-smoke-test" target="_blank" rel="noopener">Code ↗</a></div>
       </div>
       <div class="card">
         <div class="c-top"><span class="c-name">analytics-significance</span><span class="badge pub">Public</span></div>
@@ -498,11 +445,53 @@
         <div class="links"><a class="btn" href="https://github.com/jigonyoo/agentops-trace-cost-guard" target="_blank" rel="noopener">Code ↗</a></div>
       </div>
       <div class="card">
+        <div class="c-top"><span class="c-name">lerobot-dataset-migrate</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">A LeRobot v2.1 dataset → a validated migration to the v3 layout: documented field/layout mapping, then integrity checks (frame counts, features, index continuity, stats) so nothing is silently dropped.</p>
+        <div class="c-moat">Migration + validation, not a black box — it models the publicly documented format and reports what it preserved vs what still needs checking against real datasets.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">robotics</span><span class="tag">lerobot</span><span class="tag">data migration</span><span class="tag">robotops</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/lerobot-dataset-migrate" target="_blank" rel="noopener">Code ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">policy-eval-harness</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">Robot policy rollout logs → success rate with Wilson confidence intervals, per-task breakdowns, and A/B comparison (difference CI + two-proportion test), with small-sample flags.</p>
+        <div class="c-moat">Same training loss &ne; same real success rate: it compares measured success with uncertainty, and never reports a rate without its n and CI.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">robotics</span><span class="tag">evaluation</span><span class="tag">statistics</span><span class="tag">robotops</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/policy-eval-harness" target="_blank" rel="noopener">Code ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">dataset-curation-dedup</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">A robot/ML dataset manifest → near-duplicate detection (Hamming/cosine on provided hashes), quality gates, a coverage/imbalance report, and a curated manifest with a justified rejection log.</p>
+        <div class="c-moat">Every drop has a reason and borderline duplicates go to human review, never silent auto-deletion; it operates on manifests + hashes, not raw pixels.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">robotics</span><span class="tag">dataset</span><span class="tag">dedup</span><span class="tag">robotops</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/dataset-curation-dedup" target="_blank" rel="noopener">Code ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">domain-rand-sweep</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">A parameter-space spec → a domain-randomization sweep (grid / random / Latin-hypercube) plus coverage and pairwise-gap analysis, ready to feed a simulator.</p>
+        <div class="c-moat">Designs and analyzes the sweep only — it runs no simulator and makes no sim-to-real transfer claim: broad coverage is not evidence of real-world robustness.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">robotics</span><span class="tag">domain randomization</span><span class="tag">sim</span><span class="tag">robotops</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/domain-rand-sweep" target="_blank" rel="noopener">Code ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">crossembodiment-align</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">Multiple robot demonstration datasets (different embodiments, action spaces, control rates, gripper conventions) → a mixability assessment: normalize, flag frequency/gripper conflicts and missing embodiment metadata, and a per-pair mix / mix-subset / do-not-mix report.</p>
+        <div class="c-moat">The metadata needed to mix robot datasets is often missing — even NVIDIA&#39;s BridgeData v3 has an empty robot_type. This finds it from manifests, trains nothing, and every verdict cites its measured reasons.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">robotics</span><span class="tag">cross-embodiment</span><span class="tag">dataset</span><span class="tag">robotops</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/crossembodiment-align" target="_blank" rel="noopener">Code ↗</a></div>
+      </div>
+      <div class="card">
         <div class="c-top"><span class="c-name">agent-trace-triage</span><span class="badge pub">Public</span></div>
         <p class="c-desc">Agent execution traces → a rule-based failure taxonomy (tool-selection error, loop, timeout, malformed args, wrong answer…), a failure distribution, and a labeled eval-ready dataset with a human-review queue for ambiguous cases.</p>
         <div class="c-moat">The missing link between observability (89% adoption) and evaluation (52%): it turns raw traces into eval data deterministically, and sends ambiguous cases to a human rather than guessing.</div>
         <div class="tags"><span class="tag">python</span><span class="tag">agentops</span><span class="tag">evaluation</span><span class="tag">observability</span></div>
         <div class="links"><a class="btn" href="https://github.com/jigonyoo/agent-trace-triage" target="_blank" rel="noopener">Code ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">robotdata-pipeline</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">Raw operator/rosbag logs → a training-ready ML dataset (RLDS/LeRobot-style) with episode-level splits, a data contract that fails the build on bad data, and an RLDS-vs-LeRobot format recommendation.</p>
+        <div class="c-moat">The &quot;make it&quot; that follows an audit&#39;s &quot;it&#39;s broken&quot;: a contract violation blocks a bad dataset from being produced instead of silently shipping one.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">robotics</span><span class="tag">etl</span><span class="tag">data contract</span><span class="tag">robotops</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/robotdata-pipeline" target="_blank" rel="noopener">Code ↗</a></div>
       </div>
     </div>
   </div>

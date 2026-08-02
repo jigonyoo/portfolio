@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>dataset-curation-dedup — Curate a Dataset Without Silent Deletion</title>
+<style>
+  :root{--bg:#0a0e0d;--panel:#10171a;--panel-2:#0d1315;--line:#1c2a2b;--txt:#e7f0ee;--muted:#869a97;--dim:#5f7370;--green:#22c55e;--green-dim:#15803d;--green-soft:rgba(34,197,94,.12);--amber:#f5b544;--red:#fb7185}
+  *{box-sizing:border-box}html,body{margin:0}
+  body{background:radial-gradient(1100px 600px at 85% -8%,rgba(34,197,94,.09),transparent 60%),var(--bg);color:var(--txt);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Arial,sans-serif}
+  .wrap{max-width:1000px;margin:auto;padding:34px 24px 64px}
+  a{color:inherit;text-decoration:none}
+  .top,.actions,.stats{display:flex;gap:10px;flex-wrap:wrap}.top{justify-content:space-between;align-items:flex-start}
+  .eyebrow{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase}
+  h1{font-size:clamp(28px,5vw,46px);line-height:1.1;margin:9px 0}
+  .lead{color:#cdd8d5;font-size:17px;max-width:760px}
+  .badge,.btn{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:8px;padding:7px 11px;font-size:12px;font-weight:750}
+  .badge{color:var(--green);background:var(--green-soft)}.btn:hover{border-color:var(--green)}
+  section{margin-top:34px}
+  .label{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;border-bottom:1px solid var(--line);padding-bottom:8px}
+  h2{font-size:22px;margin:13px 0 8px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:18px;margin-top:13px}
+  .step{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase}
+  pre{white-space:pre-wrap;overflow:auto;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:15px;color:#cdd8d5;font-size:13px}
+  .issue{border-left:3px solid var(--red)}.ok{border-left:3px solid var(--green)}
+  .stats .stat{flex:1;min-width:150px;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:14px 16px}
+  .stat b{display:block;font-size:26px;color:var(--green)}
+  .stat span{color:var(--muted);font-size:13px}
+  table{width:100%;border-collapse:collapse}th,td{text-align:left;border-bottom:1px solid var(--line);padding:9px 8px;font-size:14px}th{color:var(--muted);font-size:12px}
+  .pass{color:var(--green);font-weight:700}.fail{color:var(--red);font-weight:700}
+  .foot{margin-top:42px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}.foot a{color:var(--green)}
+  .note{color:var(--muted);font-size:13px;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <div class="eyebrow">Robotics · dataset curation</div>
+      <h1>dataset-curation-dedup</h1>
+    </div>
+    <div class="actions">
+      <a class="btn" href="https://github.com/jigonyoo/dataset-curation-dedup" target="_blank" rel="noopener">GitHub Code ↗</a>
+      <a class="btn" href="../index.html">← Back to hub</a>
+    </div>
+  </div>
+  <p class="lead">Manifest-level curation with quality gates, supplied hashes and feature vectors, a reason for every rejection, and a human queue for borderline duplicates.</p>
+  <span class="badge">Public · synthetic demo</span>
+
+  <section>
+    <div class="label">The problem</div>
+    <h2>Automatic deduplication is dangerous when the threshold is treated as truth.</h2>
+    <p class="lead">Confirmed duplicates need deterministic rejection reasons; borderline pairs need human review instead of automatic deletion.</p>
+  </section>
+
+  <section>
+    <div class="label">The money shot</div>
+    <h2>Every removal is explained; the borderline case remains</h2>
+    <div class="card issue">
+      <div class="step">Measured curation result</div>
+      <div class="stats" style="margin:10px 0 0">
+        <div class="stat"><b>50</b><span>input records</span></div>
+        <div class="stat"><b>45</b><span>curated episodes</span></div>
+        <div class="stat"><b>6</b><span>total rejections</span></div>
+        <div class="stat"><b>1</b><span>borderline pair for review</span></div>
+      </div>
+      <table>
+        <tr><th>stage</th><th>measured result</th></tr>
+        <tr><td>corrupt ingest</td><td>1</td></tr>
+        <tr><td>passed quality gate</td><td>48</td></tr>
+        <tr><td>duplicate groups</td><td>3</td></tr>
+        <tr><td>dropped as duplicate</td><td>3</td></tr>
+      </table>
+    </div>
+    <div class="card ok">
+      <div class="step">Human review boundary</div>
+      <pre>ep_0003 ↔ ep_0046
+metric: hamming
+value: 6
+verdict: review queue — not auto-dropped</pre>
+      <p class="note">The manifest also reports task coverage and imbalance; it does not reinterpret those counts as training utility.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="label">Honest limitations</div>
+    <p class="lead">The tool operates on a manifest plus provided hashes and feature vectors, not raw pixels, video, point clouds, or sensor streams. Hamming and cosine thresholds are heuristics. Borderline duplicates are never auto-resolved.</p>
+  </section>
+
+  <div class="foot">This page reports the supplied sample output and its stated limits. <a href="https://github.com/jigonyoo/dataset-curation-dedup" target="_blank" rel="noopener">Inspect the code and evidence ↗</a></div>
+</div>
+</body>
+</html>
