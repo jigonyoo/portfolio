@@ -409,7 +409,7 @@
   <!-- DATA ENGINEERING -->
   <div class="sec" id="dataeng">
     <div class="sec-h">
-      <div class="row"><h2>Data engineering &amp; extraction</h2><span class="cnt">15</span></div>
+      <div class="row"><h2>Data engineering &amp; extraction</h2><span class="cnt">16</span></div>
       <div class="desc">Reproducible pipelines that clean, normalize, and load — idempotently, with per-row confidence where it matters.</div>
     </div>
     <div class="grid">
@@ -426,6 +426,13 @@
         <div class="c-moat">Unified schema + idempotent loads — re-runs don't duplicate or corrupt the store.</div>
         <div class="tags"><span class="tag">python</span><span class="tag">web scraping</span><span class="tag">etl</span><span class="tag">sqlite</span></div>
         <div class="links"><a class="btn" href="https://github.com/jigonyoo/hardware-parts-data-pipeline" target="_blank" rel="noopener">Code ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">scraper-canary</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">Seven invariants that fire when a site changes underneath a working scraper &mdash; selector hit-rate, per-field fill-rate, a median+MAD row-count band, type and enum stability, tag-skeleton drift, and freshness. Runs offline against committed snapshots of a fictional catalogue.</p>
+        <div class="c-moat">The expensive scraping failure is not a crash &mdash; it is a job that keeps succeeding while the prices come back empty. The report states how many planted breakages were caught, how many were missed, and how many were false alarms.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">web scraping</span><span class="tag">drift</span><span class="tag">monitoring</span><span class="tag">data quality</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/scraper-canary" target="_blank" rel="noopener">Code &#8599;</a><a class="btn primary" href="showcase/scraper-canary.html">Demo &#8599;</a></div>
       </div>
       <div class="card">
         <div class="c-top"><span class="c-name">wnba-player-vs-defense</span><span class="badge pub">Public</span></div>
