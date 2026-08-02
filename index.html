@@ -195,10 +195,17 @@
   <!-- DOCUMENT AI -->
   <div class="sec" id="devtools">
     <div class="sec-h">
-      <div class="row"><h2>Developer &amp; AI tooling</h2><span class="cnt">6</span></div>
+      <div class="row"><h2>Developer &amp; AI tooling</h2><span class="cnt">7</span></div>
       <div class="desc">Making a codebase something an AI agent can actually work in — generated context, kept fresh, and verified.</div>
     </div>
     <div class="grid">
+      <div class="card">
+        <div class="c-top"><span class="c-name">llm-deprecation-radar</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">Static-scans a codebase for retired and soon-to-retire LLM model IDs, API surfaces, and parameters, then reports days remaining, blast radius, and the published replacement path. The deterministic demo catches 11 of 12 planted cases; the twelfth is a current-model negative control.</p>
+        <div class="c-moat">The moat is the dated evidence boundary: 6 Confirmed, 2 Likely, 2 Unverified, and 1 runtime-data-required finding — plus registry freshness and a weekly CI deadline gate. Dynamic selection is never mislabeled as clean.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">static analysis</span><span class="tag">llm ops</span><span class="tag">ci gate</span><span class="tag">deterministic</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/llm-deprecation-radar" target="_blank" rel="noopener">Code ↗</a><a class="btn primary" href="showcase/llm-deprecation-radar.html">Demo ↗</a></div>
+      </div>
       <div class="card">
         <div class="c-top"><span class="c-name">ai-ready-repo-setup</span><span class="badge pub">Public</span></div>
         <p class="c-desc">Scans a repo into a CLAUDE.md / AGENTS.md an agent can follow — build/test commands, coding rules, prohibitions, CI smoke test, Definition of Done — then detects when it goes stale and scores readiness deterministically.</p>

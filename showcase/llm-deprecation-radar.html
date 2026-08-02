@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>llm-deprecation-radar — Deadlines Hidden in Your Codebase</title>
+<style>
+  :root{--bg:#0a0e0d;--panel:#10171a;--panel-2:#0d1315;--line:#1c2a2b;--txt:#e7f0ee;--muted:#869a97;--dim:#5f7370;--green:#22c55e;--green-dim:#15803d;--green-soft:rgba(34,197,94,.12);--amber:#f5b544;--red:#fb7185}
+  *{box-sizing:border-box}html,body{margin:0}
+  body{background:radial-gradient(1100px 600px at 85% -8%,rgba(34,197,94,.09),transparent 60%),var(--bg);color:var(--txt);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Arial,sans-serif}
+  .wrap{max-width:1000px;margin:auto;padding:34px 24px 64px}
+  a{color:inherit;text-decoration:none}
+  .top,.actions,.stats{display:flex;gap:10px;flex-wrap:wrap}.top{justify-content:space-between;align-items:flex-start}
+  .eyebrow{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase}
+  h1{font-size:clamp(28px,5vw,46px);line-height:1.1;margin:9px 0}
+  .lead{color:#cdd8d5;font-size:17px;max-width:760px}
+  .badge,.btn{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:8px;padding:7px 11px;font-size:12px;font-weight:750}
+  .badge{color:var(--green);background:var(--green-soft)}.btn:hover{border-color:var(--green)}
+  section{margin-top:34px}
+  .label{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;border-bottom:1px solid var(--line);padding-bottom:8px}
+  h2{font-size:22px;margin:13px 0 8px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:18px;margin-top:13px}
+  .step{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase}
+  pre{white-space:pre-wrap;overflow:auto;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:15px;color:#cdd8d5;font-size:13px}
+  .issue{border-left:3px solid var(--red)}.ok{border-left:3px solid var(--green)}
+  .stats .stat{flex:1;min-width:150px;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:14px 16px}
+  .stat b{display:block;font-size:26px;color:var(--green)}
+  .stat span{color:var(--muted);font-size:13px}
+  table{width:100%;border-collapse:collapse}th,td{text-align:left;border-bottom:1px solid var(--line);padding:9px 8px;font-size:14px}th{color:var(--muted);font-size:12px}
+  .pass{color:var(--green);font-weight:700}.fail{color:var(--red);font-weight:700}.warn{color:var(--amber);font-weight:700}
+  .foot{margin-top:42px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}.foot a{color:var(--green)}
+  .note{color:var(--muted);font-size:13px;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <div class="eyebrow">Developer tooling · LLM operations</div>
+      <h1>llm-deprecation-radar</h1>
+    </div>
+    <div class="actions">
+      <a class="btn" href="https://github.com/jigonyoo/llm-deprecation-radar" target="_blank" rel="noopener">GitHub Code ↗</a>
+      <a class="btn" href="../index.html">← Back to hub</a>
+    </div>
+  </div>
+  <p class="lead">An offline, dated static scan for the model IDs and API surfaces that are scattered across source, configuration, environment defaults, and documentation — with days remaining and blast radius attached.</p>
+  <span class="badge">Public · synthetic demo · stdlib only</span>
+
+  <section>
+    <div class="label">The problem</div>
+    <h2>The vendor publishes a date. The codebase forgets where the dependency lives.</h2>
+    <p class="lead">A production app can still wake up broken on shutdown day because model references hide in settings, test fixtures, old modules, and runtime routers. This radar builds the inventory. It does not perform the migration.</p>
+  </section>
+
+  <section>
+    <div class="label">The money shot</div>
+    <h2>Deadlines on 2026-08-02, from the generated report</h2>
+
+    <div class="card issue">
+      <div class="step">① What needs attention first</div>
+      <table>
+        <tr><th>reference</th><th>deadline state</th><th>evidence path</th></tr>
+        <tr><td><code>gemini-2.0-flash</code></td><td class="fail">RETIRED · −62 days</td><td><code>legacy_google.py:1</code></td></tr>
+        <tr><td><code>temperature</code> on Opus 4.8</td><td class="fail">RETIRED · immediate</td><td><code>anthropic_client.py:1</code></td></tr>
+        <tr><td><code>claude-opus-4-1-20250805</code></td><td class="fail">CRITICAL · 3 days</td><td><code>config.yaml:2</code></td></tr>
+        <tr><td>Assistants API</td><td class="fail">CRITICAL · 24 days</td><td><code>app.py:4</code></td></tr>
+        <tr><td><code>gpt-4-0613</code></td><td class="warn">WARN · 82 days</td><td><code>app.py:3</code></td></tr>
+      </table>
+      <p class="note">The Gemini reference is already past its published shutdown date. If that path still executes and depends on the retired model, it is already broken; static analysis alone cannot prove that the file is live or reachable.</p>
+    </div>
+
+    <div class="card ok">
+      <div class="step">② Evidence stays in its lane</div>
+      <div class="stats" style="margin:10px 0 0">
+        <div class="stat"><b>6</b><span>Confirmed evidence</span></div>
+        <div class="stat"><b>2</b><span>Likely references</span></div>
+        <div class="stat"><b>2</b><span>Unverified hypotheses</span></div>
+        <div class="stat"><b>1</b><span>Needs runtime data</span></div>
+      </div>
+      <pre>dynamic f-string      → Unverified hypotheses
+runtime MODELS router → Unverified hypotheses
+remote config service → Additional data required</pre>
+      <p class="note">Dynamic selection is never promoted to Confirmed and never presented as clean. Runtime logs are the missing evidence.</p>
+    </div>
+
+    <div class="card ok">
+      <div class="step">③ Reproducible deadline gate</div>
+      <div class="stats" style="margin:2px 0 0">
+        <div class="stat"><b>11 / 12</b><span>planted cases detected independently</span></div>
+        <div class="stat"><b>0 days</b><span>registry snapshot age</span></div>
+        <div class="stat"><b>exit 1</b><span>retired / ≤30-day gate</span></div>
+      </div>
+      <p class="note">The twelfth planted case is the current-model negative control and correctly produces no finding. Provider snapshots are dated and the weekly CI run fails when a live-code finding is retired or inside the configured deadline.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="label">Four-section method</div>
+    <h2>The classification is the honesty boundary.</h2>
+    <pre>Confirmed evidence        exact literal registry match
+Likely                    strong indirect reference, such as an env default
+Unverified hypotheses     dynamic construction or runtime router
+Additional data required  remote config, database, or feature-flag evidence</pre>
+  </section>
+
+  <section>
+    <div class="label">Honest limitations</div>
+    <pre>· Static analysis cannot resolve model names chosen at runtime.
+· This tool inventories references and deadlines; it does not perform migrations.
+· Vendor dates come from dated registry snapshots and must be re-verified at source.
+· A clean report means “nothing matched the registry,” not “your system is safe.”
+· A static reference does not prove that a file is deployed, reachable, or executed.</pre>
+  </section>
+
+  <div class="foot">This is a deterministic synthetic sample demonstrating the inventory method. <a href="https://github.com/jigonyoo/llm-deprecation-radar" target="_blank" rel="noopener">Inspect the dated registries, scanner, tests, and generated report ↗</a></div>
+</div>
+</body>
+</html>
