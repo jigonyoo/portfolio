@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AI Product Extractor — The Row That Parses but Lies, Sent to a Human</title>
+<meta name="description" content="Messy product listings to structured rows, with a review gate that catches the price a rule-based parser gets confidently wrong, and a coverage report that names what the backend cannot fill.">
+<style>
+:root{--bg:#0a0e0d;--panel:#10171a;--panel-2:#0d1315;--line:#1c2a2b;--txt:#e7f0ee;--muted:#869a97;--green:#22c55e;--green-dim:#15803d;--green-soft:rgba(34,197,94,.12);--amber:#f5b544;--red:#fb7185}*{box-sizing:border-box}html,body{margin:0}body{background:radial-gradient(1100px 600px at 85% -8%,rgba(34,197,94,.09),transparent 60%),var(--bg);color:var(--txt);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Arial,sans-serif}.wrap{max-width:1040px;margin:auto;padding:34px 24px 64px}a{color:inherit;text-decoration:none}.top,.actions,.stats{display:flex;gap:10px;flex-wrap:wrap}.top{justify-content:space-between;align-items:flex-start}.eyebrow{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase}h1{font-size:clamp(28px,5vw,46px);line-height:1.1;margin:9px 0}.lead{color:#cdd8d5;font-size:17px;max-width:720px}.badge,.btn{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:8px;padding:7px 11px;font-size:12px;font-weight:750}.badge{color:var(--green);background:var(--green-soft)}.btn:hover{border-color:var(--green)}section{margin-top:34px}.label{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;border-bottom:1px solid var(--line);padding-bottom:8px}h2{font-size:22px;margin:13px 0 8px}.card{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:18px;margin-top:13px}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}@media(max-width:760px){.grid{grid-template-columns:1fr}}pre{white-space:pre-wrap;overflow:auto;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:15px;color:#cdd8d5}.stat{flex:1;min-width:145px}.stat b{display:block;font-size:24px;color:var(--green)}table{width:100%;border-collapse:collapse}th,td{text-align:left;border-bottom:1px solid var(--line);padding:10px 8px}th{color:var(--muted);font-size:12px}.alert{color:var(--red);font-weight:800}.ok{color:var(--green);font-weight:800}.warn{color:var(--amber);font-weight:800}.foot{margin-top:42px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}.foot a{color:var(--green)}
+</style>
+</head>
+<body><main class="wrap">
+<header class="top"><div><div class="eyebrow">AI automation · extraction with a review gate</div><h1>ai-product-extractor</h1><p class="lead">Messy listings become structured rows. The interesting part is not the extraction — it is the row that extracts cleanly and is still wrong, and what the pipeline does about it.</p><span class="badge">Public · synthetic demo · offline</span></div><nav class="actions"><a class="btn" href="https://github.com/jigonyoo/ai-product-extractor" target="_blank" rel="noopener">GitHub Code ↗</a><a class="btn" href="../index.html">← Back to hub</a></nav></header>
+
+<section><div class="label">The problem</div><h2>"It extracted a price" is not "it extracted the right price."</h2><p>A rule-based parser reads a listing, finds a currency symbol followed by digits, and returns a number. It looks like a success. On a listing that says <em>"was $119 now $79.95"</em> it returns <strong>119</strong> — confidently, silently, and wrong by $39.05. Nothing in the output says anything is amiss. That single row is the whole reason this project exists.</p></section>
+
+<section><div class="label">Input</div><h2>Ten deliberately messy listings</h2><pre>L001  Anker PowerCore 10000 Portable Charger — $25.99. 10000mAh. In stock.
+L004  Instant Pot Duo 7-in-1 pressure cooker, 6 Quart. was $119 now $79.95!
+L006  handmade oak cutting board, ~30x20cm, no price listed, contact for availability
+L007  샤오미 미밴드 39,900원 재고있음
+L009  USB-C cable 2m — $8
+
+Mixed currencies (USD/KRW), HTML noise, sale prices, missing prices,
+Korean stock wording. Ten rows, one target schema.</pre></section>
+
+<section><div class="label">The money shot</div><h2>Actual output of <code>pipeline.py</code> on the committed listings</h2>
+<div class="stats"><div class="card stat"><span>Rows in</span><b>10</b></div><div class="card stat"><span>Sent to a human</span><b>2</b></div><div class="card stat"><span>Auto-passed</span><b>8</b></div><div class="card stat"><span>Errors in auto-passed rows</span><b>0</b></div></div>
+<div class="card"><table><thead><tr><th>Row</th><th>What the gate saw</th><th>Decision</th></tr></thead><tbody>
+<tr><td><code>L004</code> — "was $119 now $79.95"</td><td>two distinct prices in the source; a rule-based pick is a coin flip</td><td class="alert">price_ambiguous → review</td></tr>
+<tr><td><code>L006</code> — "no price listed"</td><td>no price to extract at all</td><td class="alert">price_missing → review</td></tr>
+<tr><td>the other 8 rows</td><td>one unambiguous price, currency and availability resolved</td><td class="ok">auto-pass</td></tr>
+</tbody></table>
+<p style="margin-bottom:0">Checked against the committed ground truth, the 8 auto-passed rows contain <strong>zero</strong> errors in price, currency, or availability. The one row a naive pipeline would have shipped wrong is exactly the one that got flagged. Nothing else was flagged — the gate does not cry on rows it can actually judge.</p></div></section>
+
+<section><div class="label">Naive vs gated</div><h2>Same extractor, same data, different honesty</h2>
+<div class="card"><table><thead><tr><th></th><th>No gate</th><th>With the gate</th></tr></thead><tbody>
+<tr><td>Rows shipped as final</td><td>10</td><td>8</td></tr>
+<tr><td>Wrong values shipped silently</td><td class="alert">1 &nbsp;(L004: $119 instead of $79.95)</td><td class="ok">0</td></tr>
+<tr><td>Rows a human must look at</td><td>unknown — nothing says which</td><td class="ok">2, named, with the reason</td></tr>
+<tr><td>False alarms</td><td>—</td><td class="ok">0</td></tr>
+</tbody></table></div></section>
+
+<section><div class="label">Field coverage</div><h2>What this backend fills, and what it openly does not</h2>
+<div class="card"><table><thead><tr><th>Field</th><th>Filled</th><th>Coverage</th></tr></thead><tbody>
+<tr><td>name</td><td>10 / 10</td><td class="ok">100%</td></tr>
+<tr><td>availability</td><td>10 / 10</td><td class="ok">100%</td></tr>
+<tr><td>price</td><td>9 / 10</td><td class="ok">90%</td></tr>
+<tr><td>currency</td><td>9 / 10</td><td class="ok">90%</td></tr>
+<tr><td>brand</td><td>0 / 10</td><td class="alert">0% — the offline backend does not do this</td></tr>
+<tr><td>category</td><td>0 / 10</td><td class="alert">0% — the offline backend does not do this</td></tr>
+</tbody></table>
+<p style="margin-bottom:0">This is the distinction the project is built on. A <em>wrong</em> value is a per-row alarm and goes to a human. A field the backend structurally cannot fill is a <em>capability gap</em> — it is printed as 0% in every run rather than flagged on all ten rows, because a checker that fires on everything is as useless as one that never fires. Brand and category are what the LLM backend is for; the offline path is the deterministic baseline that runs anywhere, with no key.</p></div></section>
+
+<section><div class="label">How it's verified</div><h2>Runs offline, twice, with the same result.</h2><p>Every listing is validated against a Pydantic schema before it reaches SQLite, and rows upsert on a stable business key. Running the pipeline twice leaves the <code>products</code> table at <strong>10 rows</strong> with <strong>2</strong> still marked <code>needs_review</code> — no duplication, no drift. The unit suite covers currency parsing, HTML stripping, the missing-price path, the was/now ambiguity path, and — deliberately — that an unambiguous row is <em>not</em> flagged: <strong>6 tests, all passing</strong>. No API key is required for any of it.</p></section>
+
+<section><div class="label">Honest limitations</div><div class="card"><ul>
+<li>Ten synthetic listings are a demonstration of the method, not a benchmark. Real accuracy depends entirely on the client's source text.</li>
+<li>The offline backend extracts no brand and no category. Seven of the eight auto-passed rows do have a brand stated in the source that this path leaves empty — the coverage report says so on every run rather than letting it pass unnoticed.</li>
+<li>The gate catches ambiguity and absence, not plausibility. A single, clean, wrong number in the source will still pass.</li>
+<li>The LLM backend is implemented and documented but is not measured here, because running it requires an API key. No numbers are claimed for it.</li>
+</ul></div></section>
+
+<footer class="foot">A synthetic sample demonstrating the method; no client data is included. <a href="https://github.com/jigonyoo/ai-product-extractor" target="_blank" rel="noopener">Inspect the code, tests, and validation layer ↗</a></footer>
+</main></body></html>

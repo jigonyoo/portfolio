@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hardware Parts Data Pipeline — Two Catalogues, One Comparable Schema</title>
+<meta name="description" content="Two robotics retailers with 192 differently-named spec fields normalized into one typed catalogue of 380 products, loaded idempotently into SQLite.">
+<style>
+:root{--bg:#0a0e0d;--panel:#10171a;--panel-2:#0d1315;--line:#1c2a2b;--txt:#e7f0ee;--muted:#869a97;--green:#22c55e;--green-dim:#15803d;--green-soft:rgba(34,197,94,.12);--amber:#f5b544;--red:#fb7185}*{box-sizing:border-box}html,body{margin:0}body{background:radial-gradient(1100px 600px at 85% -8%,rgba(34,197,94,.09),transparent 60%),var(--bg);color:var(--txt);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Arial,sans-serif}.wrap{max-width:1040px;margin:auto;padding:34px 24px 64px}a{color:inherit;text-decoration:none}.top,.actions,.stats{display:flex;gap:10px;flex-wrap:wrap}.top{justify-content:space-between;align-items:flex-start}.eyebrow{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase}h1{font-size:clamp(28px,5vw,46px);line-height:1.1;margin:9px 0}.lead{color:#cdd8d5;font-size:17px;max-width:720px}.badge,.btn{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:8px;padding:7px 11px;font-size:12px;font-weight:750}.badge{color:var(--green);background:var(--green-soft)}.btn:hover{border-color:var(--green)}section{margin-top:34px}.label{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;border-bottom:1px solid var(--line);padding-bottom:8px}h2{font-size:22px;margin:13px 0 8px}.card{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:18px;margin-top:13px}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}@media(max-width:760px){.grid{grid-template-columns:1fr}}pre{white-space:pre-wrap;overflow:auto;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:15px;color:#cdd8d5}.stat{flex:1;min-width:145px}.stat b{display:block;font-size:24px;color:var(--green)}figure{margin:0}img{width:100%;height:auto;border-radius:9px;background:white}figcaption{color:var(--muted);font-size:12px;margin-top:7px}table{width:100%;border-collapse:collapse}th,td{text-align:left;border-bottom:1px solid var(--line);padding:10px 8px}th{color:var(--muted);font-size:12px}.alert{color:var(--red);font-weight:800}.ok{color:var(--green);font-weight:800}.foot{margin-top:42px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}.foot a{color:var(--green)}
+</style>
+</head>
+<body><main class="wrap">
+<header class="top"><div><div class="eyebrow">Data engineering · multi-source normalization</div><h1>hardware-parts-data-pipeline</h1><p class="lead">Two robotics retailers describe the same motor in two different vocabularies. This pipeline collapses 192 distinct spec labels into one typed schema of 380 products, then loads it into SQLite so re-runs never duplicate.</p><span class="badge">Public · live retailer data</span></div><nav class="actions"><a class="btn" href="https://github.com/jigonyoo/hardware-parts-data-pipeline" target="_blank" rel="noopener">GitHub Code ↗</a><a class="btn" href="../index.html">← Back to hub</a></nav></header>
+
+<section><div class="label">The problem</div><h2>You cannot compare parts that are not described the same way.</h2><p>Pololu writes <code>Stall torque @ 6V</code> and expresses gear ratio as <code>224:1</code>. Adafruit writes <code>Diameter with rubber tire</code> and states <code>1:48</code>. One lists torque in oz·in, the other in kg·cm; one gives millimetres, the other millimetres <em>and</em> inches in the same string. Across the two catalogues there are <strong>192 distinct spec field names</strong>. Until that is reconciled, "find the best torque per dollar" is not a query — it is a manual afternoon.</p></section>
+
+<section><div class="label">Input</div><h2>The same motor, as the source hands it to you</h2><pre>Solarbotics GM2 224:1 Gear Motor Offset Output   (pololu, raw)
+{
+  "Size":                 "48.2 × 44.8 × 22.7 mm",
+  "Weight":               "32 g",
+  "Gear ratio":           "224:1",
+  "No-load speed @ 6V":   "46 rpm",
+  "No-load current @ 6V": "50 mA",
+  "Stall current @ 6V":   "710 mA",
+  "Stall torque @ 6V":    "57 oz·in",
+  "No-load speed @ 3V":   "24 rpm",     &lt;-- same field, second voltage
+  "Stall current @ 3V":   "400 mA"
+}</pre>
+<p>Every dimension is trapped in one string. Every performance figure exists once per voltage. Nothing here is a number a database can sort on.</p></section>
+
+<section><div class="label">The money shot</div><h2>Actual committed output of <code>normalize.py</code> and <code>pipeline.py</code></h2>
+<div class="stats"><div class="card stat"><span>Products in one schema</span><b>380</b></div><div class="card stat"><span>Duplicates dropped</span><b>0</b></div><div class="card stat"><span>Typed columns</span><b>26</b></div><div class="card stat"><span>Spec labels collapsed</span><b>192</b></div></div>
+<div class="card"><h2 style="margin-top:0">The same motor, after</h2><pre>source              pololu
+sku                 180
+name                Solarbotics GM2 224:1 Gear Motor Offset Output
+brand               Solarbotics
+category            Plastic DC Gearmotors
+price_usd           12.3
+weight_g            32.0
+length_mm           48.2      width_mm  44.8      height_mm  22.7
+gear_ratio          224.0
+rated_voltage_v     6.0       &lt;-- @3V figures dropped; one comparable basis
+no_load_speed_rpm   46.0
+no_load_current_ma  50.0
+stall_current_ma    710.0
+stall_torque_ozin   57.0      &lt;-- kg·cm sources converted (x13.8874)
+spec_count          11        &lt;-- traceability: raw specs kept in raw_specs_json</pre>
+<p style="color:var(--muted);margin-bottom:0">Because every product now sits on the same basis, the pipeline can answer a real question. Best stall torque per dollar in the committed catalogue: <strong>Solarbotics GM8 143:1 Gear Motor</strong> — $12.30 for 76.0 oz·in.</p></div></section>
+
+<section><div class="label">Field coverage</div><h2>What the merge actually filled in — including where it is thin</h2>
+<div class="card"><table><thead><tr><th>Field</th><th>Filled</th><th>Coverage</th></tr></thead><tbody>
+<tr><td>sku · name · category</td><td>380 / 380</td><td class="ok">100%</td></tr>
+<tr><td>brand</td><td>378 / 380</td><td class="ok">99%</td></tr>
+<tr><td>price_usd</td><td>378 / 380</td><td class="ok">99%</td></tr>
+<tr><td>weight_g</td><td>319 / 380</td><td>83%</td></tr>
+<tr><td>length_mm · width_mm</td><td>303 / 380</td><td>79%</td></tr>
+<tr><td>shaft_diameter_mm</td><td>293 / 380</td><td>77%</td></tr>
+<tr><td>height_mm</td><td>277 / 380</td><td>72%</td></tr>
+<tr><td>rated_voltage_v · motor performance</td><td>270–272 / 380</td><td>71%</td></tr>
+<tr><td>encoder</td><td>195 / 380</td><td>51%</td></tr>
+<tr><td>stepper fields (NEMA, steps, holding torque)</td><td>23–29 / 380</td><td class="alert">6–7%</td></tr>
+<tr><td>status</td><td>23 / 380</td><td class="alert">6%</td></tr>
+</tbody></table><p style="color:var(--muted);margin-bottom:0">The low rows are not failures to hide — they are what the sources publish. Stepper-specific fields only apply to the 23–29 steppers in the catalogue, and most listings carry no status label at all. A coverage table you can read is worth more than a schema that looks full.</p></div></section>
+
+<section><div class="label">How it's verified</div><h2>Re-running is safe, and that is measured, not asserted.</h2><p>The ETL stage upserts on a stable business key and writes a run log. Running <code>pipeline.py</code> twice in a row on the committed CSVs leaves the <code>products</code> table at <strong>380 rows</strong> with <strong>2 entries in <code>run_log</code></strong> — the loads are recorded, the data is not duplicated. Extraction counts are printed each run (310 from Pololu, 70 from Adafruit) so a silent short read is visible immediately.</p>
+<div class="card"><table><thead><tr><th>Check</th><th>Actual result</th></tr></thead><tbody>
+<tr><td>Merge without duplication</td><td class="ok">380 products, 0 dropped as duplicates</td></tr>
+<tr><td>Idempotent load (2 consecutive runs)</td><td class="ok">products = 380 both times · run_log = 2</td></tr>
+<tr><td>Row counts per source</td><td class="ok">pololu 310 · adafruit 70</td></tr>
+<tr><td>Unit harmonization</td><td class="ok">torque → oz·in · current → mA · dimensions → mm · weight → g</td></tr>
+<tr><td>Traceability</td><td class="ok">original specs preserved in <code>raw_specs_json</code></td></tr>
+</tbody></table></div></section>
+
+<section><div class="label">Honest limitations</div><div class="card"><ul>
+<li>The scrapers are rate-limited and respect <code>robots.txt</code>; the committed CSVs are a snapshot, so prices and stock in this catalogue are historical, not live.</li>
+<li>Adafruit's spec coverage is genuinely thinner than Pololu's. The merge does not invent the missing values — it leaves them empty and reports the rate.</li>
+<li>Voltage-parameterized specs are collapsed to each product's rated voltage. Figures at other voltages remain in <code>raw_specs_json</code> but are not columns.</li>
+<li>Two retailers is a demonstration, not a market. Adding a third source means new label mappings, and that work is explicit rather than automatic.</li>
+</ul></div></section>
+
+<footer class="foot">A working sample built on public retailer data; no client data is included. <a href="https://github.com/jigonyoo/hardware-parts-data-pipeline" target="_blank" rel="noopener">Inspect the code, schema, and catalogue ↗</a></footer>
+</main></body></html>
