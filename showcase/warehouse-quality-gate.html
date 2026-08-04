@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>warehouse-quality-gate &mdash; Stop the Batch Before It Becomes a Wrong Number</title>
+<style>
+  :root{--bg:#0a0e0d;--panel:#10171a;--panel-2:#0d1315;--line:#1c2a2b;--txt:#e7f0ee;--muted:#869a97;--dim:#5f7370;--green:#22c55e;--green-dim:#15803d;--green-soft:rgba(34,197,94,.12);--amber:#f5b544;--red:#fb7185}
+  *{box-sizing:border-box}html,body{margin:0}
+  body{background:radial-gradient(1100px 600px at 85% -8%,rgba(34,197,94,.09),transparent 60%),var(--bg);color:var(--txt);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Arial,sans-serif}
+  .wrap{max-width:1000px;margin:auto;padding:34px 24px 64px}
+  a{color:inherit;text-decoration:none}
+  .top,.actions,.stats{display:flex;gap:10px;flex-wrap:wrap}.top{justify-content:space-between;align-items:flex-start}
+  .eyebrow{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase}
+  h1{font-size:clamp(28px,5vw,46px);line-height:1.1;margin:9px 0}
+  .lead{color:#cdd8d5;font-size:17px;max-width:760px}
+  .badge,.btn{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:8px;padding:7px 11px;font-size:12px;font-weight:750}
+  .badge{color:var(--green);background:var(--green-soft)}.btn:hover{border-color:var(--green)}
+  section{margin-top:34px}
+  .label{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;border-bottom:1px solid var(--line);padding-bottom:8px}
+  h2{font-size:22px;margin:13px 0 8px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:18px;margin-top:13px}
+  .step{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase}
+  pre{white-space:pre-wrap;overflow:auto;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:15px;color:#cdd8d5;font-size:13px}
+  .issue{border-left:3px solid var(--red)}.ok{border-left:3px solid var(--green)}
+  .stats .stat{flex:1;min-width:150px;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:14px 16px}
+  .stat b{display:block;font-size:26px;color:var(--green)}
+  .stat span{color:var(--muted);font-size:13px}
+  table{width:100%;border-collapse:collapse}th,td{text-align:left;border-bottom:1px solid var(--line);padding:9px 8px;font-size:14px}th{color:var(--muted);font-size:12px}
+  .pass{color:var(--green);font-weight:700}.fail{color:var(--red);font-weight:700}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .foot{margin-top:42px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}.foot a{color:var(--green)}
+  .note{color:var(--muted);font-size:13px;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <div class="eyebrow">Data engineering &middot; dbt contracts</div>
+      <h1>warehouse-quality-gate</h1>
+    </div>
+    <div class="actions">
+      <a class="btn" href="https://github.com/jigonyoo/warehouse-quality-gate" target="_blank" rel="noopener">GitHub Code &#8599;</a>
+      <a class="btn" href="../index.html">&larr; Back to hub</a>
+    </div>
+  </div>
+  <p class="lead">A <b>dbt contract</b> that blocks a bad batch before it reaches the mart. The sabotaged batch loads without a single error and reports revenue of <b>$4,905,051</b> instead of <b>$395,751</b> &mdash; a <b>1,139% overstatement</b> that a plain pipeline waves straight through. The contract fails 12 tests and the mart is never built.</p>
+  <span class="badge">Public &middot; synthetic demo</span>
+
+  <section>
+    <div class="label">The problem</div>
+    <h2>&quot;It loaded without errors&quot; is not a quality signal.</h2>
+    <p class="lead">Every one of the twelve defects in the sabotaged batch is a defect that <em>survives a plain load</em>. Nothing throws. A duplicated customer file, an order amount that arrived in cents, a status with a capital <code>D</code> &mdash; the rows land, the job exits 0, and the number a stakeholder reads is wrong by an order of magnitude.</p>
+  </section>
+
+  <section>
+    <div class="label">The money shot</div>
+    <h2>Same sabotaged batch, loaded two ways</h2>
+
+    <div class="card issue">
+      <div class="step">&#9312; Plain load vs the contract</div>
+      <table>
+        <tr><th>run</th><th class="num">rows loaded</th><th class="num">revenue reported</th><th class="num">errors</th><th class="num">tests failed</th></tr>
+        <tr><td>Plain load &mdash; clean batch</td><td class="num">900</td><td class="num">$395,751.28</td><td class="num">0</td><td class="num">&mdash;</td></tr>
+        <tr><td>Plain load &mdash; sabotaged</td><td class="num">901</td><td class="num fail">$4,905,051.18</td><td class="num fail">0</td><td class="num">&mdash;</td></tr>
+        <tr><td>Contract &mdash; clean batch</td><td class="num">900</td><td class="num">$395,751.28</td><td class="num">0</td><td class="num pass">0 of 15</td></tr>
+        <tr><td>Contract &mdash; sabotaged</td><td class="num"><em>blocked</em></td><td class="num"><em>not built</em></td><td class="num">12</td><td class="num pass">12 of 15</td></tr>
+      </table>
+      <div class="stats" style="margin:10px 0 0">
+        <div class="stat"><b>12/12</b><span>planted defects caught</span></div>
+        <div class="stat"><b>1,139%</b><span>overstatement a plain load ships</span></div>
+        <div class="stat"><b>0</b><span>false alarms on the clean batch</span></div>
+      </div>
+    </div>
+
+    <div class="card ok">
+      <div class="step">&#9313; Two defects worth expanding on</div>
+      <p class="note"><b>D9 tests the raw value, not the normalised one.</b> It is tempting to <code>lower()</code> the status in staging and test the clean column &mdash; but then the test can never fail, and the downstream filter doing an exact match on <code>'delivered'</code> still silently drops the row. The model exposes both <code>status_raw</code> and <code>status_normalised</code>; the contract tests the raw one.</p>
+      <p class="note"><b>D7 is a contract, not a bug.</b> Nothing is wrong with an EUR order. What is wrong is that <code>fct_revenue_daily</code> sums <code>amount</code> without conversion, so mixing currencies makes the total meaningless. The single-currency rule is written down as a test precisely because the assumption lives in a model somewhere else.</p>
+    </div>
+
+    <div class="card ok">
+      <div class="step">&#9314; The twelve, and what caught each</div>
+      <table>
+        <tr><th>#</th><th>what arrived</th><th>caught by</th></tr>
+        <tr><td>D1</td><td>customer_id 8 duplicated &mdash; a re-sent file loaded twice</td><td><code>unique</code></td></tr>
+        <tr><td>D2</td><td>customer 16 email arrived as <code>&quot;&quot;</code>, not NULL</td><td><code>not_null</code></td></tr>
+        <tr><td>D3</td><td>country <code>USA</code> instead of ISO-2 <code>US</code></td><td><code>accepted_values</code></td></tr>
+        <tr><td>D4</td><td>signup_date in 2027 &mdash; an upstream timezone bug</td><td><code>not_in_future</code></td></tr>
+        <tr><td>D5</td><td>order 101 references customer 99999, which does not exist</td><td><code>relationships</code></td></tr>
+        <tr><td>D6</td><td>order 201 amount is <code>-450.00</code> with status <code>placed</code></td><td><code>non_negative</code></td></tr>
+        <tr><td>D7</td><td>orders 301&ndash;302 switched to EUR while the mart sums as USD</td><td><code>accepted_values</code></td></tr>
+        <tr><td>D8</td><td>order 401 amount <code>4,500,000</code> &mdash; a cents/dollars mix-up</td><td><code>within_magnitude</code></td></tr>
+        <tr><td>D9</td><td>status <code>Delivered</code> with a capital D</td><td><code>accepted_values</code> on raw</td></tr>
+        <tr><td>D10</td><td>order 601 present twice &mdash; double revenue recognition</td><td><code>unique</code></td></tr>
+        <tr><td>D11</td><td>order 701 dated before the reporting window opens</td><td><code>within_reporting_window</code></td></tr>
+        <tr><td>D12</td><td>order 801 amount arrived empty and loads as <code>0</code></td><td><code>not_null</code></td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="label">Reproduce it</div>
+    <pre>pip install dbt-core dbt-duckdb
+python3 scripts/make_batches.py     # regenerates both batches, seed is fixed
+./scripts/run_evidence.sh           # runs the contract over each, writes evidence/
+python3 scripts/naive_vs_gate.py    # shows what a plain load reports instead</pre>
+    <p class="note">The warehouse here is DuckDB so the whole thing runs on a laptop in under a second. The contract is ordinary dbt &mdash; moving it to Snowflake, BigQuery or Postgres is a change of <code>profiles.yml</code>, not a change of tests.</p>
+  </section>
+
+  <section>
+    <div class="label">Honest limitations</div>
+    <pre>&middot; Synthetic batches (900 rows, fixed seed) &mdash; a demonstrator of the method, not a benchmark.
+&middot; Contracts stop bad data. They do not tell you a job never ran, or that a scraper returned
+  an empty page &mdash; those are pipeline-heartbeat and scraper-canary.
+&middot; The twelve defects are the ones that survive a plain load. Defects that crash the load
+  are already visible and are deliberately out of scope.</pre>
+  </section>
+
+  <div class="foot">This is a synthetic sample demonstrating the method. <a href="https://github.com/jigonyoo/warehouse-quality-gate" target="_blank" rel="noopener">Inspect the checks, the fixtures, and the reproducible evidence &#8599;</a></div>
+</div>
+</body>
+</html>

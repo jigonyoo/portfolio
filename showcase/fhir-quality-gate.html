@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>fhir-quality-gate &mdash; Valid FHIR That Is Still Wrong</title>
+<style>
+  :root{--bg:#0a0e0d;--panel:#10171a;--panel-2:#0d1315;--line:#1c2a2b;--txt:#e7f0ee;--muted:#869a97;--dim:#5f7370;--green:#22c55e;--green-dim:#15803d;--green-soft:rgba(34,197,94,.12);--amber:#f5b544;--red:#fb7185}
+  *{box-sizing:border-box}html,body{margin:0}
+  body{background:radial-gradient(1100px 600px at 85% -8%,rgba(34,197,94,.09),transparent 60%),var(--bg);color:var(--txt);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Arial,sans-serif}
+  .wrap{max-width:1000px;margin:auto;padding:34px 24px 64px}
+  a{color:inherit;text-decoration:none}
+  .top,.actions,.stats{display:flex;gap:10px;flex-wrap:wrap}.top{justify-content:space-between;align-items:flex-start}
+  .eyebrow{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase}
+  h1{font-size:clamp(28px,5vw,46px);line-height:1.1;margin:9px 0}
+  .lead{color:#cdd8d5;font-size:17px;max-width:760px}
+  .badge,.btn{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:8px;padding:7px 11px;font-size:12px;font-weight:750}
+  .badge{color:var(--green);background:var(--green-soft)}.btn:hover{border-color:var(--green)}
+  section{margin-top:34px}
+  .label{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;border-bottom:1px solid var(--line);padding-bottom:8px}
+  h2{font-size:22px;margin:13px 0 8px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:18px;margin-top:13px}
+  .step{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase}
+  pre{white-space:pre-wrap;overflow:auto;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:15px;color:#cdd8d5;font-size:13px}
+  .issue{border-left:3px solid var(--red)}.ok{border-left:3px solid var(--green)}
+  .stats .stat{flex:1;min-width:150px;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:14px 16px}
+  .stat b{display:block;font-size:26px;color:var(--green)}
+  .stat span{color:var(--muted);font-size:13px}
+  table{width:100%;border-collapse:collapse}th,td{text-align:left;border-bottom:1px solid var(--line);padding:9px 8px;font-size:14px}th{color:var(--muted);font-size:12px}
+  .pass{color:var(--green);font-weight:700}.fail{color:var(--red);font-weight:700}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .foot{margin-top:42px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}.foot a{color:var(--green)}
+  .note{color:var(--muted);font-size:13px;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <div class="eyebrow">Healthcare data &middot; interoperability QA</div>
+      <h1>fhir-quality-gate</h1>
+    </div>
+    <div class="actions">
+      <a class="btn" href="https://github.com/jigonyoo/fhir-quality-gate" target="_blank" rel="noopener">GitHub Code &#8599;</a>
+      <a class="btn" href="../index.html">&larr; Back to hub</a>
+    </div>
+  </div>
+  <p class="lead">A FHIR bundle can be <b>structurally valid and still wrong in ways that cost money</b>. The drifted bundle here is valid JSON, valid FHIR R4, and passes a structural validator. It also carries three type-2 diabetes diagnoses written <code>E119</code> instead of <code>E11.9</code> &mdash; enough to drop <b>3 patients out of a 46-patient quality-measure denominator</b> without raising anything at all. <code>fhir-gate</code> catches <b>12 of 12</b> planted defect types and <b>0</b> on the clean bundle.</p>
+  <span class="badge">Public &middot; synthetic demo</span>
+
+  <section>
+    <div class="label">The problem</div>
+    <h2>Neither run raised an error. Both produced a number.</h2>
+    <p class="lead">Both bundles carry <b>identical base data</b> &mdash; same 300 patients, same observations, same seed. Every difference below is a planted defect, not sampling noise. The measure: adults with active type-2 diabetes (E11.9) who have a glucose result on file.</p>
+
+    <div class="card issue">
+      <div class="step">&#9312; What a quality measure computes on each</div>
+      <table>
+        <tr><th>bundle</th><th class="num">patients</th><th class="num">denominator</th><th class="num">numerator</th><th class="num">measure</th></tr>
+        <tr><td>clean</td><td class="num">300</td><td class="num">46</td><td class="num">26</td><td class="num pass">56.5%</td></tr>
+        <tr><td>drifted</td><td class="num">300</td><td class="num fail">43</td><td class="num fail">24</td><td class="num fail">55.8%</td></tr>
+      </table>
+      <p class="note">Three patients left the denominator because of a <b>missing decimal point</b>, and two glucose results vanished &mdash; one referencing a patient not in the bundle, one labelled with the SNOMED system URI instead of LOINC. <b>Neither run errored.</b> Both produce a number that looks like a measure result.</p>
+      <div class="stats" style="margin:10px 0 0">
+        <div class="stat"><b>12/12</b><span>defect types caught</span></div>
+        <div class="stat"><b>0</b><span>findings on the clean bundle</span></div>
+        <div class="stat"><b>6.5%</b><span>cohort shift from one missing period</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="label">The money shot</div>
+    <h2>Three that show up in real integration work</h2>
+
+    <div class="card ok">
+      <div class="step">&#9313; F9 &mdash; invisible, not wrong</div>
+      <p class="note">A glucose result carrying LOINC <code>2339-0</code> under <code>http://snomed.info/sct</code> is not rejected by anything &mdash; it simply never matches a query filtering on <code>system = 'http://loinc.org'</code>. Nothing errors. The result is just not there. This is the failure mode that takes weeks to find, because <b>every individual record looks fine when you open it</b>.</p>
+    </div>
+
+    <div class="card ok">
+      <div class="step">&#9314; F5 &mdash; the one that reaches a patient</div>
+      <p class="note">The unit says inches, the magnitude is still centimetres. Downstream BMI is computed from a height of <b>170 inches</b>. No validator objects, because <code>in</code> is a perfectly good UCUM unit.</p>
+    </div>
+
+    <div class="card ok">
+      <div class="step">&#9315; F12 &mdash; cheapest to fix, most expensive to miss</div>
+      <p class="note"><code>E119</code> is four characters that a payer's adjudication engine rejects outright. Here it removed three patients from a 46-patient denominator &mdash; a <b>6.5% shift in the cohort</b>, from one missing period.</p>
+    </div>
+
+    <div class="card ok">
+      <div class="step">&#9316; The 12 checks</div>
+      <table>
+        <tr><th>#</th><th>severity</th><th>what it catches</th></tr>
+        <tr><td>F2</td><td class="fail">critical</td><td>duplicate resource id in one bundle &mdash; counted twice, or overwritten</td></tr>
+        <tr><td>F4</td><td class="fail">critical</td><td>Patient with no identifier &mdash; a new patient on every import</td></tr>
+        <tr><td>F5</td><td class="fail">critical</td><td>unit does not match the LOINC code &mdash; a height of 170 becomes 170 inches</td></tr>
+        <tr><td>F7</td><td class="fail">critical</td><td>subject reference points outside the bundle &mdash; orphaned from every roll-up</td></tr>
+        <tr><td>F8</td><td class="fail">critical</td><td>value outside the plausible band &mdash; systolic 4200 mm[Hg] moves a cohort mean</td></tr>
+        <tr><td>F9</td><td class="fail">critical</td><td>LOINC code declared under the SNOMED system URI &mdash; invisible, not wrong</td></tr>
+        <tr><td>F12</td><td class="fail">critical</td><td>ICD-10-CM without its decimal point &mdash; the claim is rejected</td></tr>
+        <tr><td>F1</td><td>high</td><td>gender outside the value set (<code>M</code> not <code>male</code>) &mdash; coerced to unknown</td></tr>
+        <tr><td>F3</td><td>high</td><td>birthDate in the future &mdash; age-banded measures exclude the patient</td></tr>
+        <tr><td>F6</td><td>high</td><td>code and display disagree &mdash; humans read one thing, systems compute another</td></tr>
+        <tr><td>F10</td><td>high</td><td>dateTime with no timezone offset &mdash; a 23:00 result lands on the wrong day</td></tr>
+        <tr><td>F11</td><td>high</td><td>status <code>FINAL</code> where the value set is lowercase &mdash; treated as missing</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="label">What this is not</div>
+    <h2>Not a structural validator.</h2>
+    <p class="lead">It assumes the bundle already parses and already conforms to R4 &mdash; use the HL7 validator for that. These checks sit <b>one layer up</b>, where the resource is valid and the meaning is still wrong.</p>
+    <p class="note">Terminology is pinned in <code>fhirgate/checks.py</code> rather than fetched, so the repo runs offline and the result is reproducible. In production those tables come from a terminology server; the check logic does not change.</p>
+  </section>
+
+  <section>
+    <div class="label">Reproduce it</div>
+    <pre>./scripts/run_evidence.sh          # everything, into evidence/
+python3 -m fhirgate.cli bundles/drifted.json --today 2026-08-04</pre>
+    <p class="note">No dependencies beyond the standard library. Bundles are generated deterministically from seed 20260804.</p>
+  </section>
+
+  <section>
+    <div class="label">Honest limitations</div>
+    <pre>&middot; Synthetic bundles (300 patients, seed 20260804) &mdash; a demonstrator of the method, not a benchmark.
+&middot; Terminology tables are pinned, not fetched from a terminology server.
+&middot; Structural R4 conformance is assumed, not tested &mdash; that is the HL7 validator's job.
+&middot; No PHI: every resource is generated, none is derived from a real record.</pre>
+  </section>
+
+  <div class="foot">This is a synthetic sample demonstrating the method. <a href="https://github.com/jigonyoo/fhir-quality-gate" target="_blank" rel="noopener">Inspect the checks, the fixtures, and the reproducible evidence &#8599;</a></div>
+</div>
+</body>
+</html>

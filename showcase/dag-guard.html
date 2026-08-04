@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>dag-guard &mdash; What a Green DAG in the Airflow UI Will Not Tell You</title>
+<style>
+  :root{--bg:#0a0e0d;--panel:#10171a;--panel-2:#0d1315;--line:#1c2a2b;--txt:#e7f0ee;--muted:#869a97;--dim:#5f7370;--green:#22c55e;--green-dim:#15803d;--green-soft:rgba(34,197,94,.12);--amber:#f5b544;--red:#fb7185}
+  *{box-sizing:border-box}html,body{margin:0}
+  body{background:radial-gradient(1100px 600px at 85% -8%,rgba(34,197,94,.09),transparent 60%),var(--bg);color:var(--txt);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Arial,sans-serif}
+  .wrap{max-width:1000px;margin:auto;padding:34px 24px 64px}
+  a{color:inherit;text-decoration:none}
+  .top,.actions,.stats{display:flex;gap:10px;flex-wrap:wrap}.top{justify-content:space-between;align-items:flex-start}
+  .eyebrow{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase}
+  h1{font-size:clamp(28px,5vw,46px);line-height:1.1;margin:9px 0}
+  .lead{color:#cdd8d5;font-size:17px;max-width:760px}
+  .badge,.btn{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:8px;padding:7px 11px;font-size:12px;font-weight:750}
+  .badge{color:var(--green);background:var(--green-soft)}.btn:hover{border-color:var(--green)}
+  section{margin-top:34px}
+  .label{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;border-bottom:1px solid var(--line);padding-bottom:8px}
+  h2{font-size:22px;margin:13px 0 8px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:18px;margin-top:13px}
+  .step{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase}
+  pre{white-space:pre-wrap;overflow:auto;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:15px;color:#cdd8d5;font-size:13px}
+  .issue{border-left:3px solid var(--red)}.ok{border-left:3px solid var(--green)}
+  .stats .stat{flex:1;min-width:150px;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:14px 16px}
+  .stat b{display:block;font-size:26px;color:var(--green)}
+  .stat span{color:var(--muted);font-size:13px}
+  table{width:100%;border-collapse:collapse}th,td{text-align:left;border-bottom:1px solid var(--line);padding:9px 8px;font-size:14px}th{color:var(--muted);font-size:12px}
+  .pass{color:var(--green);font-weight:700}.fail{color:var(--red);font-weight:700}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .foot{margin-top:42px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}.foot a{color:var(--green)}
+  .note{color:var(--muted);font-size:13px;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <div class="eyebrow">Data engineering &middot; orchestration review</div>
+      <h1>dag-guard</h1>
+    </div>
+    <div class="actions">
+      <a class="btn" href="https://github.com/jigonyoo/dag-guard" target="_blank" rel="noopener">GitHub Code &#8599;</a>
+      <a class="btn" href="../index.html">&larr; Back to hub</a>
+    </div>
+  </div>
+  <p class="lead">Reads your Airflow DAG files with <code>ast</code> &mdash; <b>no Airflow install, no imports, no side effects</b> &mdash; and reports what a green DAG in the UI will not. The sabotaged DAG here is valid Python that parses without warnings. It also queues <b>90,816 backfill runs the moment it deploys</b>, writes revenue twice from two unordered tasks, and pages nobody when it fails at 3am.</p>
+  <span class="badge">Public &middot; synthetic demo</span>
+
+  <section>
+    <div class="label">The problem</div>
+    <h2>The DAG renders perfectly. That is the problem.</h2>
+    <p class="lead">Nothing about <code>broken_pipeline.py</code> looks wrong in review. It parses, it renders, the graph makes sense. The defects are all <em>configuration</em> &mdash; a missing <code>max_active_runs</code>, an append-only write with retries enabled, two writers to one table with no edge between them. They only become visible in production, usually at the worst moment.</p>
+  </section>
+
+  <section>
+    <div class="label">The money shot</div>
+    <h2>Both DAGs, checked</h2>
+
+    <div class="card issue">
+      <div class="step">&#9312; 12 planted defects, 12 caught, 0 false alarms</div>
+      <pre>planted defects      : 12
+caught               : 12
+missed               : none
+false alarms on clean: 0
+
+OK  12/12 caught, 0 false alarms</pre>
+      <div class="stats" style="margin:10px 0 0">
+        <div class="stat"><b>90,816</b><span>backfill runs O1 computes</span></div>
+        <div class="stat"><b>5 / 5 / 2</b><span>critical / high / medium &mdash; exit 1</span></div>
+        <div class="stat"><b>0</b><span>findings on the clean DAG &mdash; exit 0</span></div>
+      </div>
+      <p class="note">Exit code 1 on high or critical, so CI blocks the merge. The clean DAG exits 0 and the same job stays quiet.</p>
+    </div>
+
+    <div class="card ok">
+      <div class="step">&#9313; Three that cause incidents rather than annoyance</div>
+      <p class="note"><b>O1 computes the actual number.</b> <code>catchup=True</code> is not a defect by itself &mdash; it is a defect when <code>start_date</code> is far in the past and the schedule is short. The check does the arithmetic: <code>(now &minus; start_date) / interval</code>. Here that is <b>90,816 runs</b>. A reviewer skimming the file sees <code>catchup=True</code> and moves on; the number is what makes it real.</p>
+      <p class="note"><b>O6 and O11 are a pair.</b> O6 says the write is not idempotent. O11 says two of them run with no ordering. Either alone is survivable. Together they mean the revenue number depends on scheduler timing &mdash; the kind of bug that gets found in a board meeting.</p>
+      <p class="note"><b>O10 is about worker economics.</b> A sensor in <code>poke</code> mode holds its slot while it waits. With a 15-minute schedule and a 24-hour timeout, every run parks a worker for up to a day. The pool fills with sensors waiting for upstreams that are themselves waiting for a free slot.</p>
+    </div>
+
+    <div class="card ok">
+      <div class="step">&#9314; The 12 checks</div>
+      <table>
+        <tr><th>#</th><th>severity</th><th>what it catches</th></tr>
+        <tr><td>O1</td><td class="fail">critical</td><td><code>catchup=True</code> over a long backlog &mdash; 90,816 runs queue on deploy</td></tr>
+        <tr><td>O3</td><td class="fail">critical</td><td>dependency cycle &mdash; the DAG can never complete</td></tr>
+        <tr><td>O5</td><td class="fail">critical</td><td>no <code>max_active_runs</code> on a short schedule &mdash; two writers, one table</td></tr>
+        <tr><td>O6</td><td class="fail">critical</td><td>append-only write a rerun duplicates &mdash; silently double-counted revenue</td></tr>
+        <tr><td>O11</td><td class="fail">critical</td><td>two writers to one target with no edge &mdash; row count depends on finish order</td></tr>
+        <tr><td>O2</td><td>high</td><td><code>retries</code> not set &mdash; one 503 ends the whole run</td></tr>
+        <tr><td>O7</td><td>high</td><td><code>depends_on_past</code> with no retry budget &mdash; one failure blocks every future run</td></tr>
+        <tr><td>O9</td><td>high</td><td>no <code>execution_timeout</code> &mdash; a hung request holds a worker slot forever</td></tr>
+        <tr><td>O10</td><td>high</td><td>sensor waits longer than the schedule interval in <code>poke</code> mode</td></tr>
+        <tr><td>O12</td><td>high</td><td>no <code>on_failure_callback</code> &mdash; it fails at 3am, someone notices at 9</td></tr>
+        <tr><td>O4</td><td>medium</td><td>task with no dependencies either way &mdash; readers may get the stale version</td></tr>
+        <tr><td>O8</td><td>medium</td><td>no SLA anywhere &mdash; late is not failed, so a stale dashboard looks live</td></tr>
+      </table>
+      <p class="note">Every finding carries three fields, not one: <b>evidence</b> (what is in the file), <b>impact</b> (what happens in production), <b>fix</b> (what to change). A finding that only says &quot;missing retries&quot; gets ignored; one that says what breaks does not.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="label">Why parse instead of import</div>
+    <h2>Importing a DAG is the obvious way to inspect it, and the wrong one.</h2>
+    <p class="lead">Importing executes module-level code, so it needs the whole Airflow install, every connection the file touches, and any credential a top-level client happens to construct &mdash; a slow, fragile CI job that fails for reasons unrelated to the DAG. <code>dag-guard</code> parses with <code>ast</code> instead: it runs on a plain <code>python:3.11-slim</code> image in about a second and <b>cannot have side effects</b>.</p>
+    <p class="note">The tradeoff is stated honestly: it sees what is written in the file, not what a dynamically generated DAG resolves to at runtime.</p>
+  </section>
+
+  <section>
+    <div class="label">Reproduce it</div>
+    <pre>python3 tests/test_checks.py      # the 12/12 assertion above
+./scripts/run_evidence.sh         # full output for both DAGs into evidence/
+python3 -m dagguard.cli dags/*.py --now 2026-08-04</pre>
+  </section>
+
+  <section>
+    <div class="label">Honest limitations</div>
+    <pre>&middot; Static analysis: dynamically generated DAGs resolve at runtime and are out of reach.
+&middot; Synthetic DAG pair (one clean, one with 12 planted defects) &mdash; a demonstrator, not a benchmark.
+&middot; It checks the orchestration. Whether the data itself is correct is warehouse-quality-gate;
+  whether a job silently moved zero rows is pipeline-heartbeat.</pre>
+  </section>
+
+  <div class="foot">This is a synthetic sample demonstrating the method. <a href="https://github.com/jigonyoo/dag-guard" target="_blank" rel="noopener">Inspect the checks, the fixtures, and the reproducible evidence &#8599;</a></div>
+</div>
+</body>
+</html>

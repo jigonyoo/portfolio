@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>metrics-contract &mdash; Two Dashboards, Same Data, Different Numbers</title>
+<style>
+  :root{--bg:#0a0e0d;--panel:#10171a;--panel-2:#0d1315;--line:#1c2a2b;--txt:#e7f0ee;--muted:#869a97;--dim:#5f7370;--green:#22c55e;--green-dim:#15803d;--green-soft:rgba(34,197,94,.12);--amber:#f5b544;--red:#fb7185}
+  *{box-sizing:border-box}html,body{margin:0}
+  body{background:radial-gradient(1100px 600px at 85% -8%,rgba(34,197,94,.09),transparent 60%),var(--bg);color:var(--txt);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Arial,sans-serif}
+  .wrap{max-width:1000px;margin:auto;padding:34px 24px 64px}
+  a{color:inherit;text-decoration:none}
+  .top,.actions,.stats{display:flex;gap:10px;flex-wrap:wrap}.top{justify-content:space-between;align-items:flex-start}
+  .eyebrow{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase}
+  h1{font-size:clamp(28px,5vw,46px);line-height:1.1;margin:9px 0}
+  .lead{color:#cdd8d5;font-size:17px;max-width:760px}
+  .badge,.btn{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:8px;padding:7px 11px;font-size:12px;font-weight:750}
+  .badge{color:var(--green);background:var(--green-soft)}.btn:hover{border-color:var(--green)}
+  section{margin-top:34px}
+  .label{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;border-bottom:1px solid var(--line);padding-bottom:8px}
+  h2{font-size:22px;margin:13px 0 8px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:18px;margin-top:13px}
+  .step{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase}
+  pre{white-space:pre-wrap;overflow:auto;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:15px;color:#cdd8d5;font-size:13px}
+  .issue{border-left:3px solid var(--red)}.ok{border-left:3px solid var(--green)}
+  .stats .stat{flex:1;min-width:150px;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:14px 16px}
+  .stat b{display:block;font-size:26px;color:var(--green)}
+  .stat span{color:var(--muted);font-size:13px}
+  table{width:100%;border-collapse:collapse}th,td{text-align:left;border-bottom:1px solid var(--line);padding:9px 8px;font-size:14px}th{color:var(--muted);font-size:12px}
+  .pass{color:var(--green);font-weight:700}.fail{color:var(--red);font-weight:700}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .foot{margin-top:42px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}.foot a{color:var(--green)}
+  .note{color:var(--muted);font-size:13px;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <div class="eyebrow">Analytics engineering &middot; metric governance</div>
+      <h1>metrics-contract</h1>
+    </div>
+    <div class="actions">
+      <a class="btn" href="https://github.com/jigonyoo/metrics-contract" target="_blank" rel="noopener">GitHub Code &#8599;</a>
+      <a class="btn" href="../index.html">&larr; Back to hub</a>
+    </div>
+  </div>
+  <p class="lead">Two dashboards read the same 4,000 orders and report different numbers. <b>Neither is broken.</b> <code>growth_daily</code> says the business has <b>3,119 buyers</b>; finance says <b>870</b>. One writes <code>count(user_id)</code>, the other <code>count(distinct user_id)</code>, and nobody noticed for six months. <code>metric-guard</code> surfaces <b>10 of 10</b> planted definition drifts &mdash; and attaches the number each definition actually produces.</p>
+  <span class="badge">Public &middot; synthetic demo</span>
+
+  <section>
+    <div class="label">The problem</div>
+    <h2>A drift report nobody can price is a drift report nobody actions.</h2>
+    <p class="lead">A report that says <em>&quot;filter set differs&quot;</em> gets filed under technical debt and never touched. The same report that says <b>net_revenue &mdash; contract says 697,691.42, dashboard says 755,387.65, +57,696.23 (+8.3%)</b> gets fixed that week, because someone can finally say which number went into the board pack.</p>
+  </section>
+
+  <section>
+    <div class="label">The money shot</div>
+    <h2>Every drift, priced</h2>
+
+    <div class="card issue">
+      <div class="step">&#9312; Contract value vs dashboard value</div>
+      <table>
+        <tr><th>metric</th><th class="num">contract</th><th class="num">dashboard</th><th class="num">difference</th><th>cause</th></tr>
+        <tr><td>Buyers</td><td class="num">870</td><td class="num">3,119</td><td class="num fail">+258.5%</td><td><code>count()</code> where the contract says <code>count(distinct)</code></td></tr>
+        <tr><td>Conversion rate</td><td class="num">1.60</td><td class="num">3.59</td><td class="num fail">+124.0%</td><td>denominator is users, contract says sessions</td></tr>
+        <tr><td>Gross revenue</td><td class="num">760,938</td><td class="num">834,751</td><td class="num fail">+9.7%</td><td>shipping and tax folded into the top line</td></tr>
+        <tr><td>Net revenue</td><td class="num">697,691</td><td class="num">755,388</td><td class="num fail">+8.3%</td><td>pending orders included</td></tr>
+        <tr><td>Average order value</td><td class="num">223.69</td><td class="num">240.10</td><td class="num fail">+7.3%</td><td>discount dropped from the numerator</td></tr>
+        <tr><td>Orders</td><td class="num">3,119</td><td class="num">3,119</td><td class="num"><em>latent</em></td><td>matches only because <code>order_id</code> is unique in this extract</td></tr>
+      </table>
+      <div class="stats" style="margin:10px 0 0">
+        <div class="stat"><b>10/10</b><span>planted drifts surfaced</span></div>
+        <div class="stat"><b>0</b><span>findings on the compliant dashboard</span></div>
+        <div class="stat"><b>+258.5%</b><span>largest single-metric gap</span></div>
+      </div>
+      <p class="note">Plus three findings with no number attached: a <b>timezone</b> that differs from the contract, amounts <b>summed across USD/EUR/GBP without conversion</b>, and a metric on the dashboard (<code>repeat_rate</code>) that <b>no contract entry owns</b>. Checks that cannot be priced say so plainly instead of inventing a figure.</p>
+    </div>
+
+    <div class="card ok">
+      <div class="step">&#9313; Latent findings are labelled, not hidden</div>
+      <p class="note"><code>orders</code> produces an identical number under both definitions today, purely because <code>order_id</code> happens to be unique in this extract. Calling that &quot;fine&quot; is how it ships. The report calls it <b>latent</b> and states what would separate the two &mdash; any join that fans out.</p>
+    </div>
+
+    <div class="card ok">
+      <div class="step">&#9314; The eight checks</div>
+      <table>
+        <tr><th>#</th><th>what it catches</th></tr>
+        <tr><td>M1</td><td>filter set differs &mdash; different population under the same metric name</td></tr>
+        <tr><td>M2</td><td>dashboard timezone differs from the contract &mdash; daily buckets offset</td></tr>
+        <tr><td>M3</td><td>currency-sensitive amounts summed without conversion</td></tr>
+        <tr><td>M4</td><td><code>count()</code> where the contract says <code>count(distinct)</code></td></tr>
+        <tr><td>M5</td><td>metric on a dashboard with no contract entry &mdash; nobody owns the definition</td></tr>
+        <tr><td>M6</td><td>metric in the contract that no dashboard uses &mdash; dead, or computed by hand somewhere</td></tr>
+        <tr><td>M7</td><td>expression differs &mdash; different arithmetic</td></tr>
+        <tr><td>M8</td><td>different denominator on a rate</td></tr>
+      </table>
+      <p class="note"><b>M6 is judged across all dashboards at once</b>, not per dashboard. Judged per dashboard it fires constantly &mdash; finance is not supposed to show a growth metric &mdash; and a check that always fires is a check people learn to ignore.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="label">The report</div>
+    <h2>A dumbbell per metric, because the gap is the job.</h2>
+    <p class="lead"><code>evidence/drift_report.html</code> renders each disagreement as two dots joined by a line whose length is the gap. Magnitude is not the point &mdash; the gap is &mdash; and values span three orders of magnitude across metrics, so each row is scaled to its own pair with the actual numbers beside the dots.</p>
+    <p class="note">Two series, light and dark modes, both validated for colour-vision separation (worst-pair &Delta;E 24.7 light / 26.8 dark against an &ge;8 target). Legend plus direct values, so identity never rests on colour alone, and a table view underneath.</p>
+  </section>
+
+  <section>
+    <div class="label">Reproduce it</div>
+    <pre>pip install pyyaml duckdb
+./scripts/run_evidence.sh      # runs everything, writes evidence/
+open evidence/drift_report.html</pre>
+    <p class="note">The contract is a single file: <code>metrics/metrics.yml</code>. Six metrics, each with a definition written for a finance reader, the SQL expression, the filter set, the grain, whether it is currency-sensitive, an owner, and a refresh time. Two global keys &mdash; <code>timezone</code> and <code>currency</code> &mdash; apply to everything, because those are the two assumptions that silently differ between tools.</p>
+  </section>
+
+  <section>
+    <div class="label">Honest limitations</div>
+    <pre>&middot; Synthetic dataset (4,000 orders, seed 20260804) &mdash; a demonstrator of the method, not a benchmark.
+&middot; This checks that definitions agree. Whether the underlying data is trustworthy is
+  warehouse-quality-gate; whether the job that produced it actually ran is dag-guard.
+&middot; Checks that cannot be priced are reported without a number rather than with a guessed one.</pre>
+  </section>
+
+  <div class="foot">This is a synthetic sample demonstrating the method. <a href="https://github.com/jigonyoo/metrics-contract" target="_blank" rel="noopener">Inspect the checks, the fixtures, and the reproducible evidence &#8599;</a></div>
+</div>
+</body>
+</html>

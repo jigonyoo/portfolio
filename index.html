@@ -456,6 +456,34 @@
         <div class="links"><a class="btn" href="https://github.com/jigonyoo/data-contract-guard" target="_blank" rel="noopener">Code ↗</a><a class="btn primary" href="showcase/data-contract-guard.html">Demo ↗</a></div>
       </div>
       <div class="card">
+        <div class="c-top"><span class="c-name">warehouse-quality-gate</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">A dbt contract &mdash; 15 tests over staging and marts &mdash; that blocks a bad batch before it reaches the mart. Duplicate keys, broken relationships, a cents/dollars unit mix-up, a mixed-currency batch, an out-of-window date, and a status with the wrong case.</p>
+        <div class="c-moat">The sabotaged batch loads with <b>zero errors</b> and reports revenue of $4,905,051 instead of $395,751 &mdash; a 1,139% overstatement. The contract fails 12 of 15 tests and the mart is never built; the clean batch passes 15 of 15.</div>
+        <div class="tags"><span class="tag">dbt</span><span class="tag">duckdb</span><span class="tag">data quality</span><span class="tag">data contract</span><span class="tag">sql</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/warehouse-quality-gate" target="_blank" rel="noopener">Code &#8599;</a><a class="btn primary" href="showcase/warehouse-quality-gate.html">Demo &#8599;</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">dag-guard</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">Static review for Airflow DAGs &mdash; 12 checks read the source with <code>ast</code>, so there is no Airflow install, no import, and no side effects. Catchup blast radius, dependency cycles, non-idempotent writes, unordered co-writers, missing timeouts, retries, SLAs and failure callbacks.</p>
+        <div class="c-moat">The sabotaged DAG is valid Python that renders normally in the UI &mdash; and queues <b>90,816 backfill runs on deploy</b>. Every finding carries evidence, production impact and the fix. 12 of 12 caught, 0 false alarms on the clean DAG.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">airflow</span><span class="tag">ast</span><span class="tag">orchestration</span><span class="tag">ci</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/dag-guard" target="_blank" rel="noopener">Code &#8599;</a><a class="btn primary" href="showcase/dag-guard.html">Demo &#8599;</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">metrics-contract</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">A single YAML contract for six business metrics, and a checker that diffs every dashboard against it &mdash; filter sets, timezone, currency handling, distinct-ness, expressions, rate denominators, unowned metrics and dead ones.</p>
+        <div class="c-moat">It does not just say &quot;definitions differ&quot; &mdash; it runs both definitions over the same data and <b>prices the gap</b>: net revenue 697,691 vs 755,388 (+8.3%), buyers 870 vs 3,119 (+258.5%). 10 of 10 drifts surfaced, 0 on the compliant dashboard.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">duckdb</span><span class="tag">analytics</span><span class="tag">metric governance</span><span class="tag">dataviz</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/metrics-contract" target="_blank" rel="noopener">Code &#8599;</a><a class="btn primary" href="showcase/metrics-contract.html">Demo &#8599;</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">fhir-quality-gate</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">Twelve semantic checks for FHIR R4 bundles that are already structurally valid &mdash; code-system mislabelling, ICD-10 without its decimal, UCUM units that contradict the LOINC code, implausible values, unresolvable references, naive timestamps and value-set casing.</p>
+        <div class="c-moat">Both bundles share identical base data. The drifted one silently drops <b>3 patients from a 46-patient measure denominator</b> and neither run raises an error. 12 of 12 defect types caught, 0 findings on the clean bundle. Standard library only, no PHI.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">fhir</span><span class="tag">healthcare</span><span class="tag">loinc</span><span class="tag">data quality</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/fhir-quality-gate" target="_blank" rel="noopener">Code &#8599;</a><a class="btn primary" href="showcase/fhir-quality-gate.html">Demo &#8599;</a></div>
+      </div>
+      <div class="card">
         <div class="c-top"><span class="c-name">analytics-scheduled-report</span><span class="badge pub">Public</span></div>
         <p class="c-desc">A raw event/transaction log → scheduled daily/weekly reports with period-over-period deltas, threshold + statistical-outlier alerts, and idempotent re-runs.</p>
         <div class="c-moat">Every alert carries its triggering rule and measured value — flags for a human to confirm, not a black-box &quot;something&#39;s wrong&quot;.</div>
