@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>migration-verify — The Counts Match. The Data Didn't Move.</title>
+<style>
+  :root{--bg:#0a0e0d;--panel:#10171a;--panel-2:#0d1315;--line:#1c2a2b;--txt:#e7f0ee;--muted:#869a97;--dim:#5f7370;--green:#22c55e;--green-dim:#15803d;--green-soft:rgba(34,197,94,.12);--amber:#f5b544;--red:#fb7185}
+  *{box-sizing:border-box}html,body{margin:0}
+  body{background:radial-gradient(1100px 600px at 85% -8%,rgba(34,197,94,.09),transparent 60%),var(--bg);color:var(--txt);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Arial,sans-serif}
+  .wrap{max-width:1000px;margin:auto;padding:34px 24px 64px}
+  a{color:inherit;text-decoration:none}
+  .top,.actions,.stats{display:flex;gap:10px;flex-wrap:wrap}.top{justify-content:space-between;align-items:flex-start}
+  .eyebrow{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase}
+  h1{font-size:clamp(28px,5vw,46px);line-height:1.1;margin:9px 0}
+  .lead{color:#cdd8d5;font-size:17px;max-width:760px}
+  .badge,.btn{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:8px;padding:7px 11px;font-size:12px;font-weight:750}
+  .badge{color:var(--green);background:var(--green-soft)}.btn:hover{border-color:var(--green)}
+  section{margin-top:34px}
+  .label{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;border-bottom:1px solid var(--line);padding-bottom:8px}
+  h2{font-size:22px;margin:13px 0 8px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:18px;margin-top:13px}
+  .step{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase}
+  pre{white-space:pre-wrap;overflow:auto;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:15px;color:#cdd8d5;font-size:13px}
+  .issue{border-left:3px solid var(--red)}.ok{border-left:3px solid var(--green)}
+  .stats .stat{flex:1;min-width:150px;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:14px 16px}
+  .stat b{display:block;font-size:26px;color:var(--green)}
+  .stat span{color:var(--muted);font-size:13px}
+  table{width:100%;border-collapse:collapse}th,td{text-align:left;border-bottom:1px solid var(--line);padding:9px 8px;font-size:14px}th{color:var(--muted);font-size:12px}
+  .pass{color:var(--green);font-weight:700}.fail{color:var(--red);font-weight:700}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .foot{margin-top:42px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}.foot a{color:var(--green)}
+  .note{color:var(--muted);font-size:13px;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <div class="eyebrow">Data engineering · migration verification</div>
+      <h1>migration-verify</h1>
+    </div>
+    <div class="actions">
+      <a class="btn" href="https://github.com/jigonyoo/migration-verify" target="_blank" rel="noopener">GitHub Code ↗</a>
+      <a class="btn" href="../index.html">← Back to hub</a>
+    </div>
+  </div>
+  <p class="lead">A post-cutover gate that <b>reconciles the primary keys and compares the column aggregates</b> between the legacy table and the new warehouse. The migration here reports success: <code>12,000 = 12,000</code>, every cell parses, nothing is null. It is also short <b>42 orders and $5,955.90</b>. Offline, standard library only, no keys.</p>
+  <span class="badge">Public · synthetic demo</span>
+
+  <section>
+    <div class="label">The problem</div>
+    <h2>"The counts match" is not "the data moved."</h2>
+    <p class="lead">The verification most teams actually run at cutover is <code>SELECT COUNT(*)</code> on both sides — a scalar comparison of two sets it never looks inside. Drop 42 orders and replay 42 others and the count is identical. Floor the cents on the money column and every row is still money. Load local timestamps as if they were already UTC and every row is still a valid datetime, just on the wrong day. The cutover is signed off, and the discrepancy surfaces three weeks later in a finance reconciliation, after the legacy database has been decommissioned.</p>
+  </section>
+
+  <section>
+    <div class="label">The money shot</div>
+    <h2>The same migrated table, verified two ways</h2>
+
+    <div class="card issue">
+      <div class="step">① Before → after: naive PASS vs gate BLOCKED</div>
+      <table>
+        <tr><th>check</th><th>verdict on the shipped migration</th></tr>
+        <tr><td>naive <code>do the row counts match?</code></td><td class="fail">0 issues → PASS (12,000 = 12,000, cutover signed off)</td></tr>
+        <tr><td>migration-verify</td><td class="pass">84 key findings + 12 parity findings → BLOCKED</td></tr>
+      </table>
+      <div class="stats" style="margin:10px 0 0">
+        <div class="stat"><b>12,000 = 12,000</b><span>row counts, both sides</span></div>
+        <div class="stat"><b>96 findings</b><span>84 key + 12 parity</span></div>
+        <div class="stat"><b>-$5,955.90</b><span>-10.3 bps, on keys present on both sides</span></div>
+        <div class="stat"><b>1,416 orders</b><span>11.9% on a different calendar day</span></div>
+      </div>
+      <pre>before (row count): 12,000 = 12,000, 0 issues, cutover signed off
+after  (this gate): 96 findings, -5,955.90 unaccounted (-10.3 bps), cutover blocked</pre>
+    </div>
+
+    <div class="card issue">
+      <div class="step">② The demo output, verbatim</div>
+      <pre>  migration-verify · legacy orders -&gt; new warehouse, 'migration succeeded'
+  ========================================================================
+  clean migration · key findings:  0 · parity findings: 0   → PASS ✅
+  shipped migration · naive 'do the row counts match?' issues: 0   (12,000 = 12,000) → PASS (signs off) ❌
+  ------------------------------------------------------------------------
+  migration-verify on the SAME pair:
+    key findings:    84  by kind: {'missing': 42, 'orphaned': 5, 'duplicated': 37}
+    parity findings: 12  by column: {'customer_name': 1, 'order_ts': 5, 'total_amount': 4, 'coupon_code': 2}
+  ------------------------------------------------------------------------
+  smoking guns
+    1. churn      · 42 orders never landed, 37 arrived twice, 5 came from nowhere — and COUNT(*) still matches
+    2. money      · on the 11,921 keys present on both sides, 11,803 amounts changed: -5,955.90 (-10.3 bps of 5,788,394.90)
+                    worst · ORD-2025-000057: 720.99 -&gt; 720.00 (-0.99)
+    3. calendar   · 1,416 of 11,921 matched orders (11.9%) land on a different calendar day; dominant offset -9h on 11,921 rows
+                    daily revenue disagrees on 91 of 91 days; worst 2025-02-11: 63,832.24 -&gt; 56,364.00 (-7,468.24)
+    4. columns    · customer_name [max_length] 43 -&gt; 32
+                    coupon_code [null_count] 7432 -&gt; 0
+                    '% of orders with a coupon' reads 38.1% in legacy, 100.0% after migration</pre>
+      <p class="note">The clean migration — the same rows written in a different physical order — reports <b>0 key findings, 0 parity findings, PASS</b> on the same run. A gate that cries wolf on a correct cutover gets switched off before it ever catches anything.</p>
+    </div>
+
+    <div class="card ok">
+      <div class="step">③ Four silent losses under an identical COUNT(*)</div>
+      <table>
+        <tr><th>#</th><th>what happened</th><th>what the count sees</th></tr>
+        <tr><td>1</td><td>churn that nets to zero — 42 dropped, 37 replayed, 5 orphans minted by a retry</td><td class="fail">42 = 37 + 5, so nothing</td></tr>
+        <tr><td>2</td><td>the money column lost its scale — cents floored by the cast, 11,803 of 11,921 amounts changed</td><td class="fail">every row is still money</td></tr>
+        <tr><td>3</td><td>local Asia/Seoul timestamps loaded as if already UTC — a fixed -9h offset</td><td class="fail">every row is still a valid datetime</td></tr>
+        <tr><td>4</td><td><code>customer_name</code> VARCHAR truncated 43 → 32; <code>coupon_code</code> NULL arrived as <code>''</code></td><td class="fail">every row is still non-empty</td></tr>
+      </table>
+      <p class="note">Number 4 is the one that reaches a dashboard fastest: <code>COUNT(coupon_code)</code> now counts empty strings, so <b>"% of orders with a coupon" reads 38.1% in legacy and 100.0% after migration</b> — a metric that moved 62 points without anybody touching a coupon.</p>
+    </div>
+
+    <div class="card ok">
+      <div class="step">④ Verified, not asserted</div>
+      <div class="stats" style="margin:2px 0 0">
+        <div class="stat"><b>8 passed</b><span>pytest — the four losses, caught individually</span></div>
+        <div class="stat"><b>0 → 96</b><span>naive PASS vs gate BLOCKED, computed from data/</span></div>
+        <div class="stat"><b>0 / non-zero</b><span>exit code: clean migration / shipped migration</span></div>
+        <div class="stat"><b>✓</b><span>fixtures deterministic — CI regenerates and diffs</span></div>
+      </div>
+      <p class="note">The suite also asserts the negative: the row-count check must <em>miss</em> all four, so the cutover this gate blocks is a real one and not a story. A gate that waves a bad migration through fails its own CI.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="label">The two layers</div>
+    <h2>A row count is a scalar. A key set is evidence.</h2>
+    <p class="lead"><b>Key-set reconciliation</b> compares the two sets of primary keys and splits the answer three ways — <code>missing</code>, <code>orphaned</code>, <code>duplicated</code>. Every finding carries the key, so the output is a work list rather than a number.</p>
+    <p class="lead"><b>Aggregate parity</b> compares, per column, the handful of aggregates loaders actually break — <code>sum · min · max · null_count · distinct_count · max_length</code> — with a type-aware tolerance. Money gets basis points, because DECIMAL and float disagree in the last place and nobody should be paged for that; strings and counts get none.</p>
+    <p class="note">Two checks are not per-column aggregates and catch the quietest bugs. <code>money_delta()</code> re-adds the money column over the 11,921 keys present exactly once on <em>both</em> sides, so the row churn cannot be blamed for what the type change did. <code>date_buckets()</code> groups revenue by calendar date, where a fixed timezone offset stops being invisible: daily revenue disagrees on 91 of 91 days.</p>
+  </section>
+
+  <section>
+    <div class="label">Why order data</div>
+    <h2>The table a migration is least allowed to get wrong.</h2>
+    <p class="lead">The sample is <code>order_id · customer_name · order_ts · total_amount · coupon_code · status</code> — 12,000 orders across 91 days. Order tables are where these four failures are not hypotheticals: a replayed batch during a dual-write window, a target DDL that dropped the scale on the money column, a legacy application that always wrote local time into a naive <code>DATETIME</code>, a narrower <code>VARCHAR</code> in the new schema. They are also where being wrong is expensive and where nobody notices for a month, because every downstream number still looks like a number. The same two layers work on any keyed table.</p>
+  </section>
+
+  <section>
+    <div class="label">Reproduce it</div>
+    <pre>docker compose up     # row count vs reconciliation + parity (offline)
+make demo             # same, without Docker
+make test             # the migration tests (pytest)
+make gate             # the gate on the shipped migration — exits non-zero, cutover blocked
+make gate-clean       # the no-false-alarms case: a correct migration must exit 0</pre>
+  </section>
+
+  <section>
+    <div class="label">Honest limitations</div>
+    <pre>· Synthetic data (12,000 generated orders, one legacy table, one target). A demonstrator of the
+  method, not a benchmark, and not a report on a migration I ran for a client.
+· The money bug is modelled as a lost numeric scale — cents floored by the cast. A true float32
+  round-trip of a DECIMAL(10,2) total loses roughly 0.0006 bps, invisible at any realistic row
+  count; the scale drop is the version of this bug that moves money.
+· Aggregate parity is a screen, not a proof: two different sets of values can share a sum and a
+  distinct count. Row-by-row hashing on the matched keys is the next layer, deliberately out of
+  scope — this is the check cheap enough to run on every cutover.
+· The timezone check assumes a naive timestamp column and a single fixed offset. Per-row offsets,
+  DST boundaries, and genuinely tz-aware columns need more than a modal delta.
+· CSV stands in for both sides; a DB cursor drops into io.py unchanged, but connection handling,
+  chunking for tables that do not fit in memory, and sampling strategy are not implemented.
+· It verifies the data boundary. It does not repair the migration, roll it back, or find the line
+  of ETL that caused any of this — it names the column and hands you the keys.</pre>
+  </section>
+
+  <div class="foot">This is a synthetic sample demonstrating the method. <a href="https://github.com/jigonyoo/migration-verify" target="_blank" rel="noopener">Inspect the reconciler, the parity checks, and the reproducible fixtures ↗</a></div>
+</div>
+</body>
+</html>

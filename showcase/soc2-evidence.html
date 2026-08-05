@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>soc2-evidence &mdash; 12 of 12 Evidenced. 7 of Them Wouldn't Survive Fieldwork.</title>
+<style>
+  :root{--bg:#0a0e0d;--panel:#10171a;--panel-2:#0d1315;--line:#1c2a2b;--txt:#e7f0ee;--muted:#869a97;--dim:#5f7370;--green:#22c55e;--green-dim:#15803d;--green-soft:rgba(34,197,94,.12);--amber:#f5b544;--red:#fb7185}
+  *{box-sizing:border-box}html,body{margin:0}
+  body{background:radial-gradient(1100px 600px at 85% -8%,rgba(34,197,94,.09),transparent 60%),var(--bg);color:var(--txt);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Arial,sans-serif}
+  .wrap{max-width:1000px;margin:auto;padding:34px 24px 64px}
+  a{color:inherit;text-decoration:none}
+  .top,.actions,.stats{display:flex;gap:10px;flex-wrap:wrap}.top{justify-content:space-between;align-items:flex-start}
+  .eyebrow{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase}
+  h1{font-size:clamp(28px,5vw,46px);line-height:1.1;margin:9px 0}
+  .lead{color:#cdd8d5;font-size:17px;max-width:760px}
+  .badge,.btn{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:8px;padding:7px 11px;font-size:12px;font-weight:750}
+  .badge{color:var(--green);background:var(--green-soft)}.btn:hover{border-color:var(--green)}
+  section{margin-top:34px}
+  .label{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;border-bottom:1px solid var(--line);padding-bottom:8px}
+  h2{font-size:22px;margin:13px 0 8px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:18px;margin-top:13px}
+  .step{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase}
+  pre{white-space:pre-wrap;overflow:auto;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:15px;color:#cdd8d5;font-size:13px}
+  .issue{border-left:3px solid var(--red)}.ok{border-left:3px solid var(--green)}
+  .stats .stat{flex:1;min-width:150px;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:14px 16px}
+  .stat b{display:block;font-size:26px;color:var(--green)}
+  .stat span{color:var(--muted);font-size:13px}
+  table{width:100%;border-collapse:collapse}th,td{text-align:left;border-bottom:1px solid var(--line);padding:9px 8px;font-size:14px}th{color:var(--muted);font-size:12px}
+  .pass{color:var(--green);font-weight:700}.fail{color:var(--red);font-weight:700}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .foot{margin-top:42px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}.foot a{color:var(--green)}
+  .note{color:var(--muted);font-size:13px;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <div class="eyebrow">Data engineering &middot; compliance evidence</div>
+      <h1>soc2-evidence</h1>
+    </div>
+    <div class="actions">
+      <a class="btn" href="https://github.com/jigonyoo/soc2-evidence" target="_blank" rel="noopener">GitHub Code &#8599;</a>
+      <a class="btn" href="../index.html">&larr; Back to hub</a>
+    </div>
+  </div>
+  <p class="lead">An <b>evidence completeness gate</b> for SOC 2 / ISO 27001 control sets. It catches the pack where the readiness tracker reads 12 of 12 and every control has an attachment &mdash; while the artifacts are stale, cover the wrong population, prove the wrong thing, or are flatly contradicted by the access log. Offline, no keys, standard library only.</p>
+  <span class="badge">Public &middot; synthetic demo</span>
+
+  <div class="card" style="border-color:var(--amber);border-left:3px solid var(--amber)">
+    <div class="step" style="color:var(--amber)">Scope &mdash; this is not an audit</div>
+    <p class="note" style="color:#cdd8d5;font-size:15px">The author is an <b>evidence engineer, not an auditor</b>. This tool automates evidence collection and completeness checking. It issues no opinion, certifies nothing, and does not substitute for a licensed CPA firm's SOC 2 examination or an ISO 27001 certification body's audit. Its findings are inputs <em>for</em> that work, produced before fieldwork.</p>
+  </div>
+
+  <section>
+    <div class="label">The problem</div>
+    <h2>&quot;Every control has evidence&quot; is not &quot;every control is evidenced.&quot;</h2>
+    <p class="lead">The tracker counts attachments: 12 controls, 24 artifacts, 12 green ticks, book the auditor. Nobody opens the files. Underneath, the quarterly access review was pulled from the HR system so contractors and service accounts were never in it; the backup control has a year of backup-succeeded logs and zero restore tests; four controls are evidenced by artifacts collected months outside their own refresh window; and five people who left still hold production grants. Each one is a finding raised in week one of fieldwork, and the check most teams ship &mdash; <code>does this control have at least one attached artifact?</code> &mdash; waves all four through.</p>
+  </section>
+
+  <section>
+    <div class="label">The money shot</div>
+    <h2>The same evidence pack, checked two ways</h2>
+
+    <div class="card issue">
+      <div class="step">&#9312; Tracker PASS vs gate BLOCKED</div>
+      <table>
+        <tr><th>check</th><th>verdict on the shipped pack</th></tr>
+        <tr><td>naive <code>has an artifact?</code></td><td class="fail">12/12 evidenced, 0 gaps &rarr; PASS (books the audit)</td></tr>
+        <tr><td>soc2-evidence gate</td><td class="pass">14 findings across 7 of 12 controls &rarr; BLOCKED</td></tr>
+      </table>
+      <pre>  soc2-evidence &middot; the readiness tracker says the pack is ready
+  ==================================================================
+  clean pack     &middot; gate findings:   0                        &rarr; PASS &#9989;
+  shipped pack   &middot; tracker 'has an artifact?': 12/12 evidenced, 0 gaps &rarr; PASS (books the audit) &#10060;
+  ------------------------------------------------------------------
+  evidence gate on the SAME pack:
+    findings: 14  by kind: {'stale': 4, 'population': 1, 'artifact_type': 1, 'contradiction': 8}
+    controls still clean: 5/12
+  ------------------------------------------------------------------
+  smoking gun 1 &middot; RM-01: evidence is 501d old against a 365d window (136d past due)
+  smoking gun 2 &middot; AC-03: review covers 34/53 of the roster &mdash; never in scope: contractor x11, service_account x8
+  smoking gun 3 &middot; BC-01: 2x backup_job_log attached, 0x restore_test_report &mdash; the control requires the restore test
+  smoking gun 4 &middot; 8 live grants held by 5 terminated identities, e.g. cara.iyer (write on prod-k8s, 23d after last day)
+
+  before (tracker): 12/12 evidenced, 0 issues, audit gets booked
+  after  (gate):    14 findings across 7 controls, pack blocked</pre>
+      <div class="stats" style="margin:10px 0 0">
+        <div class="stat"><b>12/12 &rarr; 5/12</b><span>controls still clean (tracker &rarr; gate)</span></div>
+        <div class="stat"><b>14</b><span>findings on a pack with 0 gaps</span></div>
+        <div class="stat"><b>34 of 53</b><span>roster covered by the access review</span></div>
+        <div class="stat"><b>8</b><span>live grants held by leavers</span></div>
+      </div>
+      <p class="note">The clean pack passes untouched &mdash; 0 findings, exit 0. A gate that cries wolf on good evidence gets switched off in a week.</p>
+    </div>
+
+    <div class="card ok">
+      <div class="step">&#9313; Four ways an attachment count lies</div>
+      <table>
+        <tr><th>kind</th><th>n</th><th>the question the count never asks</th></tr>
+        <tr><td>stale</td><td class="num">4</td><td><em>When</em> was it collected? Newest artifact per control aged against the control's own <code>refresh_days</code> window</td></tr>
+        <tr><td>population</td><td class="num">1</td><td><em>Who</em> does it cover? Reviewed identities diffed against the authoritative roster</td></tr>
+        <tr><td>artifact_type</td><td class="num">1</td><td><em>What</em> does it prove? <code>required_artifact_type</code> versus what is actually attached</td></tr>
+        <tr><td>contradiction</td><td class="num">8</td><td>Does the rest of the estate <em>agree</em>? Terminated identities joined to the live grant log</td></tr>
+      </table>
+      <pre>stale &middot; VM-01: newest artifact EV-023 collected 2026-03-10 is 148d old against a 30d window (118d past due)
+population &middot; AC-03: review covers 34/53 of the roster (64.2%); 19 identities never in scope: contractor x11, service_account x8
+artifact_type &middot; BC-01: 2 artifact(s) attached, all of type backup_job_log &mdash; the control requires restore_test_report, of which there are 0
+contradiction &middot; cara.iyer (engineer) terminated 2026-07-13 &mdash; 23d ago &mdash; still holds write on prod-k8s, last used 2026-07-05</pre>
+      <p class="note">Every finding names the number behind it, not just the control id &mdash; the window, the age, the days past due; covered over total plus who is missing and in what role; the type required against the types present; the person, their last day, the system, the privilege, the days elapsed. A finding that says &quot;evidence is stale&quot; gets argued with; one that says <b>118 days past a 30-day window</b> does not.</p>
+    </div>
+
+    <div class="card ok">
+      <div class="step">&#9314; Verified, not asserted</div>
+      <div class="stats" style="margin:2px 0 0">
+        <div class="stat"><b>8 passed</b><span>pytest &mdash; each sabotage class asserted with its numbers</span></div>
+        <div class="stat"><b>0 / non-zero</b><span>clean pack exits 0, shipped pack blocks</span></div>
+        <div class="stat"><b>&#10003;</b><span>fixtures deterministic &mdash; CI regenerates and diffs</span></div>
+      </div>
+      <p class="note">The tests also assert the naive attachment count misses all four classes, so the finding the gate prevents is demonstrated rather than claimed. Fixture scale: <b>12 controls &middot; 24 artifacts &middot; 60 identities (53 active) &middot; 90 grants</b>, generated from a seed by <code>scripts/make_data.py</code> &mdash; CI regenerates them and fails if the result isn't byte-identical.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="label">Why compliance evidence</div>
+    <h2>The controls are usually written correctly. The evidence is where readiness quietly fails.</h2>
+    <p class="lead">What breaks is the four dimensions no attachment count measures: <em>when</em> the artifact was collected, <em>who</em> it covers, <em>what</em> it actually proves, and whether the rest of the estate contradicts it. Those are data-engineering questions &mdash; date windows, population diffs, joins &mdash; not legal ones, and they are cheap to answer continuously against exports most organisations already produce from Okta, AWS, GitHub, Jira and their HRIS. Finding a 19-identity population gap in March costs a script run; finding it during fieldwork costs a re-test.</p>
+    <p class="note">Run it as a gate: <code>soc2_evidence.run</code> exits non-zero on any finding, so it slots into a nightly job or CI and the pack is checked continuously instead of the week before fieldwork. <code>--report out.json</code> writes the findings as structured JSON for a ticket queue.</p>
+  </section>
+
+  <section>
+    <div class="label">Reproduce it</div>
+    <pre>make test        # 8 passed
+make demo        # the tracker-vs-gate contrast above
+make gate        # the shipped pack &mdash; exits non-zero, pack blocked
+make gate-clean  # the no-false-alarms case &mdash; exits 0
+python -m soc2_evidence.run --controls data/controls.json --evidence data/evidence.csv --as-of 2026-08-05</pre>
+  </section>
+
+  <section>
+    <div class="label">Honest limitations</div>
+    <pre>&middot; Synthetic data (12 controls &middot; 24 artifacts &middot; 60 identities &middot; 90 grants) &mdash; a demonstrator of the
+  method, not a report on any real organisation. No client data appears here.
+&middot; This checks whether the evidence is complete. It does not judge whether a control is designed
+  adequately &mdash; that is a licensed CPA firm's call, and nothing here is an opinion or a certification.
+&middot; Control definitions are hand-written JSON. Mapping a real framework, control versioning, and
+  exceptions / compensating controls are out of scope.
+&middot; It checks metadata and populations, not artifact contents: it cannot tell a genuine restore-test
+  report from an empty file named like one. Chain of custody is the next layer, deliberately skipped.
+&middot; Four checks are the common failure modes, not a complete taxonomy &mdash; sampling adequacy,
+  segregation of duties and vendor evidence are not covered.
+&middot; It reports findings; it does not remediate. Revoking the orphaned grants is still a human decision.</pre>
+  </section>
+
+  <div class="foot">This is a synthetic sample demonstrating the method. <a href="https://github.com/jigonyoo/soc2-evidence" target="_blank" rel="noopener">Inspect the four checks, the deterministic fixtures, and the test suite &#8599;</a></div>
+</div>
+</body>
+</html>

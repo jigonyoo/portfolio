@@ -409,7 +409,7 @@
   <!-- DATA ENGINEERING -->
   <div class="sec" id="dataeng">
     <div class="sec-h">
-      <div class="row"><h2>Data engineering &amp; extraction</h2><span class="cnt">17</span></div>
+      <div class="row"><h2>Data engineering &amp; extraction</h2><span class="cnt">20</span></div>
       <div class="desc">Reproducible pipelines that clean, normalize, and load — idempotently, with per-row confidence where it matters.</div>
     </div>
     <div class="grid">
@@ -447,6 +447,27 @@
         <div class="c-moat">The data engine behind the PROPBOARD demo — source-verifiable, reproducible.</div>
         <div class="tags"><span class="tag">python</span><span class="tag">sports data</span><span class="tag">pipeline</span></div>
         <div class="links"><a class="btn" href="https://github.com/jigonyoo/wnba-player-vs-defense" target="_blank" rel="noopener">Code ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">migration-verify</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">A post-migration verification gate for the losses a row count cannot see &mdash; primary-key reconciliation plus column-aggregate parity between the legacy table and the new warehouse. Row churn that nets to zero, a lost numeric scale on the money column, a timezone shift onto the wrong calendar day, silent truncation and NULL&rarr;'' coercion.</p>
+        <div class="c-moat">The cutover check every team ships reports <b>12,000 = 12,000, 0 issues</b> and signs off. The same pair yields 96 findings: 42 orders missing, 37 duplicated, <b>$5,955.90 (10.3 bps) unaccounted</b>, and 1,416 orders on the wrong day. A correct migration passes at 0.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">data migration</span><span class="tag">reconciliation</span><span class="tag">cutover</span><span class="tag">data quality</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/migration-verify" target="_blank" rel="noopener">Code &#8599;</a><a class="btn primary" href="showcase/migration-verify.html">Demo &#8599;</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">soc2-evidence</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">An evidence completeness gate for SOC&nbsp;2 / ISO&nbsp;27001 control sets &mdash; refresh windows, population coverage against the authoritative roster, artifact-type matching, and contradiction against the access log. Evidence engineering: it checks whether the pack is complete, it does not issue an audit opinion.</p>
+        <div class="c-moat">The readiness tracker reads <b>12 of 12 evidenced</b> and books the auditor. The gate returns <b>14 findings across 7 controls</b> on the same pack: evidence 501 days old against a 365-day window, a review covering 34 of 53 identities, a backup control with 0 restore tests, and 8 live production grants held by 5 leavers.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">soc 2</span><span class="tag">iso 27001</span><span class="tag">compliance evidence</span><span class="tag">access review</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/soc2-evidence" target="_blank" rel="noopener">Code &#8599;</a><a class="btn primary" href="showcase/soc2-evidence.html">Demo &#8599;</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">pii-guard</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">A pre-release gate for &ldquo;anonymized&rdquo; exports &mdash; column-agnostic PII detection, mask-uniqueness and hash-invertibility checks, k-anonymity over quasi-identifiers, and DSAR erasure completeness across every related table.</p>
+        <div class="c-moat">The masking review finds <b>0 issues</b> and the export ships. The guard blocks the same file: 652 PII instances in three unlabeled columns, 799 masks for 799 subjects, 567 user_ids reversed from the delivery&rsquo;s own send log, <b>87.5% of rows unique at k=1</b>, and 16 surviving references to an erased subject. The properly anonymized variant passes at min k&nbsp;=&nbsp;13.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">gdpr</span><span class="tag">pii</span><span class="tag">k-anonymity</span><span class="tag">dsar</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/pii-guard" target="_blank" rel="noopener">Code &#8599;</a><a class="btn primary" href="showcase/pii-guard.html">Demo &#8599;</a></div>
       </div>
       <div class="card">
         <div class="c-top"><span class="c-name">data-contract-guard</span><span class="badge pub">Public</span></div>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>pii-guard — The PII Columns Were Masked. 87.5% of Rows Were Still Unique.</title>
+<style>
+  :root{--bg:#0a0e0d;--panel:#10171a;--panel-2:#0d1315;--line:#1c2a2b;--txt:#e7f0ee;--muted:#869a97;--dim:#5f7370;--green:#22c55e;--green-dim:#15803d;--green-soft:rgba(34,197,94,.12);--amber:#f5b544;--red:#fb7185}
+  *{box-sizing:border-box}html,body{margin:0}
+  body{background:radial-gradient(1100px 600px at 85% -8%,rgba(34,197,94,.09),transparent 60%),var(--bg);color:var(--txt);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Arial,sans-serif}
+  .wrap{max-width:1000px;margin:auto;padding:34px 24px 64px}
+  a{color:inherit;text-decoration:none}
+  .top,.actions,.stats{display:flex;gap:10px;flex-wrap:wrap}.top{justify-content:space-between;align-items:flex-start}
+  .eyebrow{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase}
+  h1{font-size:clamp(28px,5vw,46px);line-height:1.1;margin:9px 0}
+  .lead{color:#cdd8d5;font-size:17px;max-width:760px}
+  .badge,.btn{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:8px;padding:7px 11px;font-size:12px;font-weight:750}
+  .badge{color:var(--green);background:var(--green-soft)}.btn:hover{border-color:var(--green)}
+  section{margin-top:34px}
+  .label{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;border-bottom:1px solid var(--line);padding-bottom:8px}
+  h2{font-size:22px;margin:13px 0 8px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:18px;margin-top:13px}
+  .step{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase}
+  pre{white-space:pre-wrap;overflow:auto;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:15px;color:#cdd8d5;font-size:13px}
+  .issue{border-left:3px solid var(--red)}.ok{border-left:3px solid var(--green)}
+  .stats .stat{flex:1;min-width:150px;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:14px 16px}
+  .stat b{display:block;font-size:26px;color:var(--green)}
+  .stat span{color:var(--muted);font-size:13px}
+  table{width:100%;border-collapse:collapse}th,td{text-align:left;border-bottom:1px solid var(--line);padding:9px 8px;font-size:14px}th{color:var(--muted);font-size:12px}
+  .pass{color:var(--green);font-weight:700}.fail{color:var(--red);font-weight:700}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .foot{margin-top:42px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}.foot a{color:var(--green)}
+  .note{color:var(--muted);font-size:13px;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <div class="eyebrow">Data engineering · privacy &amp; GDPR</div>
+      <h1>pii-guard</h1>
+    </div>
+    <div class="actions">
+      <a class="btn" href="https://github.com/jigonyoo/pii-guard" target="_blank" rel="noopener">GitHub Code ↗</a>
+      <a class="btn" href="../index.html">← Back to hub</a>
+    </div>
+  </div>
+  <p class="lead">A pre-release gate for <b>&quot;anonymized&quot; exports</b>. The customer table here passed its masking review and is still personal data: <b>652 PII instances</b> in columns nobody labeled, masks that are 1:1 with the subject, <b>87.5% of rows unique</b> at k=1, and an erasure request that only touched one table. Offline, standard library only, no keys.</p>
+  <span class="badge">Public · synthetic demo</span>
+
+  <section>
+    <div class="label">The problem</div>
+    <h2>&quot;The PII columns are masked&quot; is not &quot;this file is anonymous.&quot;</h2>
+    <p class="lead">A customer table is prepared for an analytics vendor. <code>customer_name</code>, <code>email</code> and <code>phone</code> are masked, someone regexes those three columns, finds nothing, signs off. The export ships. Nobody looked at <code>support_notes</code>, nobody counted how many <em>distinct</em> masked values there are, nobody computed k over <code>birth_date + postal_code + gender</code>, and nobody checked whether last month's erasure request removed the person from the order table. Each is a separate way the file is still identifiable, and a name-based review sees none of them.</p>
+  </section>
+
+  <section>
+    <div class="label">The money shot</div>
+    <h2>The same shipped export, checked two ways</h2>
+
+    <div class="card issue">
+      <div class="step">① Naive masking review vs pii-guard</div>
+      <table>
+        <tr><th>check</th><th>verdict on the shipped export</th></tr>
+        <tr><td>naive <code>are the PII columns masked?</code></td><td class="fail">0 findings → PASS (ships identifiable data)</td></tr>
+        <tr><td>pii-guard</td><td class="pass">652 hidden PII · 799:799 masks · 567 ids reversed · 87.5% unique · 16 DSAR leftovers → BLOCKED</td></tr>
+      </table>
+      <div class="stats" style="margin:10px 0 0">
+        <div class="stat"><b>0 → 652</b><span>PII instances (naive → guard)</span></div>
+        <div class="stat"><b>87.5%</b><span>rows unique (min k = 1)</span></div>
+        <div class="stat"><b>567</b><span>hashed ids reversed of 799</span></div>
+        <div class="stat"><b>16</b><span>DSAR leftovers in 3 tables</span></div>
+      </div>
+      <p class="note">The declared columns really were masked — the naive check passes for a real reason. It is blind by construction, so the contrast is a computed number rather than a claim.</p>
+    </div>
+
+    <div class="card ok">
+      <div class="step">② Four separate ways it is still personal data</div>
+      <table>
+        <tr><th>column</th><th>kind</th><th class="num">instances</th><th class="num">rows</th></tr>
+        <tr><td><code>support_notes</code></td><td>email</td><td class="num">201</td><td class="num">201</td></tr>
+        <tr><td><code>support_notes</code></td><td>phone</td><td class="num">157</td><td class="num">157</td></tr>
+        <tr><td><code>shipping_instructions</code></td><td>phone</td><td class="num">106</td><td class="num">106</td></tr>
+        <tr><td><code>legacy_ref</code></td><td>national_id</td><td class="num">71</td><td class="num">71</td></tr>
+        <tr><td><code>support_notes</code></td><td>national_id</td><td class="num">65</td><td class="num">65</td></tr>
+        <tr><td><code>shipping_instructions</code></td><td>email</td><td class="num">52</td><td class="num">52</td></tr>
+      </table>
+      <p class="note"><b>1 · Unlabeled columns.</b> The scan is column-agnostic — every column, every cell, no name allow-listing. <code>legacy_ref</code> gets the same treatment as <code>email</code>, because PII does not live where the data dictionary says.</p>
+      <p class="note"><b>2 · Masking is not anonymization.</b> 799 distinct masked emails for 799 subjects is 1:1 — a stable pseudonym the vendor can re-link across deliveries. And <code>user_id</code> is an unsalted sha256 of the address: the dictionary attack's wordlist is <code>email_log</code>, another table in the same delivery, and it recovers <b>567/799 (71.0%)</b> from 568 addresses. The test re-hashes a recovered address and reproduces the stored id, so the inversion is real, not asserted.</p>
+      <p class="note"><b>3 · Quasi-identifiers.</b> k over <code>birth_date+postal_code+gender</code> is <b>min k=1</b>, with 699/799 rows unique (87.5%) and a k-distribution of <code>{1: 699, 2: 40, 3: 60}</code>. No name is needed to re-identify a row that is alone in its group.</p>
+      <p class="note"><b>4 · Erasure completeness.</b> <code>DSAR-2026-0117</code> (<code>CUST-000042</code>) was erased from the primary table. 16 references survive in 3 tables — <code>{'email_log': 4, 'orders': 6, 'support_tickets': 6}</code> — matched by four identifier forms: <code>{'email': 4, 'masked_email': 2, 'customer_id': 8, 'user_id': 2}</code>. Keyed columns by equality, free text by containment.</p>
+    </div>
+
+    <div class="card issue">
+      <div class="step">③ The run, verbatim</div>
+      <pre>  pii-guard · an 'anonymized' customer export, on its way to a vendor
+  ====================================================================
+  clean export      · PII findings: 0 · min k: 13 · unique rows: 0.0% · mask ratio: 0.001  → PASS ✅
+  shipped export    · naive 'are the PII columns masked?' findings: 0  → PASS (ships it) ❌
+  --------------------------------------------------------------------
+  pii-guard on the SAME export:
+    1 · unlabeled columns: 652 PII instances the name-based check never looks at
+        support_notes          email         201 instances in 201 rows
+        support_notes          phone         157 instances in 157 rows
+        shipping_instructions  phone         106 instances in 106 rows
+        legacy_ref             national_id    71 instances in  71 rows
+        support_notes          national_id    65 instances in  65 rows
+        shipping_instructions  email          52 instances in  52 rows
+    2 · masking is not anonymization: 799 distinct masked emails for 799 subjects (1:1)
+        user_id is an unsalted sha256 of the address — 567/799 recovered (71.0%) from 568 addresses in email_log
+    3 · k-anonymity(birth_date+postal_code+gender): min k=1 · 699/799 rows unique (87.5%) · k-distribution {1: 699, 2: 40, 3: 60}
+    4 · DSAR DSAR-2026-0117 (CUST-000042): erased from the primary table, 16 references survive in 3 tables {'email_log': 4, 'orders': 6, 'support_tickets': 6}
+        matched by {'email': 4, 'masked_email': 2, 'customer_id': 8, 'user_id': 2}
+  --------------------------------------------------------------------
+  smoking gun · support_notes row 1: cyd.abernathy@globex.example.org  (a column nobody labeled)
+  smoking gun · CUST-000001 user_id -&gt; xan.gorman@acme.example.com  (one hash lookup)
+
+  before (naive): 0 findings, the export ships
+  after  (pii-guard): 652 hidden PII instances · 799:799 masks · 567 ids reversed · 87.5% of rows unique · 16 DSAR leftovers — blocked</pre>
+    </div>
+
+    <div class="card ok">
+      <div class="step">④ Verified, not asserted</div>
+      <div class="stats" style="margin:2px 0 0">
+        <div class="stat"><b>9 passed</b><span>policy tests (pytest)</span></div>
+        <div class="stat"><b>min k = 13</b><span>clean export — 0 findings, exit 0</span></div>
+        <div class="stat"><b>✓</b><span>fixtures deterministic, CI diffs them</span></div>
+      </div>
+      <p class="note">The policy is a test suite, not a promise: the anonymized export must pass with zero findings, each of the four sabotage classes must be caught on its own, and the naive review must miss all four. CI regenerates the fixtures from <code>scripts/make_data.py</code> and fails if they are not byte-identical. The clean export exits 0, the shipped one exits non-zero — a guard that lets identifiable data through fails its own CI.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="label">Fixture safety</div>
+    <h2>Nothing in the fixtures can collide with a real person.</h2>
+    <p class="lead">Every identifier in the fixtures is deliberately non-resolvable: the RFC 2606 reserved domains (<code>example.com</code> / <code>example.org</code> / <code>example.net</code>) plus the <code>.invalid</code> TLD, phone numbers drawn only from the reserved <code>555-01xx</code> fictional block, and national-ID strings built from ranges that are never issued (SSN area 000 / 666 / 9xx, resident-registration month fields 13–19). The 800 subjects and 4 related tables are generated from a seed. Nothing in the fixtures can collide with a real person.</p>
+  </section>
+
+  <section>
+    <div class="label">Why it matters for GDPR / CCPA work</div>
+    <h2>&quot;We masked the name column&quot; is an argument. <code>min k=1</code> is a measurement.</h2>
+    <p class="lead">Anonymous data is out of scope; pseudonymous data is not. Recital 26 turns on whether re-identification is <em>reasonably likely</em>. Three of the four layers produce numbers a DPIA actually needs — how many rows are unique on the quasi-identifiers, whether the pseudonym is stable across deliveries, whether the key is invertible with data the recipient already holds. The fourth is the Art. 17 problem nobody schedules time for: erasure is complete only when the subject is gone from every table, under every identifier form they ever had.</p>
+  </section>
+
+  <section>
+    <div class="label">Reproduce it</div>
+    <pre>docker compose up     # naive review vs the guard (offline)
+make demo             # same, without Docker
+make test             # the policy tests — 9 passed
+make gate             # the release gate on the shipped export (non-zero = blocked)
+make gate-clean       # the no-false-alarms case: the clean export must exit 0</pre>
+  </section>
+
+  <section>
+    <div class="label">Honest limitations</div>
+    <pre>· Synthetic data (800 subjects + 4 related tables) — a demonstrator, not a benchmark. The numbers
+  above come from the fixtures in data/, not from a client table.
+· Detection is regex + shape. It misses obfuscated PII ("ada dot arden at example dot com"),
+  free-text names and addresses, and anything in a non-Latin script. Every finding carries the
+  cell excerpt so a human confirms it.
+· k-anonymity is a floor, not a full privacy guarantee. It says nothing about attribute
+  disclosure — l-diversity, t-closeness and differential privacy are out of scope.
+· It guards one export boundary. It does not rewrite the data or fix the pipeline.</pre>
+  </section>
+
+  <div class="foot">This is a synthetic sample demonstrating the method. <a href="https://github.com/jigonyoo/pii-guard" target="_blank" rel="noopener">Inspect the detectors, the re-identification math, and the reproducible fixtures ↗</a></div>
+</div>
+</body>
+</html>
