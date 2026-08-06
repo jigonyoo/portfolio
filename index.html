@@ -505,6 +505,13 @@
         <div class="links"><a class="btn" href="https://github.com/jigonyoo/fhir-quality-gate" target="_blank" rel="noopener">Code &#8599;</a><a class="btn primary" href="showcase/fhir-quality-gate.html">Demo &#8599;</a></div>
       </div>
       <div class="card">
+        <div class="c-top"><span class="c-name">rubric-grading-gate</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">A release gate for automatically-marked answer sheets. It grades against the rubric, then decides which of those grades are <i>supported</i> well enough to reach a student &mdash; naming the criterion, the reason, and the words on the page for every one it holds.</p>
+        <div class="c-moat">The moat is the evidence span, not the page. On 480 sheets carrying 156 wrong grades, a page-confidence threshold releases 378 with <b>128 wrong (66.14%)</b>; this gate releases 326 with <b>6 wrong (98.16%)</b>, and 97.4% of what a teacher opens is genuinely wrong. Six flags were written and <b>two were cut by ablation</b> &mdash; they add 49 sheets to the queue and catch nothing the other four miss. Standard library only, offline, seeded fixtures, 25 tests.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">data quality</span><span class="tag">release gate</span><span class="tag">edtech</span><span class="tag">deterministic</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/rubric-grading-gate" target="_blank" rel="noopener">Code &#8599;</a><a class="btn primary" href="showcase/rubric-grading-gate.html">Demo &#8599;</a></div>
+      </div>
+      <div class="card">
         <div class="c-top"><span class="c-name">analytics-scheduled-report</span><span class="badge pub">Public</span></div>
         <p class="c-desc">A raw event/transaction log → scheduled daily/weekly reports with period-over-period deltas, threshold + statistical-outlier alerts, and idempotent re-runs.</p>
         <div class="c-moat">Every alert carries its triggering rule and measured value — flags for a human to confirm, not a black-box &quot;something&#39;s wrong&quot;.</div>

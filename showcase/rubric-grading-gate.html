@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>rubric-grading-gate — A Grade That Cannot Name Its Evidence</title>
+<meta name="description" content="A release gate for automatically-marked answer sheets: it decides which machine grades are supported well enough to reach a student, and names the words on the page for every one it holds.">
+<style>
+  :root{--bg:#0a0e0d;--panel:#10171a;--panel-2:#0d1315;--line:#1c2a2b;--txt:#e7f0ee;--muted:#869a97;--dim:#5f7370;--green:#22c55e;--green-dim:#15803d;--green-soft:rgba(34,197,94,.12);--amber:#f5b544;--red:#fb7185}
+  *{box-sizing:border-box}html,body{margin:0}
+  body{background:radial-gradient(1100px 600px at 85% -8%,rgba(34,197,94,.09),transparent 60%),var(--bg);color:var(--txt);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Arial,sans-serif}
+  .wrap{max-width:1000px;margin:auto;padding:34px 24px 64px}
+  a{color:inherit;text-decoration:none}
+  .top,.actions,.stats{display:flex;gap:10px;flex-wrap:wrap}.top{justify-content:space-between;align-items:flex-start}
+  .eyebrow{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase}
+  h1{font-size:clamp(28px,5vw,46px);line-height:1.1;margin:9px 0}
+  .lead{color:#cdd8d5;font-size:17px;max-width:760px}
+  .badge,.btn{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:8px;padding:7px 11px;font-size:12px;font-weight:750}
+  .badge{color:var(--green);background:var(--green-soft)}.btn:hover{border-color:var(--green)}
+  section{margin-top:34px}
+  .label{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;border-bottom:1px solid var(--line);padding-bottom:8px}
+  h2{font-size:22px;margin:13px 0 8px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:18px;margin-top:13px}
+  .step{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase}
+  pre{white-space:pre-wrap;overflow:auto;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:15px;color:#cdd8d5;font-size:13px}
+  .issue{border-left:3px solid var(--red)}.ok{border-left:3px solid var(--green)}
+  .stats .stat{flex:1;min-width:150px;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:14px 16px}
+  .stat b{display:block;font-size:26px;color:var(--green)}
+  .stat span{color:var(--muted);font-size:13px}
+  table{width:100%;border-collapse:collapse}th,td{text-align:left;border-bottom:1px solid var(--line);padding:9px 8px;font-size:14px}th{color:var(--muted);font-size:12px}
+  .pass{color:var(--green);font-weight:700}.fail{color:var(--red);font-weight:700}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .foot{margin-top:42px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}.foot a{color:var(--green)}
+  .note{color:var(--muted);font-size:13px;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <div>
+      <div class="eyebrow">Education data · automated marking QA</div>
+      <h1>rubric-grading-gate</h1>
+    </div>
+    <div class="actions">
+      <a class="btn" href="https://github.com/jigonyoo/rubric-grading-gate" target="_blank" rel="noopener">GitHub Code ↗</a>
+      <a class="btn" href="../index.html">← Back to hub</a>
+    </div>
+  </div>
+
+  <p class="lead">A machine marked 480 answer sheets. <b>156 of those grades do not match the teacher key</b>, and the pipeline is perfectly happy about all of them — the scan was clean, the scorer ran, a number came out. This is the layer that decides which grades are <b>supported</b> well enough to reach a student, and it can name the criterion, the reason, and the words on the page for every single one it holds.</p>
+  <div style="margin-top:12px"><span class="badge">Public · synthetic demo · standard library only · offline</span></div>
+
+  <section>
+    <div class="label">The problem</div>
+    <h2>Recognition confidence is reported per page. Grades are not earned per page.</h2>
+    <div class="card issue">
+      <div class="step">R-0001 · a wrong grade released</div>
+      <p>The scan comes back at <b>0.94</b> and looks clean, so the batch goes out. But the mark for the first criterion rested on four words — <code>less dense than water</code> — and the reader was <b>0.44</b> sure of one of them. It guessed <code>clense</code>. The phrase stopped matching, the student silently lost two marks they had earned, and nothing anywhere was unhappy. It reaches a report card, and the only person who could have caught it is the one person who got skipped.</p>
+    </div>
+    <div class="card issue">
+      <div class="step">R-0003 · a correct grade held for nothing</div>
+      <p>A genuinely messy page — <b>0.73</b> overall — pulled for review even though every phrase the rubric actually cares about was read at 0.94 or better. The teacher opens it, agrees with the machine, closes it. That is not caution. That is a page-level number being asked a question about a span.</p>
+    </div>
+    <div class="card issue">
+      <div class="step">And confidence is only half of it</div>
+      <p><code>light is quicker than sound</code> earns full marks from a keyword matcher and partial marks from a teacher. <code>maybe it is less dense than water</code> earns full marks too. A fluent, correct, cleanly-read answer written in words the rubric does not list earns zero. <b>In all three the reader did its job perfectly.</b></p>
+    </div>
+  </section>
+
+  <section>
+    <div class="label">The money shot</div>
+    <h2>Same scorer, same batch. The only difference is what each is willing to release.</h2>
+    <table>
+      <tr><th></th><th class="num">released</th><th class="num">wrong grades released</th><th class="num">released accuracy</th><th class="num">held</th><th class="num">of those, held for nothing</th></tr>
+      <tr><td>page confidence ≥ 0.85</td><td class="num">378</td><td class="num fail">128</td><td class="num fail">66.14%</td><td class="num">102</td><td class="num">74</td></tr>
+      <tr><td><b>rubric-grading-gate</b></td><td class="num">326</td><td class="num pass">6</td><td class="num pass">98.16%</td><td class="num">154</td><td class="num pass">4</td></tr>
+    </table>
+    <p class="note">The threshold catches 28 of the 156 bad grades. The gate catches 150. The two queues are not nested: they overlap on 28 sheets, the gate adds 126 and drops 74 — and of the 126 it adds, 122 are a grade that was actually wrong.</p>
+    <div class="stats" style="margin-top:16px">
+      <div class="stat"><b>98.16%</b><span>of what reaches a student is right (66.14% at the threshold)</span></div>
+      <div class="stat"><b>97.4%</b><span>of the teacher's queue is real work (27% at the threshold)</span></div>
+      <div class="stat"><b>0</b><span>holds on a clean batch — no false alarms</span></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="label">The design, in one sentence</div>
+    <h2>A grader that returns a number can only be trusted or not trusted. A grader that returns the span its number rests on can be checked.</h2>
+    <div class="card ok">
+      <div class="step">① evidence, not scores</div>
+      <p><code>score.py</code> never returns a bare score. Per criterion it returns which phrasing matched, <b>which token indices it matched on</b>, whether the rubric flags that phrasing as arguable, and whether a hedge or a negation sits on it. Everything else is built on those spans.</p>
+    </div>
+    <div class="card ok">
+      <div class="step">② zeros are graded too</div>
+      <p>When a criterion fails to match, <code>text.find_near_span</code> looks for a run of the answer that differs from an accepted phrasing in <b>exactly one token</b>. If that token is also the one the reader was least sure of, the zero is more likely the reader's than the student's. This is the check that is easy to leave out — you audit the marks you gave, not the marks something silently deleted.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="label">The ablation</div>
+    <h2>Six flags were written. Four ship. The reason is measured, not argued.</h2>
+    <table>
+      <tr><th>flag</th><th class="num">held</th><th class="num">wrong grades released if dropped</th></tr>
+      <tr><td><code>hedged_evidence</code> — a hedge or negation in the 4 tokens before the matched claim</td><td class="num">66</td><td class="num">6 → <b class="fail">64</b></td></tr>
+      <tr><td><code>off_rubric</code> — a substantive answer matched no accepted phrasing</td><td class="num">44</td><td class="num">6 → <b class="fail">37</b></td></tr>
+      <tr><td><code>unread_evidence</code> — a zero whose one breaking word was guessed</td><td class="num">39</td><td class="num">6 → <b class="fail">27</b></td></tr>
+      <tr><td><code>rubric_borderline</code> — marks from a phrasing the rubric calls disputable</td><td class="num">26</td><td class="num">6 → <b class="fail">27</b></td></tr>
+      <tr><td><code>low_evidence_confidence</code> — an <i>awarded</i> mark rests on badly-read words</td><td class="num"><i>strict</i></td><td class="num">—</td></tr>
+      <tr><td><code>unread_span</code> — some word on the page was never read at all</td><td class="num"><i>strict</i></td><td class="num">—</td></tr>
+    </table>
+    <p class="note">Turning both strict flags on adds <b>49 sheets</b> to the teacher's queue and catches <b>zero</b> grades the four defaults miss — the same six escape either way. Queue precision falls from 97.4% to 73.9%, and released accuracy goes <i>down</i> (98.16% → 97.83%), because every extra hold is a correct grade.</p>
+    <div class="card">
+      <div class="step">⭐ the interesting half of that result</div>
+      <p>The flag in the strict set is <b>the one anyone would build first</b>. <i>"Was the evidence for this mark read well?"</i> sounds like the whole problem — and on this batch it finds nothing on its own, because a phrase that was read badly but <i>still matched</i> has usually still produced the right mark. The value is almost entirely on the other side of the ledger: on the marks that were <b>not</b> awarded. Same signal, opposite direction, and only one of the two directions is worth a teacher's evening.</p>
+      <p class="note">Keeping all six would have made the queue look thorough. The ablation is pinned by <code>test_every_default_flag_pays_for_itself</code> and <code>test_the_two_excluded_flags_catch_nothing_the_other_four_miss</code>.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="label">Threshold sensitivity</div>
+    <h2>A control whose result depends on where you happened to put a constant is not a control.</h2>
+    <table>
+      <tr><th>baseline <code>PAGE_FLOOR</code></th><th class="num">0.75</th><th class="num">0.80</th><th class="num"><b>0.85</b></th><th class="num">0.90</th><th class="num">0.95</th></tr>
+      <tr><td>wrong grades released</td><td class="num">153</td><td class="num">147</td><td class="num"><b>128</b></td><td class="num">33</td><td class="num">1</td></tr>
+      <tr><td>sheets held</td><td class="num">28</td><td class="num">45</td><td class="num"><b>102</b></td><td class="num">365</td><td class="num">477</td></tr>
+    </table>
+    <table style="margin-top:18px">
+      <tr><th>gate <code>EVIDENCE_FLOOR</code></th><th class="num">0.55</th><th class="num">0.65</th><th class="num"><b>0.75</b></th><th class="num">0.85</th><th class="num">0.95</th></tr>
+      <tr><td>wrong grades released</td><td class="num">16</td><td class="num">9</td><td class="num"><b>6</b></td><td class="num">4</td><td class="num">0</td></tr>
+      <tr><td>sheets held</td><td class="num">144</td><td class="num">151</td><td class="num"><b>154</b></td><td class="num">156</td><td class="num">160</td></tr>
+    </table>
+    <p class="note">The baseline has no good setting: between 0.85 and 0.90 it goes from releasing 128 wrong grades to holding three quarters of the class. The gate moves 16 sheets across its entire sweep. Both tables are printed by <code>make sweep</code> on the same data — and 0.75 is not the optimum, it is just the default.</p>
+  </section>
+
+  <section>
+    <div class="label">What this is not</div>
+    <h2>It gates the release. It does not mark the paper.</h2>
+    <div class="card">
+      <p>It does not correct the transcription, annotate the image, or decide the disputed grades — it names them and hands them to the person whose job that is. Handwriting recognition is not in here and is not claimed: the input is text with per-token confidences.</p>
+      <p>The scorer is a phrase matcher <b>deliberately</b>. It stands in for whatever actually marks the paper. The claim is about the layer above it, and that layer needs only one thing from the marker: evidence spans alongside the score. <b>A marker that returns a bare number cannot be gated this way at all</b> — which is the main integration constraint, and worth knowing before you pick one.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="label">Reproduce it</div>
+    <pre>make demo         # the page-confidence threshold vs this gate, side by side
+make gate         # the classroom batch (exits non-zero = held for review)
+make gate-clean   # the no-false-alarms case: a clean batch must exit 0
+make gate-strict  # the same batch with the two flags the ablation rejected
+make sweep        # regenerate the threshold-sensitivity tables above
+make test         # 25 tests</pre>
+    <p class="note">No dependencies beyond the standard library — no model, no keys, no network. Fixtures are generated deterministically from seed <code>20260806</code>; CI regenerates them and fails on any diff, and runs the gate both ways: a clean batch must pass, the classroom batch must be blocked. A gate that waves a bad batch through fails its own build.</p>
+  </section>
+
+  <section>
+    <div class="label">Honest limitations</div>
+    <pre>· Synthetic data: 480 generated responses over 12 questions, one rubric, one reader.
+  A demonstrator of the method. Not a benchmark, and not a report on a deployment.
+· ⚠️ The fixture injects damage in the same vocabulary the flags are written in — a
+  hedge goes in, `hedged_evidence` comes out. So "150 of 156 caught" is partly a
+  property of the generator and should not be quoted as a detection rate. What the
+  fixture can honestly settle is narrower: that a page-confidence threshold does not
+  see these failures, that two of the six flags cost more than they return, and where
+  the design is blind. Those three survive the objection.
+· 6 wrong grades are still released, and they are all the same thing: the reader
+  misread a word and rated it above the flag's floor. Raising the floor to 0.95
+  catches all six here — but only because the generator caps misread confidence at
+  0.94, so that is a fact about the fixture, not a safe setting.
+· `off_rubric` requires the WHOLE answer to have matched nothing. A student who
+  phrases one criterion in their own words and the rest in the rubric's loses those
+  marks silently and the sheet is released. This is the largest known hole in the
+  design; the fixture cannot produce the case, so it is pinned by a test instead.
+· `hedged_evidence` looks 4 tokens back and never forward. Two mangled words in the
+  same phrase leave no near miss, so nothing looks at their confidence at all.
+· `rubric_borderline` only knows a phrasing is arguable because the rubric says so.
+  Writing that list is teacher work. The gate makes the disputes visible; it does
+  not discover them.</pre>
+    <p class="note">Each of the four admitted failure modes above has a test that fails if it quietly gets worse. An admitted limitation that nothing holds in place is just a sentence.</p>
+  </section>
+
+  <div class="foot">This is a synthetic sample demonstrating the method. Inspect the flags, the fixtures, and the ablation — <a href="https://github.com/jigonyoo/rubric-grading-gate" target="_blank" rel="noopener">github.com/jigonyoo/rubric-grading-gate ↗</a></div>
+
+</div>
+</body>
+</html>
