@@ -183,6 +183,13 @@
         <div class="links"><a class="btn" href="https://github.com/jigonyoo/ai-intake-qualifier" target="_blank" rel="noopener">Code ↗</a><a class="btn" href="https://www.loom.com/share/70296fb33bc9496fab540f085fdfd4ca" target="_blank" rel="noopener">Walkthrough ↗</a><a class="btn primary" href="showcase/ai-intake-qualifier.html">Demo ↗</a></div>
       </div>
       <div class="card">
+        <div class="c-top"><span class="c-name">intake-agent-n8n</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">An n8n workflow that scores incoming inquiries with deterministic rules and routes them through a verification gate: complete leads land in a CRM-ready lane, uncertain ones stop in a human-review queue with explicit reasons, spam is rejected. Ships with the workflow JSON, a 24-case golden fixture set, ten unit tests and run screenshots — and the same scoring logic runs standalone with zero dependencies.</p>
+        <div class="c-moat">Anyone can wire n8n nodes together; the value is a gate that refuses to guess — every routing decision replays from committed fixtures (ALL PASS 24/24), and the executed branch was verified against the execution log, not just the response payload.</div>
+        <div class="tags"><span class="tag">n8n</span><span class="tag">workflow automation</span><span class="tag">routing</span><span class="tag">qa gate</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/intake-agent-n8n" target="_blank" rel="noopener">Code ↗</a></div>
+      </div>
+      <div class="card">
         <div class="c-top"><span class="c-name">intake-router-multisource</span><span class="badge pub">Public</span></div>
         <p class="c-desc">Leads arrive from four differently-shaped sources (web form, Facebook Lead Ads, inbound email, CSV) → normalized to one schema → cross-source identity resolution merges the same person across channels → deterministic routing / SLA → a review gate for anything uncertain. Runs fully offline (deterministic) or with OpenAI.</p>
         <div class="c-moat">Merging is a risk, not a convenience: only an exact email / phone match auto-merges — same name + same company but different contacts is flagged for a human, never silently combined. Full provenance and audit trail on every merge.</div>
@@ -409,7 +416,7 @@
   <!-- DATA ENGINEERING -->
   <div class="sec" id="dataeng">
     <div class="sec-h">
-      <div class="row"><h2>Data engineering &amp; extraction</h2><span class="cnt">20</span></div>
+      <div class="row"><h2>Data engineering &amp; extraction</h2><span class="cnt">26</span></div>
       <div class="desc">Reproducible pipelines that clean, normalize, and load — idempotently, with per-row confidence where it matters.</div>
     </div>
     <div class="grid">
@@ -447,6 +454,48 @@
         <div class="c-moat">The data engine behind the PROPBOARD demo — source-verifiable, reproducible.</div>
         <div class="tags"><span class="tag">python</span><span class="tag">sports data</span><span class="tag">pipeline</span></div>
         <div class="links"><a class="btn" href="https://github.com/jigonyoo/wnba-player-vs-defense" target="_blank" rel="noopener">Code ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">automation-run-audit</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">An audit of a no-code automation&rsquo;s own execution history &mdash; for the runs that reported success and still lost data. Silent attrition at a filter step, duplicate delivery from a retry without idempotency, schedule gaps, retry storms whose eventual success hides the failures, success rows carrying an error payload, and events applied out of their own order.</p>
+        <div class="c-moat">The platform dashboard shows the scenario active and the success rate in the high nineties. The audit returns <b>9 findings across all 7 checks</b> on 30 runs: <b>90 items dropped</b> by a filter at 3.00% against a 1.00% tolerance, one order delivered twice an hour apart, a <b>9-day window where the schedule never fired</b>, and a &lsquo;cancelled&rsquo; applied before its own &lsquo;created&rsquo;. It reads an exported run log &mdash; no account access, no API token.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">n8n</span><span class="tag">make.com</span><span class="tag">zapier</span><span class="tag">automation reliability</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/automation-run-audit" target="_blank" rel="noopener">Code &#8599;</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">ecommerce-order-reconcile</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">A three-way reconciliation for an online store &mdash; orders against fulfillments against payouts. Paid but never shipped, shipped but never paid, quantity mismatches, payout shortfalls attributed to fee drift or an unrecorded refund, duplicate charges separated from legitimate repeat purchases, refunds with no restock, and currency or cent-level rounding breaks.</p>
+        <div class="c-moat">All three dashboards agree they are fine. The reconciliation returns <b>11 findings across all 8 checks</b> and names <b>$80.90 of payout shortfall</b> &mdash; $0.90 at 62 bps explained by fee drift, <b>$80.00 at 8,290 bps unexplained by any recorded refund</b>. Money is <code>Decimal</code> end to end, with a test asserting no float ever touches it. A clean set with a real repeat purchase and a real partial fulfillment passes at 0.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">shopify</span><span class="tag">stripe</span><span class="tag">reconciliation</span><span class="tag">decimal</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/ecommerce-order-reconcile" target="_blank" rel="noopener">Code &#8599;</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">sheet-to-db-contract</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">A load contract for the spreadsheet that quietly feeds a production system &mdash; header drift including reordering, spreadsheet error literals arriving as text, type drift, ambiguous dates, leading-zero and scientific-notation mangling, structural noise like repeated headers and totals rows, primary-key integrity, and declared enums and ranges.</p>
+        <div class="c-moat">The import ran and loaded every row without an error. The gate returns <b>31 findings (17 error, 14 warning)</b> on 24 rows: <b>#REF!, #VALUE! and #N/A landed as text</b>, a declared column vanished, a long id arrived as <b>1.23457E+11</b>, and <b>03/04/2026 is reported as ambiguous rather than guessed</b>. It runs on a CSV export, so it needs no Google credentials at all.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">google sheets</span><span class="tag">csv</span><span class="tag">data contract</span><span class="tag">pre-load gate</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/sheet-to-db-contract" target="_blank" rel="noopener">Code &#8599;</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">odoo-migration-gate</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">A pre-flight gate for a legacy export on its way into Odoo &mdash; required fields, dangling many2one references, duplicate and near-duplicate external IDs, selection values outside the allowed set, non-ISO dates, thousands separators in decimals, credit-note sign convention, and header totals that disagree with their own lines.</p>
+        <div class="c-moat">The import wizard reports the file is readable and the load begins. The gate returns <b>16 findings across 9 checks</b> on the same export: a <b>99.00 gap</b> between <code>amount_total</code> and the sum of its lines, an <b>EUR invoice with no rate against a USD company</b>, two references pointing at partners that are not in the export, and <b>&lsquo;15/01/2026&rsquo; parsed as a date</b>. A clean export passes at 0.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">odoo</span><span class="tag">erp migration</span><span class="tag">data contract</span><span class="tag">referential integrity</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/odoo-migration-gate" target="_blank" rel="noopener">Code &#8599;</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">geo-data-quality-gate</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">A load contract for GeoJSON before it reaches PostGIS &mdash; CRS declaration, coordinate range, ring closure, winding order, self-intersection, zero-area and too-short rings, hole containment, duplicate geometry, dimension and geometry-type conformance, plus a longitude/latitude axis-swap heuristic.</p>
+        <div class="c-moat">The file parses as valid JSON and the load job starts. The gate blocks the same file with <b>17 findings across 13 checks</b> on 13 features: <b>longitude 190.0</b> and <b>latitude 95.0</b> outside their ranges, a ring that never closes, a polygon that crosses itself, a hole outside its shell, and <b>5 points that only fall inside the declared bbox once swapped</b> &mdash; flagged as a heuristic, not a proof. Zero runtime dependencies: the segment-intersection and shoelace math is stdlib.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">geojson</span><span class="tag">postgis</span><span class="tag">spatial data</span><span class="tag">data quality</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/geo-data-quality-gate" target="_blank" rel="noopener">Code &#8599;</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">crm-contact-hygiene</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">Deduplication and merge audit for contacts a CRM already holds &mdash; blocking, per-field similarity, a three-way verdict, declared conflict-resolution rules, and an audit log that names which record won every field and why. Nothing is looked up externally; the tool reads one file and writes cleaned output.</p>
+        <div class="c-moat">Blocking cuts <b>153 naive pair comparisons to 7</b> (95.4% saved). On 18 records it merges 3, leaves 15, and puts <b>2 pairs in a review queue</b> rather than guessing &mdash; one because two rules disagree on a field, one because the score lands in the grey band. A father and son at one address, and two employees sharing a switchboard number, are <b>not</b> merged; that guard is a test.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">crm</span><span class="tag">deduplication</span><span class="tag">record linkage</span><span class="tag">merge audit</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/crm-contact-hygiene" target="_blank" rel="noopener">Code &#8599;</a></div>
       </div>
       <div class="card">
         <div class="c-top"><span class="c-name">migration-verify</span><span class="badge pub">Public</span></div>
