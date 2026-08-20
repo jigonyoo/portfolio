@@ -137,7 +137,7 @@
     <h1>Automation your team can put into production — and <span class="hl">actually trust</span>.</h1>
     <p class="lead">I build data and AI-automation pipelines with a <b>verification layer built in</b> — confidence scores, checks against source, and a human-review queue for anything uncertain. Anyone can get a model to emit JSON; what a team pays for is output it can <b>trust and sign off on</b>.</p>
     <div class="chips">
-      <span class="chip"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>60 public, 57 unit-tested</span>
+      <span class="chip"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>62 public, 59 unit-tested</span>
       <span class="chip"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Reproducible runs</span>
       <span class="chip"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Human-in-the-loop</span>
       <span class="chip"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Async · chat-based delivery</span>
@@ -167,10 +167,38 @@
   <!-- LIVE -->
   <div class="sec" id="live">
     <div class="sec-h">
-      <div class="row"><h2>Live app</h2><span class="cnt">1</span></div>
+      <div class="row"><h2>Live app</h2><span class="cnt">3</span></div>
       <div class="desc">Deployed and interactive — click through it in the browser.</div>
     </div>
     <div class="grid">
+      <div class="card feat">
+        <div class="c-top">
+          <span class="c-name">DATA CONTRACT DEMO</span>
+          <span class="badge live">● Live</span>
+          <span class="badge pub">Public</span>
+        </div>
+        <p class="c-desc">Load a CSV or JSON in the browser and get contract violations and drift signals against an editable, inferred contract. Nothing is uploaded — every check runs on the page.</p>
+        <div class="c-moat">The fixtures are synthetic controls with planted faults, and the test suite includes a mutation control: removing each planted fault lowers the caught count by exactly one, so the checker is proved to be detecting rather than guessing.</div>
+        <div class="tags"><span class="tag">javascript</span><span class="tag">data contracts</span><span class="tag">drift</span><span class="tag">browser-only</span><span class="tag">20 tests</span></div>
+        <div class="links">
+          <a class="btn primary" href="https://data-contract-demo.vercel.app" target="_blank" rel="noopener">Open live demo <span class="arrow">↗</span></a>
+          <a class="btn" href="https://github.com/jigonyoo/data-contract-demo" target="_blank" rel="noopener">Code <span class="arrow">↗</span></a>
+        </div>
+      </div>
+      <div class="card feat">
+        <div class="c-top">
+          <span class="c-name">MIGRATION VERIFY DEMO</span>
+          <span class="badge live">● Live</span>
+          <span class="badge pub">Public</span>
+        </div>
+        <p class="c-desc">Compare a source and a target export and get key reconciliation plus field-level evidence — the step where a migration quietly breaks. Both files stay in the browser.</p>
+        <div class="c-moat">It does not decide whether the migration should be accepted. It produces the evidence a person signs off on, and says so on the page.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">javascript</span><span class="tag">migration</span><span class="tag">reconciliation</span><span class="tag">16 tests</span></div>
+        <div class="links">
+          <a class="btn primary" href="https://migration-verify-demo.vercel.app" target="_blank" rel="noopener">Open live demo <span class="arrow">↗</span></a>
+          <a class="btn" href="https://github.com/jigonyoo/migration-verify-demo" target="_blank" rel="noopener">Code <span class="arrow">↗</span></a>
+        </div>
+      </div>
       <div class="card feat">
         <div class="c-top">
           <span class="c-name">WNBA PROPBOARD</span>
@@ -683,7 +711,7 @@
   <!-- footer -->
   <div class="foot">
     <div class="ft-h">How to read these</div>
-    All 60 projects are public on <a href="https://github.com/jigonyoo" target="_blank" rel="noopener">github.com/jigonyoo</a>, each with a README and a reproducible run. 57 of the 60 carry test suites, and every repository is MIT-licensed. Sample projects use synthetic or sample data where noted; the point they demonstrate is the <b>pipeline and its verification layer</b>, not a specific dataset.
+    All 62 projects are public on <a href="https://github.com/jigonyoo" target="_blank" rel="noopener">github.com/jigonyoo</a>, each with a README and a reproducible run. 59 of the 62 carry test suites, and every repository is MIT-licensed. Sample projects use synthetic or sample data where noted; the point they demonstrate is the <b>pipeline and its verification layer</b>, not a specific dataset.
     <div class="sig">
       <span>Jigon Yoo — Data &amp; AI-Automation Engineer</span>
       <span>Async · chat-based delivery · <a href="mailto:jigondaniel1224@gmail.com?subject=Project%20enquiry%20via%20jigonyoo.com">available for freelance work</a></span>
