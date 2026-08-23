@@ -137,11 +137,11 @@
     <h1>Automation your team can put into production — and <span class="hl">actually trust</span>.</h1>
     <p class="lead">I build data and AI-automation pipelines with a <b>verification layer built in</b> — confidence scores, checks against source, and a human-review queue for anything uncertain. Then I show what the checks caught, <b>what they missed</b>, and where a person still has to decide. Anyone can get a model to emit JSON; what a team pays for is output it can <b>trust and sign off on</b>.</p>
     <div class="chips">
-      <span class="chip"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>62 public, 59 unit-tested</span>
+      <span class="chip"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>75 public, 72 unit-tested</span>
       <span class="chip"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Reproducible runs</span>
       <span class="chip"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Human-in-the-loop</span>
       <span class="chip"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Async · chat-based delivery</span>
-      <span class="chip"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>All 62 MIT-licensed</span>
+      <span class="chip"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>All 75 MIT-licensed</span>
     </div>
     <div class="cta">
       <a class="primary" href="mailto:jigondaniel1224@gmail.com?subject=Project%20enquiry%20via%20jigonyoo.com">Work with me &rarr;</a>
@@ -343,10 +343,39 @@
   <!-- DOCUMENT AI -->
   <div class="sec" id="devtools">
     <div class="sec-h">
-      <div class="row"><h2>Developer &amp; AI tooling</h2><span class="cnt">7</span></div>
+      <div class="row"><h2>Developer &amp; AI tooling</h2><span class="cnt">11</span></div>
       <div class="desc">Making a codebase something an AI agent can actually work in — generated context, kept fresh, and verified.</div>
     </div>
     <div class="grid">
+      <div class="card">
+        <div class="c-top"><span class="c-name">mcp-permission-server</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">A permission layer in front of MCP tools, and a log that can prove what it decided. The same 17-call session through a naive allowlist and through nine checks: calls executed without a grant 7 &rarr; 0, decisions that cannot be reconstructed from the log 16 &rarr; 0, denials that left no trace 1 &rarr; 0, secrets sitting in the log 2 &rarr; 0, entries removable unnoticed 1 &rarr; 0 &mdash; with <b>0 legitimate calls refused</b>.</p>
+        <div class="c-moat">The moat is the log. Almost every audit trail records what happened; almost none record enough to recompute <b>why it was allowed</b>. <code>--verify</code> re-decides all 17 entries from the log alone and checks each against the verdict it claims. Redaction at write time, hash-chained entries, and a stated limit: this is a policy and audit layer, <b>not a sandbox</b>.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">mcp</span><span class="tag">authorization</span><span class="tag">audit-log</span><span class="tag">hash-chain</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/mcp-permission-server" target="_blank" rel="noopener">Code &#8599;</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">agent-approval-gate</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">An LLM support agent that cannot spend money without a human &mdash; and the number that proves it. The same 37 recorded incidents run twice, once through a typical agent loop and once through seven gates: <b>unapproved money moved $453.50 &rarr; $0.00</b>, duplicate side effects 4 &rarr; 0, injected args executed 4 &rarr; 0, malformed money moves 2 &rarr; 0, and 5 actions held for a person.</p>
+        <div class="c-moat">The moat is what gets measured. Most agent demos score whether the agent <i>finished</i>; this one scores what it <b>moved</b>, replaying every refund that actually landed against <code>policy.yaml</code> to ask whether a human was required. Noise on control tasks stays at 0 &mdash; legitimate work is untouched.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">agent safety</span><span class="tag">human-in-the-loop</span><span class="tag">approval gate</span><span class="tag">deterministic</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/agent-approval-gate" target="_blank" rel="noopener">Code &#8599;</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">odds-mcp</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">An MCP server where every read names its evidence and the one write is impossible without an approval token. A risk envelope checked before a human ever sees the request, a single-use token issued by a separate step, a publish that cannot happen without it, and an append-only log of every attempt &mdash; especially the refused ones.</p>
+        <div class="c-moat">The moat is the shape of the dangerous tool. Reads are easy to make safe; this is the <b>propose &rarr; approve &rarr; publish</b> pattern that makes a side-effectful agent tool safe enough to exist at all. Data comes from <code>odds-consensus</code>, so the integration surface is a real pipeline rather than a mock.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">mcp</span><span class="tag">approval token</span><span class="tag">audit log</span><span class="tag">agent tools</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/odds-mcp" target="_blank" rel="noopener">Code &#8599;</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">readonly-guard</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">A narrow Python guard for audit, inventory, and verification tools that are meant to read evidence <b>without changing the environment they are pointed at</b>. Blocks write-capable <code>open</code> modes, selected <code>pathlib</code>/<code>os</code>/<code>shutil</code> mutations, and HTTP POST/PUT/PATCH/DELETE &mdash; while the sample inventory still runs inside the guard.</p>
+        <div class="c-moat">The moat is that the disclaimer is part of the contract: this is a tested <b>application-level policy, not an operating-system sandbox</b>, and the one-pager says so before a client ever sees it.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">read-only</span><span class="tag">audit tooling</span><span class="tag">safety</span><span class="tag">unittest</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/readonly-guard" target="_blank" rel="noopener">Code &#8599;</a></div>
+      </div>
+
       <div class="card">
         <div class="c-top"><span class="c-name">llm-deprecation-radar</span><span class="badge pub">Public</span></div>
         <p class="c-desc">Static-scans a codebase for retired and soon-to-retire LLM model IDs, API surfaces, and parameters, then reports days remaining, blast radius, and the published replacement path. The deterministic demo catches 11 of 12 planted cases; the twelfth is a current-model negative control.</p>
@@ -401,10 +430,25 @@
 
   <div class="sec" id="docai">
     <div class="sec-h">
-      <div class="row"><h2>Document &amp; knowledge AI</h2><span class="cnt">5</span></div>
+      <div class="row"><h2>Document &amp; knowledge AI</h2><span class="cnt">7</span></div>
       <div class="desc">Extraction and retrieval that cite their sources, reconcile the numbers, and refuse when the evidence isn't there.</div>
     </div>
     <div class="grid">
+      <div class="card">
+        <div class="c-top"><span class="c-name">rag-copilot</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">A document copilot that cites what it says, refuses when the evidence is not there, and ships the test that proves both. Same corpus, same 33 questions, same scorer: <b>baseline 12/33 &rarr; harness 32/33</b>, including 4/4 on superseded editions, 4/4 on regional scope, and 4/4 on questions the corpus cannot answer at all.</p>
+        <div class="c-moat"><b>The control row is the honest part</b> &mdash; both systems answer all 8 un-trapped questions, so the gain is not bought with refusals. The baseline is what most demos ship: it invented an answer to every unanswerable question and returned two confident numbers from a policy edition retired on 2025-12-31. Runs in Docker with <code>network_mode: none</code>.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">rag</span><span class="tag">citations</span><span class="tag">refusal</span><span class="tag">ablation</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/rag-copilot" target="_blank" rel="noopener">Code &#8599;</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">docs-chatbot-kit</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">A support bot&rsquo;s mistakes do not live in its sentences &mdash; they live <b>between</b> them. The layer between a model&rsquo;s draft reply and the person reading it, scored over 17 conversations / 32 turns: conversations never handed off 4 &rarr; 0, replies that must not go out but were sent anyway 4 &rarr; 0, good conversations interrupted 3 &rarr; 0.</p>
+        <div class="c-moat">The moat is that single-turn evaluation <b>passes every failure in this repository</b>. Read turn 6 of <code>B-06</code> alone and it is a correct, well-cited sentence; read it after turn 1 and it is the bot telling the same person the opposite of what it just said. The naive baseline &mdash; a keyword escalation list &mdash; escalates the wrong half and misses every cross-turn failure.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">support automation</span><span class="tag">escalation</span><span class="tag">multi-turn</span><span class="tag">guardrails</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/docs-chatbot-kit" target="_blank" rel="noopener">Code &#8599;</a></div>
+      </div>
+
       <div class="card">
         <div class="c-top"><span class="c-name">invoice-to-structured</span><span class="badge pub">Public</span></div>
         <p class="c-desc">Documents (invoices, purchase orders, bank statements — PDF or scanned) → structured JSON/CSV through a deterministic verification engine: line math, balance reconciliation, totals, required fields, confidence scores, and a cross-document human-review gate. Optional AWS Textract path for scans.</p>
@@ -446,10 +490,18 @@
   <!-- ANALYTICS -->
   <div class="sec" id="analytics">
     <div class="sec-h">
-      <div class="row"><h2>Analytics, ML &amp; mining</h2><span class="cnt">4</span></div>
+      <div class="row"><h2>Analytics, ML &amp; mining</h2><span class="cnt">5</span></div>
       <div class="desc">Reports, predictions, and segments — with the data-quality checks, baselines, and limits stated up front.</div>
     </div>
     <div class="grid">
+      <div class="card">
+        <div class="c-top"><span class="c-name">odds-consensus</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">De-margined fair prices and a cross-book consensus that <b>refuses to merge markets that are not the same</b>. One schema for five books, the margin stripped the same way everywhere, and a hard rule for when two markets are actually the same market &mdash; before anyone claims a book is off the market by 9.85%.</p>
+        <div class="c-moat">The moat is what it writes down when it declines: <code>skipped.json</code> and <code>devig_skips.json</code> record what was refused and why, so the consensus is a statement about markets that were genuinely comparable. No keys, no network, byte-identical fixtures.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">normalization</span><span class="tag">de-vig</span><span class="tag">consensus</span><span class="tag">reproducible</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/odds-consensus" target="_blank" rel="noopener">Code &#8599;</a></div>
+      </div>
+
       <div class="card">
         <div class="c-top"><span class="c-name">analytics-pipeline</span><span class="badge pub">Public</span></div>
         <p class="c-desc">Messy CSV → cleaned data (with a quality log) → KPIs and month-over-month analysis → an automated report with charts. Includes anomaly detection: outliers, revenue mismatches, MoM spikes.</p>
@@ -484,10 +536,53 @@
   <!-- DATA ENGINEERING -->
   <div class="sec" id="dataeng">
     <div class="sec-h">
-      <div class="row"><h2>Data engineering &amp; extraction</h2><span class="cnt">31</span></div>
+      <div class="row"><h2>Data engineering &amp; extraction</h2><span class="cnt">37</span></div>
       <div class="desc">Reproducible pipelines that clean, normalize, and load — idempotently, with per-row confidence where it matters.</div>
     </div>
     <div class="grid">
+      <div class="card">
+        <div class="c-top"><span class="c-name">statement-to-ledger</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">Bank and card statements into a reconciled ledger &mdash; and a refusal, in plain English, for the ones that do not add up. Importers are scored on rows parsed; this is scored on rows <b>wrong</b>: silently wrong rows 26 &rarr; 0, <b>silently wrong money $62,832.40 &rarr; $0.00</b>, unreconciled $8,905.20 &rarr; $0.00, corrupt sources caught 0/5 &rarr; 5/5.</p>
+        <div class="c-moat">The moat is that it accepts <b>fewer</b> statements on purpose &mdash; 11 of 16 instead of 16 of 16 &mdash; and holds the rest rather than parsing them wrongly. Clean sources held: 0. The refusals are targeted, not blanket caution.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">reconciliation</span><span class="tag">finance</span><span class="tag">refusal</span><span class="tag">decimal</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/statement-to-ledger" target="_blank" rel="noopener">Code &#8599;</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">dupe-merge-gate</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">Decide what your duplicates <i>are</i> before you delete any of them. The three-line <code>DELETE &hellip; WHERE id NOT IN (SELECT MIN(id) &hellip;)</code> against a gated path over eleven cases: <b>facts lost 7 &rarr; 0</b>, rows destroyed 6 &rarr; 0, rows fabricated 4 &rarr; 0, duplicates left behind 4 &rarr; 0, deletes with no undo 13 &rarr; 0, blocking operations in the plan 22 &rarr; 0.</p>
+        <div class="c-moat">The moat is the split-brain hold. Rows that share an email but disagree on <code>external_id</code> are not one person, and the gate says so instead of picking a winner &mdash; 3 held for a human, 1 migration refused, and <b>0 false alarms</b> on the sets that really were duplicates.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">deduplication</span><span class="tag">migration safety</span><span class="tag">reversible</span><span class="tag">sql</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/dupe-merge-gate" target="_blank" rel="noopener">Code &#8599;</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">run-ledger-hardening-kit</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">A run-tracking table that has never once said &ldquo;failed&rdquo; is not evidence that nothing failed. 282 runs across four pipelines, every row marked success or still running, reconstructed from what the runs left behind: silent failures found 4/10 &rarr; <b>10/10</b>, false accusations 4 &rarr; 0, duplicate alerts 3 &rarr; 0, runs that never ran 0/2 &rarr; 2/2.</p>
+        <div class="c-moat">The moat is the <b>undecided</b> column. Three runs come back honestly undecided rather than guessed at &mdash; and of those three, zero were really broken. The naive baseline is not invented: it is the three sensible rules somebody writes the afternoon they are asked whether the pipelines are healthy.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">observability</span><span class="tag">silent failure</span><span class="tag">alerting</span><span class="tag">evidence</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/run-ledger-hardening-kit" target="_blank" rel="noopener">Code &#8599;</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">site-watch-diff</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">Tell me what changed on this page &mdash; not what <i>moved</i> on it. Change watchers fail in both directions at once, and both are quiet: over the same 12 material changes, <b>missed changes 7 &rarr; 0</b> and <b>false alarms 40 &rarr; 0</b>, with unusable snapshots caught 0/5 &rarr; 5/5.</p>
+        <div class="c-moat">The moat is that the baseline is not a straw man &mdash; it is <b>this same pipeline with every gate switched off</b>, which is exactly what a text-based watcher does. And it catches the changes that never appear on screen: a link&rsquo;s destination, a form&rsquo;s post target, a <code>robots</code> directive.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">change detection</span><span class="tag">monitoring</span><span class="tag">ablation</span><span class="tag">offline</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/site-watch-diff" target="_blank" rel="noopener">Code &#8599;</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">operations-canary</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">Scheduled, offline evidence for a data operation that may drift after delivery. Replays four committed weeks of an order feed through six stages &mdash; collect, normalize, declared checks, change record, alert payloads written but <b>not sent</b>, and exports a client can open without this codebase.</p>
+        <div class="c-moat">The moat is the badge disclaimer. The README states plainly that the workflow badge <b>is not evidence until the scheduled run actually completes in public</b> &mdash; the same honesty the checks themselves apply. Standard library only; no network call, no alert sent, no credential persisted.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">scheduled checks</span><span class="tag">drift</span><span class="tag">evidence</span><span class="tag">github actions</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/operations-canary" target="_blank" rel="noopener">Code &#8599;</a></div>
+      </div>
+      <div class="card">
+        <div class="c-top"><span class="c-name">repair-cases</span><span class="badge pub">Public</span></div>
+        <p class="c-desc">Two synthetic before/after repair cases with the fault planted on purpose: a pipeline that completes <b>without an exception</b> while mapping reordered columns by position and misreading a changed encoding, and a static page carrying a blocking script, four font stylesheets, and an injected layout shift.</p>
+        <div class="c-moat">The moat is the &ldquo;what these are not&rdquo; section. They demonstrate diagnosis on deliberately broken <b>local</b> code &mdash; no client system, no production data, no commercial website &mdash; and each fix is stated as holding for the planted fault, not as a general remedy.</div>
+        <div class="tags"><span class="tag">python</span><span class="tag">diagnosis</span><span class="tag">before/after</span><span class="tag">etl</span><span class="tag">performance</span></div>
+        <div class="links"><a class="btn" href="https://github.com/jigonyoo/repair-cases" target="_blank" rel="noopener">Code &#8599;</a></div>
+      </div>
+
       <div class="card">
         <div class="c-top"><span class="c-name">ai-product-extractor</span><span class="badge pub">Public</span></div>
         <p class="c-desc">Messy product listings → clean, validated, de-duplicated data. LLM + heuristic extraction with a per-row confidence score and human-review flags.</p>
@@ -711,7 +806,7 @@
   <!-- footer -->
   <div class="foot">
     <div class="ft-h">How to read these</div>
-    All 62 projects are public on <a href="https://github.com/jigonyoo" target="_blank" rel="noopener">github.com/jigonyoo</a>, each with a README and a reproducible run. 59 of the 62 carry test suites, and all 62 are MIT-licensed. Sample projects use synthetic or sample data where noted; the point they demonstrate is the <b>pipeline and its verification layer</b>, not a specific dataset.
+    All 75 projects are public on <a href="https://github.com/jigonyoo" target="_blank" rel="noopener">github.com/jigonyoo</a>, each with a README and a reproducible run. 72 of the 75 carry test suites, and all 75 are MIT-licensed. Sample projects use synthetic or sample data where noted; the point they demonstrate is the <b>pipeline and its verification layer</b>, not a specific dataset.
     <div class="sig">
       <span>Jigon Yoo — Data &amp; AI-Automation Engineer</span>
       <span>Async · chat-based delivery · <a href="mailto:jigondaniel1224@gmail.com?subject=Project%20enquiry%20via%20jigonyoo.com">available for freelance work</a></span>
