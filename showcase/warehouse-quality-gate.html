@@ -45,18 +45,18 @@
       <a class="btn" href="../index.html">&larr; Back to hub</a>
     </div>
   </div>
-  <p class="lead">A <b>dbt contract</b> that blocks a bad batch before it reaches the mart. The sabotaged batch loads without a single error and reports revenue of <b>$4,905,051</b> instead of <b>$395,751</b> &mdash; a <b>1,139% overstatement</b> that a plain pipeline waves straight through. The contract fails 12 tests and the mart is never built.</p>
+  <p class="lead">A <b>dbt contract</b> that stops a bad batch before the mart is rebuilt from it. The sabotaged batch loads without a single error and reports revenue of <b>$4,905,051</b>; a clean batch from the same generator reports <b>$395,751</b>. Almost all of the gap is one row &mdash; order 401 at 4,500,000 &mdash; and a plain pipeline waves it straight through. The contract fails 12 tests and skips the mart build, so the mart keeps the last good run&rsquo;s numbers.</p>
   <span class="badge">Public &middot; synthetic demo</span>
 
   <section>
     <div class="label">The problem</div>
     <h2>&quot;It loaded without errors&quot; is not a quality signal.</h2>
-    <p class="lead">Every one of the twelve defects in the sabotaged batch is a defect that <em>survives a plain load</em>. Nothing throws. A duplicated customer file, an order amount that arrived in cents, a status with a capital <code>D</code> &mdash; the rows land, the job exits 0, and the number a stakeholder reads is wrong by an order of magnitude.</p>
+    <p class="lead">Every one of the twelve defects in the sabotaged batch is a defect that <em>survives a plain load</em>. Nothing throws. A duplicated customer file, an amount thousands of times larger than any other order, a status with a capital <code>D</code> &mdash; the rows land, the job exits 0, and the number a stakeholder reads is wrong by an order of magnitude.</p>
   </section>
 
   <section>
     <div class="label">The money shot</div>
-    <h2>Same sabotaged batch, loaded two ways</h2>
+    <h2>Two batches, loaded two ways</h2>
 
     <div class="card issue">
       <div class="step">&#9312; Plain load vs the contract</div>
@@ -65,18 +65,18 @@
         <tr><td>Plain load &mdash; clean batch</td><td class="num">900</td><td class="num">$395,751.28</td><td class="num">0</td><td class="num">&mdash;</td></tr>
         <tr><td>Plain load &mdash; sabotaged</td><td class="num">901</td><td class="num fail">$4,905,051.18</td><td class="num fail">0</td><td class="num">&mdash;</td></tr>
         <tr><td>Contract &mdash; clean batch</td><td class="num">900</td><td class="num">$395,751.28</td><td class="num">0</td><td class="num pass">0 of 15</td></tr>
-        <tr><td>Contract &mdash; sabotaged</td><td class="num"><em>blocked</em></td><td class="num"><em>not built</em></td><td class="num">12</td><td class="num pass">12 of 15</td></tr>
+        <tr><td>Contract &mdash; sabotaged</td><td class="num">901 <em>(staging)</em></td><td class="num"><em>mart not rebuilt</em></td><td class="num">12</td><td class="num pass">12 of 15</td></tr>
       </table>
       <div class="stats" style="margin:10px 0 0">
         <div class="stat"><b>12/12</b><span>planted defects caught</span></div>
-        <div class="stat"><b>1,139%</b><span>overstatement a plain load ships</span></div>
+        <div class="stat"><b>$4.5M</b><span>carried by one row a plain load ships</span></div>
         <div class="stat"><b>0</b><span>false alarms on the clean batch</span></div>
       </div>
     </div>
 
     <div class="card ok">
       <div class="step">&#9313; Two defects worth expanding on</div>
-      <p class="note"><b>D9 tests the raw value, not the normalised one.</b> It is tempting to <code>lower()</code> the status in staging and test the clean column &mdash; but then the test can never fail, and the downstream filter doing an exact match on <code>'delivered'</code> still silently drops the row. The model exposes both <code>status_raw</code> and <code>status_normalised</code>; the contract tests the raw one.</p>
+      <p class="note"><b>D9 tests the raw value, not the normalised one.</b> It is tempting to <code>lower()</code> the status in staging and test the clean column &mdash; but then the test can never fail, and the downstream filter doing an exact match on <code>'delivered'</code> still silently drops the row. The model exposes both <code>status_raw</code> and <code>status_normalised</code>, and the contract tests <code>status_raw</code> &mdash; which is only trimmed, not untouched (see the limitations below).</p>
       <p class="note"><b>D7 is a contract, not a bug.</b> Nothing is wrong with an EUR order. What is wrong is that <code>fct_revenue_daily</code> sums <code>amount</code> without conversion, so mixing currencies makes the total meaningless. The single-currency rule is written down as a test precisely because the assumption lives in a model somewhere else.</p>
     </div>
 
@@ -85,28 +85,29 @@
       <table>
         <tr><th>#</th><th>what arrived</th><th>caught by</th></tr>
         <tr><td>D1</td><td>customer_id 8 duplicated &mdash; a re-sent file loaded twice</td><td><code>unique</code></td></tr>
-        <tr><td>D2</td><td>customer 16 email arrived as <code>&quot;&quot;</code>, not NULL</td><td><code>not_null</code></td></tr>
+        <tr><td>D2</td><td>customer 16 email arrived blank (the seed loader reads it as NULL)</td><td><code>not_null</code></td></tr>
         <tr><td>D3</td><td>country <code>USA</code> instead of ISO-2 <code>US</code></td><td><code>accepted_values</code></td></tr>
-        <tr><td>D4</td><td>signup_date in 2027 &mdash; an upstream timezone bug</td><td><code>not_in_future</code></td></tr>
+        <tr><td>D4</td><td>signup_date 2027-06-01, in the future</td><td><code>not_in_future</code> (compares with today&rsquo;s date)</td></tr>
         <tr><td>D5</td><td>order 101 references customer 99999, which does not exist</td><td><code>relationships</code></td></tr>
-        <tr><td>D6</td><td>order 201 amount is <code>-450.00</code> with status <code>placed</code></td><td><code>non_negative</code></td></tr>
+        <tr><td>D6</td><td>order 201 amount is <code>-450.0</code> on an order that is not a refund</td><td><code>non_negative</code></td></tr>
         <tr><td>D7</td><td>orders 301&ndash;302 switched to EUR while the mart sums as USD</td><td><code>accepted_values</code></td></tr>
-        <tr><td>D8</td><td>order 401 amount <code>4,500,000</code> &mdash; a cents/dollars mix-up</td><td><code>within_magnitude</code></td></tr>
+        <tr><td>D8</td><td>order 401 amount <code>4,500,000</code> &mdash; thousands of times any other order</td><td><code>within_magnitude</code></td></tr>
         <tr><td>D9</td><td>status <code>Delivered</code> with a capital D</td><td><code>accepted_values</code> on raw</td></tr>
         <tr><td>D10</td><td>order 601 present twice &mdash; double revenue recognition</td><td><code>unique</code></td></tr>
         <tr><td>D11</td><td>order 701 dated before the reporting window opens</td><td><code>within_reporting_window</code></td></tr>
-        <tr><td>D12</td><td>order 801 amount arrived empty and loads as <code>0</code></td><td><code>not_null</code></td></tr>
+        <tr><td>D12</td><td>order 801 amount arrived empty (NULL); <code>SUM</code> silently skips it</td><td><code>not_null</code></td></tr>
       </table>
     </div>
   </section>
 
   <section>
     <div class="label">Reproduce it</div>
-    <pre>pip install dbt-core dbt-duckdb
+    <pre>python3 -m venv .venv &amp;&amp; . .venv/bin/activate
+pip install dbt-core dbt-duckdb
 python3 scripts/make_batches.py     # regenerates both batches, seed is fixed
 ./scripts/run_evidence.sh           # runs the contract over each, writes evidence/
 python3 scripts/naive_vs_gate.py    # shows what a plain load reports instead</pre>
-    <p class="note">The warehouse here is DuckDB so the whole thing runs on a laptop in under a second. The contract is ordinary dbt &mdash; moving it to Snowflake, BigQuery or Postgres is a change of <code>profiles.yml</code>, not a change of tests.</p>
+    <p class="note">The warehouse here is DuckDB so the whole thing runs on a laptop. The staging models use DuckDB SQL (<code>try_cast</code>, <code>cast(&hellip; as double)</code>); moving to another warehouse means porting those, not only changing <code>profiles.yml</code>. Last checked with dbt-core 1.12.5 and dbt-duckdb 1.11.0.</p>
   </section>
 
   <section>
@@ -115,7 +116,14 @@ python3 scripts/naive_vs_gate.py    # shows what a plain load reports instead</p
 &middot; Contracts stop bad data. They do not tell you a job never ran, or that a scraper returned
   an empty page &mdash; those are pipeline-heartbeat and scraper-canary.
 &middot; The twelve defects are the ones that survive a plain load. Defects that crash the load
-  are already visible and are deliberately out of scope.</pre>
+  are already visible and are deliberately out of scope.
+&middot; The magnitude test is a fixed ceiling (100,000). A real &times;100 unit slip on orders under
+  $900 lands under 90,000 and passes; that needs a check relative to the column&rsquo;s history.
+&middot; When the contract fails, the mart is not rebuilt &mdash; it keeps the last good run&rsquo;s
+  numbers, and nothing tells the reader. Pair it with a freshness check.
+&middot; <code>status_raw</code> is <code>trim(status)</code> and <code>country</code> is tested after
+  <code>upper(trim(&hellip;))</code>, so <code>shipped&nbsp;</code> and <code>us</code> pass. Test the value as it arrived.
+&middot; An empty batch (with its column types declared) passes all fifteen tests. Volume is not checked.</pre>
   </section>
 
   <div class="foot">This is a synthetic sample demonstrating the method. <a href="https://github.com/jigonyoo/warehouse-quality-gate" target="_blank" rel="noopener">Inspect the checks, the fixtures, and the reproducible evidence &#8599;</a></div>
