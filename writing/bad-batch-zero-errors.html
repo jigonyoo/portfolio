@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>A bad batch loaded with zero errors. One row added $4.5 million. &mdash; Jigon Yoo</title>
+<link rel="canonical" href="https://jigonyoo.com/writing/bad-batch-zero-errors.html" />
+<meta name="description" content="A reproducible demo: twelve planted defects, a DuckDB warehouse, a dbt contract - and three places where the contract is weaker than it looks." />
+<style>
+  :root{--bg:#0a0e0d;--panel:#10171a;--panel-2:#0d1315;--line:#1c2a2b;--txt:#e7f0ee;--muted:#869a97;--dim:#5f7370;--green:#22c55e;--green-dim:#15803d;--green-soft:rgba(34,197,94,.12);--amber:#f5b544;--red:#fb7185}
+  *{box-sizing:border-box}html,body{margin:0}
+  body{background:radial-gradient(1100px 600px at 85% -8%,rgba(34,197,94,.09),transparent 60%),var(--bg);color:var(--txt);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Arial,sans-serif}
+  .wrap{max-width:1000px;margin:auto;padding:34px 24px 64px}
+  a{color:inherit;text-decoration:none}
+  .top,.actions,.stats{display:flex;gap:10px;flex-wrap:wrap}.top{justify-content:space-between;align-items:flex-start}
+  .eyebrow{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase}
+  h1{font-size:clamp(28px,5vw,46px);line-height:1.1;margin:9px 0}
+  .lead{color:#cdd8d5;font-size:17px;max-width:760px}
+  .badge,.btn{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:8px;padding:7px 11px;font-size:12px;font-weight:750}
+  .badge{color:var(--green);background:var(--green-soft)}.btn:hover{border-color:var(--green)}
+  section{margin-top:34px}
+  .label{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;border-bottom:1px solid var(--line);padding-bottom:8px}
+  h2{font-size:22px;margin:13px 0 8px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:18px;margin-top:13px}
+  .step{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase}
+  pre{white-space:pre-wrap;overflow:auto;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:15px;color:#cdd8d5;font-size:13px}
+  .issue{border-left:3px solid var(--red)}.ok{border-left:3px solid var(--green)}
+  .stats .stat{flex:1;min-width:150px;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:14px 16px}
+  .stat b{display:block;font-size:26px;color:var(--green)}
+  .stat span{color:var(--muted);font-size:13px}
+  table{width:100%;border-collapse:collapse}th,td{text-align:left;border-bottom:1px solid var(--line);padding:9px 8px;font-size:14px}th{color:var(--muted);font-size:12px}
+  .pass{color:var(--green);font-weight:700}.fail{color:var(--red);font-weight:700}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .foot{margin-top:42px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}.foot a{color:var(--green)}
+  .note{color:var(--muted);font-size:13px;margin-top:8px}
+  article{max-width:760px}
+  article p,article li{color:#cdd8d5;font-size:16px;line-height:1.7}
+  article h2{font-size:22px;margin:34px 0 8px;border-bottom:1px solid var(--line);padding-bottom:6px}
+  article a{color:var(--green);text-decoration:underline}
+  article code{background:var(--panel-2);border:1px solid var(--line);border-radius:5px;padding:1px 5px;font-size:13px}
+  article pre code{background:none;border:0;padding:0}
+  .tw{overflow-x:auto;margin:12px 0}
+  .meta{color:var(--muted);font-size:13px;margin:6px 0 22px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <div class="eyebrow">Writing &middot; data engineering</div>
+      <h1>A bad batch loaded with zero errors. One row added $4.5 million.</h1>
+    </div>
+    <div class="actions">
+      <a class="btn" href="https://github.com/jigonyoo/warehouse-quality-gate" target="_blank" rel="noopener">The code &#8599;</a>
+      <a class="btn" href="../index.html#writing">&larr; Back to hub</a>
+    </div>
+  </div>
+  <div class="meta">Jigon Yoo &middot; 2026-09-30</div>
+  <article>
+<p>I built a small warehouse, fed it a batch of orders with twelve defects planted in
+it, and watched the load succeed.</p>
+<p>Every row landed. Summed as loaded, the revenue came to <strong>$4,905,051.18</strong>. A clean
+batch from the same generator reports <strong>$395,751.28</strong>. Nothing in the pipeline
+objected to the difference.</p>
+<p>This post is about why that happens, what stopped it, and three places where the
+check that stopped it is weaker than it looks — none of which I had noticed until a
+review of this post went looking. The code is public and runs on a laptop:
+<a href="https://github.com/jigonyoo/warehouse-quality-gate" target="_blank" rel="noopener">github.com/jigonyoo/warehouse-quality-gate</a>.</p>
+<h2>The setup</h2>
+<p>Two tables, <code>customers</code> and <code>orders</code>, loaded from CSV into DuckDB through dbt. A
+staging layer types and trims the raw columns; one mart, <code>fct_revenue_daily</code>, sums
+order amounts by day. That mart is the number a stakeholder reads.</p>
+<p>A script generates two batches with a fixed seed: a clean one with 900 orders, then a
+sabotaged one with 901 orders and twelve planted defects. They are two separate draws
+from the same generator, not the same rows with edits applied, so they differ in
+ordinary ways too. That matters for how the numbers below should be read.</p>
+<h2>What a plain load reports</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th></th>
+<th style="text-align: right;">rows loaded</th>
+<th style="text-align: right;">revenue reported</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>clean batch</td>
+<td style="text-align: right;">900</td>
+<td style="text-align: right;">$395,751.28</td>
+</tr>
+<tr>
+<td>sabotaged batch</td>
+<td style="text-align: right;">901</td>
+<td style="text-align: right;">$4,905,051.18</td>
+</tr>
+</tbody>
+</table></div>
+<p>The plain path is just "load the CSV, sum the column". Neither load fails.</p>
+<p>Almost all of the gap is one row. Order 401 in the sabotaged batch has an amount of
+<code>4500000.0</code>, in a batch where no other order is above $900. Take that
+row out and the sabotaged batch sums to $405,051.18 — about 2% above the clean one,
+which is roughly what two draws of the same shape (plus the other, smaller defects)
+should look like. One value, thousands of
+times larger than its neighbours, carries $4.5 million.</p>
+<p>It is worth being clear about why nothing complained. <code>4500000.0</code> is a valid number.
+The column is numeric. The row has every field it needs. Moving rows is the load's
+whole job, and it did that job.</p>
+<h2>The twelve defects</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>Table</th>
+<th>What arrived</th>
+<th>Caught by</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>D1</td>
+<td>customers</td>
+<td>the same <code>customer_id</code> twice — a re-sent file</td>
+<td><code>unique</code></td>
+</tr>
+<tr>
+<td>D2</td>
+<td>customers</td>
+<td>a blank email</td>
+<td><code>not_null</code></td>
+</tr>
+<tr>
+<td>D3</td>
+<td>customers</td>
+<td>country <code>USA</code> instead of ISO-2 <code>US</code></td>
+<td><code>accepted_values</code></td>
+</tr>
+<tr>
+<td>D4</td>
+<td>customers</td>
+<td>a signup date about eight months in the future</td>
+<td>a custom "not in future" test (it compares with today's date, so from 2027-06-01 this one stops failing)</td>
+</tr>
+<tr>
+<td>D5</td>
+<td>orders</td>
+<td>an order for customer 99999, who does not exist</td>
+<td><code>relationships</code></td>
+</tr>
+<tr>
+<td>D6</td>
+<td>orders</td>
+<td>amount <code>-450.0</code> on an order with status <code>shipped</code></td>
+<td>a custom <code>non_negative</code> test</td>
+</tr>
+<tr>
+<td>D7</td>
+<td>orders</td>
+<td>two orders in EUR in a mart that sums everything as USD</td>
+<td><code>accepted_values</code> on currency</td>
+</tr>
+<tr>
+<td>D8</td>
+<td>orders</td>
+<td>the <code>4,500,000</code> above</td>
+<td>a custom <code>within_magnitude</code> test</td>
+</tr>
+<tr>
+<td>D9</td>
+<td>orders</td>
+<td>status <code>Delivered</code> with a capital D</td>
+<td><code>accepted_values</code> on the <strong>raw</strong> value</td>
+</tr>
+<tr>
+<td>D10</td>
+<td>orders</td>
+<td>the same order twice — double revenue recognition</td>
+<td><code>unique</code></td>
+</tr>
+<tr>
+<td>D11</td>
+<td>orders</td>
+<td>an order dated before the reporting window opens</td>
+<td>a custom <code>within_reporting_window</code> test</td>
+</tr>
+<tr>
+<td>D12</td>
+<td>orders</td>
+<td>an amount that arrived empty</td>
+<td><code>not_null</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>The contract is ordinary dbt: generic tests in <code>schema.yml</code> plus four custom tests of
+five lines each. Fifteen tests in total.</p>
+<h2>What the contract reports</h2>
+<div class="tw"><table>
+<thead>
+<tr>
+<th></th>
+<th style="text-align: right;">tests failed</th>
+<th>mart</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>clean batch</td>
+<td style="text-align: right;">0 of 15</td>
+<td>built</td>
+</tr>
+<tr>
+<td>sabotaged batch</td>
+<td style="text-align: right;">12 of 15</td>
+<td>skipped</td>
+</tr>
+</tbody>
+</table></div>
+<p>Twelve planted defects, twelve failing tests, no failures on the clean batch. I re-ran
+both from a fresh clone for this post: the clean run ends <code>PASS=22 … ERROR=0</code> and the
+sabotaged one <code>PASS=9 … ERROR=12 SKIP=1</code>. The skip is the mart — <code>dbt build</code> does not
+build <code>fct_revenue_daily</code> on top of staging that failed its tests.</p>
+<h2>Where the contract is weaker than it looks</h2>
+<p>A reviewer who had not written any of this — a separate AI agent, given the repo and
+the commands but not my conclusions — re-ran every number above and then went
+looking for the soft spots. Three of them are worth more than the headline.</p>
+<p><strong>1. The magnitude test only catches the absurd.</strong> <code>within_magnitude</code> fails when an
+amount is above 100,000. That catches 4,500,000. It does not catch the error a
+magnitude check is usually for. A real cents-for-dollars slip multiplies an amount by 100, and in this
+data the largest order is under $900, so the worst such slip lands under 90,000 — and
+passes. An order of $89,999 goes straight through this test. A fixed ceiling is a
+check for impossible values, not for wrong ones; a unit error needs something relative,
+like the value against its own history.</p>
+<p><strong>2. "The mart is not built" means the mart is stale.</strong> Skipping the build stops the
+wrong number from being written. It does not remove the old number. After the
+sabotaged run, <code>fct_revenue_daily</code> still holds the results of the last good run, and
+nothing tells a reader that. The staging view underneath shows the bad batch in full.
+Stopping the build is necessary, not sufficient: it has to be paired with a freshness
+check, or the failure turns into a quiet one.</p>
+<p><strong>3. I broke my own rule in the same repo.</strong> D9 is there to make a point: if you
+normalise a value before testing it, the test cannot see the defect. <code>lower('Delivered')</code>
+is <code>'delivered'</code>, so a test on the normalised status passes, while a downstream filter
+on the raw value still silently drops the row. So the orders contract tests
+<code>status_raw</code>. Except <code>status_raw</code> is <code>trim(status)</code>, not what arrived — so a status of
+<code>shipped</code> with a trailing space passes the test, and any query that reads the source
+table with an exact match still drops that row. And the customers contract
+tests <code>country</code> after <code>upper(trim(...))</code>, so a lower-case <code>us</code> passes too — and the
+orders contract does the same to <code>currency</code>. The same mistake three times in one small repo, one of them inside the fix for it. The rule I keep having to relearn: <strong>test what arrived, not what you made of it.</strong></p>
+<h2>What this does not do</h2>
+<p>A contract like this stops the defects someone thought to write down. Twelve planted
+defects and twelve catches is a statement about these twelve.</p>
+<p>It also says nothing about volume or freshness. An empty batch, with its column types
+declared so it can load at all, passes all fifteen tests and builds an empty mart. A job that never ran is not a
+test failure at all.</p>
+<h2>Where this went next</h2>
+<p>The contract answers "can a pipeline stop a bad batch?" The question I got more
+interested in is whether an <strong>agent</strong> running the load would. So I built an evaluation
+environment around this situation: a loader that never reports an error, batches that
+are wrong in several of these ways, and a score computed from what reached the
+warehouse rather than from what the agent says it did. It is public, with the same
+honesty about its limits:
+<a href="https://github.com/jigonyoo/bad-batch-gate" target="_blank" rel="noopener">github.com/jigonyoo/bad-batch-gate</a>.</p>
+<h2>Reproduce it</h2>
+<pre><code class="language-bash">git clone https://github.com/jigonyoo/warehouse-quality-gate
+cd warehouse-quality-gate
+python3 -m venv .venv &amp;&amp; . .venv/bin/activate
+pip install dbt-core dbt-duckdb      # last checked with dbt-core 1.12.5, dbt-duckdb 1.11.0
+python3 scripts/make_batches.py     # regenerates both batches, seed is fixed
+./scripts/run_evidence.sh           # runs the contract over each, writes evidence/
+python3 scripts/naive_vs_gate.py    # what a plain load reports instead
+</code></pre>
+<p><em>I use AI tools while building and writing, and I check every number against a run
+before it goes in. The numbers here come from a fresh clone on 2026-09-30.</em></p>
+  </article>
+  <div class="foot">Original on jigonyoo.com. <a href="../index.html">More projects and writing &#8599;</a></div>
+</div>
+</body>
+</html>
