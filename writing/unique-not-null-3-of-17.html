@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>A unique + not_null suite stopped 3 of 17 bad batches &mdash; Jigon Yoo</title>
+<link rel="canonical" href="https://jigonyoo.com/writing/unique-not-null-3-of-17.html" />
+<meta name="description" content="I planted 17 realistic faults, one at a time, into a small dbt project. The usual starter tests stopped 3. A fuller contract stopped 14, and the 3 it missed are the interesting ones." />
+<style>
+  :root{--bg:#0a0e0d;--panel:#10171a;--panel-2:#0d1315;--line:#1c2a2b;--txt:#e7f0ee;--muted:#869a97;--dim:#5f7370;--green:#22c55e;--green-dim:#15803d;--green-soft:rgba(34,197,94,.12);--amber:#f5b544;--red:#fb7185}
+  *{box-sizing:border-box}html,body{margin:0}
+  body{background:radial-gradient(1100px 600px at 85% -8%,rgba(34,197,94,.09),transparent 60%),var(--bg);color:var(--txt);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Arial,sans-serif}
+  .wrap{max-width:1000px;margin:auto;padding:34px 24px 64px}
+  a{color:inherit;text-decoration:none}
+  .top,.actions,.stats{display:flex;gap:10px;flex-wrap:wrap}.top{justify-content:space-between;align-items:flex-start}
+  .eyebrow{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase}
+  h1{font-size:clamp(28px,5vw,46px);line-height:1.1;margin:9px 0}
+  .lead{color:#cdd8d5;font-size:17px;max-width:760px}
+  .badge,.btn{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:8px;padding:7px 11px;font-size:12px;font-weight:750}
+  .badge{color:var(--green);background:var(--green-soft)}.btn:hover{border-color:var(--green)}
+  section{margin-top:34px}
+  .label{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;border-bottom:1px solid var(--line);padding-bottom:8px}
+  h2{font-size:22px;margin:13px 0 8px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:18px;margin-top:13px}
+  .step{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase}
+  pre{white-space:pre-wrap;overflow:auto;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:15px;color:#cdd8d5;font-size:13px}
+  .issue{border-left:3px solid var(--red)}.ok{border-left:3px solid var(--green)}
+  .stats .stat{flex:1;min-width:150px;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:14px 16px}
+  .stat b{display:block;font-size:26px;color:var(--green)}
+  .stat span{color:var(--muted);font-size:13px}
+  table{width:100%;border-collapse:collapse}th,td{text-align:left;border-bottom:1px solid var(--line);padding:9px 8px;font-size:14px}th{color:var(--muted);font-size:12px}
+  .pass{color:var(--green);font-weight:700}.fail{color:var(--red);font-weight:700}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .foot{margin-top:42px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}.foot a{color:var(--green)}
+  .note{color:var(--muted);font-size:13px;margin-top:8px}
+  article{max-width:760px}
+  article p,article li{color:#cdd8d5;font-size:16px;line-height:1.7}
+  article h2{font-size:22px;margin:34px 0 8px;border-bottom:1px solid var(--line);padding-bottom:6px}
+  article a{color:var(--green);text-decoration:underline}
+  article code{background:var(--panel-2);border:1px solid var(--line);border-radius:5px;padding:1px 5px;font-size:13px}
+  article pre code{background:none;border:0;padding:0}
+  .tw{overflow-x:auto;margin:12px 0}
+  .meta{color:var(--muted);font-size:13px;margin:6px 0 22px}
+  .svcbox{margin-top:30px;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--green);border-radius:11px;padding:14px 18px}
+  .svcbox p{margin:0;font-size:15px}
+  article blockquote{margin:12px 0;padding:2px 16px;border-left:3px solid var(--line);color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <div class="eyebrow">Writing &middot; data engineering</div>
+      <h1>A unique + not_null suite stopped 3 of 17 bad batches. Here is what got through.</h1>
+    </div>
+    <div class="actions">
+      <a class="btn" href="https://github.com/jigonyoo/dbt-fault-drill" target="_blank" rel="noopener">The code &#8599;</a>
+      <a class="btn" href="../index.html#services">&larr; Back to jigonyoo.com</a>
+    </div>
+  </div>
+  <div class="meta">Jigon Yoo &middot; 2026-10-04</div>
+  <article>
+<p>Many dbt projects start with the same two tests on every key: <code>unique</code> and
+<code>not_null</code>. They are cheap, they rarely fail, and they feel like coverage. I wanted
+a number for how much they actually stop.</p>
+<p>So I wrote a small tool that plants one realistic fault at a time into a copy of a dbt
+project&rsquo;s seed data, runs <code>dbt build</code>, and records whether anything stopped it.
+It is public and runs on a laptop with DuckDB:
+<a href="https://github.com/jigonyoo/dbt-fault-drill" target="_blank" rel="noopener">github.com/jigonyoo/dbt-fault-drill</a>.</p>
+<h2>The setup</h2>
+<p>The example project is deliberately ordinary: 240 orders and 60 customers loaded from
+CSV, two staging models, and one mart, <code>fct_daily_revenue</code>, that sums the amounts of
+orders that were not cancelled or returned, by day and currency. That sum is the number someone reads.</p>
+<p>The same <code>schema.yml</code> holds two test suites. The <strong>basic</strong> suite is the
+starter set: <code>unique</code> and <code>not_null</code> on the keys. The <strong>contract</strong> suite
+adds <code>not_null</code> on the other order columns, a relationship from orders to customers, accepted values for status and currency, a
+range on amounts, a &ldquo;not in the future&rdquo; check on dates, and a minimum row count.</p>
+<p>The drill plants 17 faults, each into its own throwaway copy: a duplicated row, a blank
+key, an amount sent in cents, a 45,000,000 amount, a status in the wrong case, last
+year&rsquo;s file loaded again, and eleven more. One bad row in an otherwise clean batch is
+the case that loads without a single error, so most faults change exactly one row.</p>
+<h2>The result</h2>
+<div class="tw"><table>
+<thead><tr><th>Suite</th><th style="text-align: right;">stopped</th><th style="text-align: right;">went through</th></tr></thead>
+<tbody>
+<tr><td>basic (<code>unique</code> + <code>not_null</code> on keys)</td><td style="text-align: right;">3 of 17</td><td style="text-align: right;">14</td></tr>
+<tr><td>contract</td><td style="text-align: right;">14 of 17</td><td style="text-align: right;">3</td></tr>
+</tbody>
+</table></div>
+<p>Of the basic suite&rsquo;s three, only two are its tests: <code>unique</code> caught the duplicated
+row and <code>not_null</code> caught the blank key. The third, a date written as
+<code>18/09/2026</code>, failed because the seed&rsquo;s columns are typed and DuckDB refused to load
+it. That is a real stop, but it came from the column type, not from a test.</p>
+<h2>What got through, and how far it moved revenue</h2>
+<p>For every fault that reached the mart, the drill also reports how far it moved <code>SUM(revenue)</code> against the
+clean run (20,174.75, summed across currencies as a raw check). These went through the basic
+suite:</p>
+<div class="tw"><table>
+<thead><tr><th>Fault</th><th style="text-align: right;">change in revenue</th></tr></thead>
+<tbody>
+<tr><td>one amount of 45,000,000</td><td style="text-align: right;">+44,999,955.17</td></tr>
+<tr><td>one amount in KRW scale, currency still USD</td><td style="text-align: right;">+21,138.33</td></tr>
+<tr><td>one amount sent in cents</td><td style="text-align: right;">+10,790.01</td></tr>
+<tr><td>90% of the batch missing</td><td style="text-align: right;">&minus;18,207.38</td></tr>
+<tr><td>the whole batch empty</td><td style="text-align: right;">&minus;20,174.75</td></tr>
+</tbody>
+</table></div>
+<p>Five more went through with a change of exactly 0.00: a lowercase currency code, a status
+in the wrong case, a date in 2099, an order pointing at a customer who does not exist, and
+last year&rsquo;s file. The remaining four (a blank amount, a negative amount, the replayed order and the 10x amount below) moved it by 100 to 300 each. A total that does not move is not the same as data that is right. The
+rows are still there, in the wrong currency group, the wrong status, the wrong year.</p>
+<h2>The three the contract missed</h2>
+<p>These are the interesting ones, because no range or uniqueness test on a single column can see them:</p>
+<ul>
+<li><strong>The same order ingested twice under a new key</strong> (+218.59). The order ids
+differ, so <code>unique</code> passes. What would stop it: uniqueness on a natural key or on the
+upstream event id, if your source carries one; this example does not, which is the point.</li>
+<li><strong>One amount off by a factor of ten</strong> (30.95 became 309.50, +278.55). Still well
+inside any sensible range. What would stop it: comparing a row with that customer&rsquo;s
+history, or a batch total with recent batches.</li>
+<li><strong>Last year&rsquo;s file loaded again</strong> (every date shifted back 365 days, total
+unchanged). Nothing checks freshness. What would stop it: the newest date must be within a
+few days of the load.</li>
+</ul>
+<h2>Read these numbers carefully</h2>
+<p>I wrote both the contract and the fault catalog, so 14 of 17 is not an independent
+benchmark; a contract written by someone who knows the faults will look good against them.
+The useful number is the one the drill reports on your own project. The tool also only
+plants faults into seed CSVs on DuckDB for now, and the revenue column is one sum: it shows
+faults that move a total, not rows that moved between groups.</p>
+<p>The tool itself went through two separate AI review passes before I published it. The first review
+found that it read a failing <code>on-run-end</code> hook as a clean build, because it trusted the
+per-node results and ignored dbt&rsquo;s exit code. A drill that reports a broken build as a
+pass is exactly the kind of quiet failure it exists to find. Every blocking finding from both reviews
+is fixed, with a regression test where one could be written.</p>
+<h2>Try it on your project</h2>
+<pre><code>pip install "dbt-fault-drill[duckdb] @ git+https://github.com/jigonyoo/dbt-fault-drill"
+dbt-fault-drill run --project-dir . --out drill.md</code></pre>
+<p>Map your columns to roles in a <code>fault_drill.yml</code> (<code>key</code>, <code>amount</code>, <code>currency</code>,
+<code>date</code>, <code>category</code>, <code>foreign_key</code>), name the <code>seed</code> to plant faults into, and leave out what you do not have; those faults are skipped and listed.
+The README has the full reproduce commands for every number above.</p>
+<div class="svcbox"><p><strong>Want this measured on a sample of your own data?</strong> I offer this as a fixed-scope <a href="https://jigonyoo.com/#services">Data load quality gate</a>: a data contract written as dbt tests, a report on faults planted in your own data and how many the contract caught, and the gate wired into CI. From $600, usually 5 business days, all in writing.</p></div>
+<p><em>Written with AI assistance. Every number comes from the committed reports and example data in the repository.</em></p>
+</article>
+  <div class="foot">Original on jigonyoo.com. <a href="../index.html">More projects and writing &#8599;</a></div>
+</div>
+</body>
+</html>
