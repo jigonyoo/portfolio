@@ -416,7 +416,7 @@ p.kicker::before { content: ""; flex: none; width: 8px; height: 8px; border-radi
           <div><dt>You send</dt><dd>Access to the code that handles tool calls or webhooks.</dd></div>
           <div><dt>You get</dt><dd>A failing test that reproduces the duplicate, a report on the cause, a proposed fix as a pull request, and proof the test passes after it.</dd></div>
         </dl>
-        <p class="proof">Evidence: <a href="https://github.com/jigonyoo/duplicate-side-effect-desk">duplicate-side-effect-desk</a>, and <a href="https://github.com/jigonyoo/agent-reliability-kit">agent-reliability-kit</a>, where double charges go from 5 to 0.</p>
+        <p class="proof">Evidence: <a href="https://github.com/jigonyoo/duplicate-side-effect-desk">duplicate-side-effect-desk</a>, and <a href="https://github.com/jigonyoo/agent-reliability-kit">agent-reliability-kit</a>, where double charges go from 5 to 0. Write-up: <a href="writing/check-then-act-paid-twice.html">why checking the ledger first still paid twice</a>.</p>
         <p class="try"><span>Free tool</span> Try <a href="https://github.com/jigonyoo/replay-twice">replay-twice</a> on your own handler first: it delivers the same event four ways and checks your ledger counts one effect.</p>
         <div class="quote"><span class="price"><b>From $800</b> usually 5 business days</span><a class="btn btn-ghost" href="#contact">Ask</a></div>
       </article>
@@ -622,6 +622,7 @@ p.kicker::before { content: ""; flex: none; width: 8px; height: 8px; border-radi
       <p>Long-form write-ups of what broke, how I measured it, and what I got wrong along the way.</p>
     </div>
     <ul class="posts">
+      <li><a href="writing/check-then-act-paid-twice.html"><h3>My refund handler checked the ledger before paying. It still paid twice.</h3><p>Four ways to deliver the same event twice, four handlers, and why reading before writing does not stop deliveries that overlap.</p><span class="where">jigonyoo.com · also on dev.to</span></a></li>
       <li><a href="writing/unique-not-null-3-of-17.html"><h3>A unique + not_null suite stopped 3 of 17 bad batches. Here is what got through.</h3><p>Seventeen realistic faults planted one at a time into a dbt project: what the starter tests let through, and the three a fuller contract still missed.</p><span class="where">jigonyoo.com · also on dev.to</span></a></li>
       <li><a href="writing/bad-batch-zero-errors.html"><h3>A bad batch loaded with zero errors. One row added $4.5 million.</h3><p>What a plain dbt contract caught, and three places where it is weaker than it looks.</p><span class="where">jigonyoo.com · also on dev.to</span></a></li>
       <li><a href="https://dev.to/jigonyoo/i-wrote-five-agents-to-cheat-my-own-benchmark-they-found-three-holes-three-more-found-me-4bk0"><h3>I wrote five agents to cheat my own benchmark. They found three holes. Three more found me.</h3><p>Attacker agents against a refund-desk grader found three holes; three more turned up later, including an API outage that raised the score.</p><span class="where">dev.to ↗</span></a></li>
