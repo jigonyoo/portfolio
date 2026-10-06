@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>My refund handler checked the ledger before paying. It still paid twice. &mdash; Jigon Yoo</title>
+<link rel="canonical" href="https://jigonyoo.com/writing/check-then-act-paid-twice.html" />
+<meta name="description" content="Reading before writing stops a sequential retry. It does not stop two deliveries that overlap. Four ways to deliver the same event twice, four handlers, and the one-line difference." />
+<style>
+  :root{--bg:#0a0e0d;--panel:#10171a;--panel-2:#0d1315;--line:#1c2a2b;--txt:#e7f0ee;--muted:#869a97;--dim:#5f7370;--green:#22c55e;--green-dim:#15803d;--green-soft:rgba(34,197,94,.12);--amber:#f5b544;--red:#fb7185}
+  *{box-sizing:border-box}html,body{margin:0}
+  body{background:radial-gradient(1100px 600px at 85% -8%,rgba(34,197,94,.09),transparent 60%),var(--bg);color:var(--txt);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Arial,sans-serif}
+  .wrap{max-width:1000px;margin:auto;padding:34px 24px 64px}
+  a{color:inherit;text-decoration:none}
+  .top,.actions,.stats{display:flex;gap:10px;flex-wrap:wrap}.top{justify-content:space-between;align-items:flex-start}
+  .eyebrow{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase}
+  h1{font-size:clamp(28px,5vw,46px);line-height:1.1;margin:9px 0}
+  .lead{color:#cdd8d5;font-size:17px;max-width:760px}
+  .badge,.btn{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:8px;padding:7px 11px;font-size:12px;font-weight:750}
+  .badge{color:var(--green);background:var(--green-soft)}.btn:hover{border-color:var(--green)}
+  section{margin-top:34px}
+  .label{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;border-bottom:1px solid var(--line);padding-bottom:8px}
+  h2{font-size:22px;margin:13px 0 8px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:18px;margin-top:13px}
+  .step{color:var(--green);font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase}
+  pre{white-space:pre-wrap;overflow:auto;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:15px;color:#cdd8d5;font-size:13px}
+  .issue{border-left:3px solid var(--red)}.ok{border-left:3px solid var(--green)}
+  .stats .stat{flex:1;min-width:150px;background:var(--panel);border:1px solid var(--line);border-radius:11px;padding:14px 16px}
+  .stat b{display:block;font-size:26px;color:var(--green)}
+  .stat span{color:var(--muted);font-size:13px}
+  table{width:100%;border-collapse:collapse}th,td{text-align:left;border-bottom:1px solid var(--line);padding:9px 8px;font-size:14px}th{color:var(--muted);font-size:12px}
+  .pass{color:var(--green);font-weight:700}.fail{color:var(--red);font-weight:700}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .foot{margin-top:42px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}.foot a{color:var(--green)}
+  .note{color:var(--muted);font-size:13px;margin-top:8px}
+  article{max-width:760px}
+  article p,article li{color:#cdd8d5;font-size:16px;line-height:1.7}
+  article h2{font-size:22px;margin:34px 0 8px;border-bottom:1px solid var(--line);padding-bottom:6px}
+  article a{color:var(--green);text-decoration:underline}
+  article code{background:var(--panel-2);border:1px solid var(--line);border-radius:5px;padding:1px 5px;font-size:13px}
+  article pre code{background:none;border:0;padding:0}
+  .tw{overflow-x:auto;margin:12px 0}
+  .meta{color:var(--muted);font-size:13px;margin:6px 0 22px}
+  .svcbox{margin-top:30px;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--green);border-radius:11px;padding:14px 18px}
+  .svcbox p{margin:0;font-size:15px}
+  article blockquote{margin:12px 0;padding:2px 16px;border-left:3px solid var(--line);color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <div class="eyebrow">Writing &middot; agents &amp; webhooks</div>
+      <h1>My refund handler checked the ledger before paying. It still paid twice.</h1>
+    </div>
+    <div class="actions">
+      <a class="btn" href="https://github.com/jigonyoo/replay-twice" target="_blank" rel="noopener">The code &#8599;</a>
+      <a class="btn" href="../index.html#services">&larr; Back to jigonyoo.com</a>
+    </div>
+  </div>
+  <div class="meta">Jigon Yoo &middot; 2026-10-06</div>
+  <article>
+<p>A refund handler commits the refund, then loses its reply. Maybe the HTTP response timed
+out. Maybe the worker died before it acknowledged the queue message. Maybe it was an AI
+agent's tool call, and the agent saw a timeout and called the tool again with the same
+arguments. The sender did nothing wrong by retrying. The question is what your handler does
+with the second delivery.</p>
+<p>The usual fix is to look first: if the ledger already has a refund for this order, return
+early. I wanted to see how far that fix goes, so I wrote a small pytest plugin that delivers
+the same event again in four different ways and counts how many times the effect landed. It
+is public and runs offline:
+<a href="https://github.com/jigonyoo/replay-twice">github.com/jigonyoo/replay-twice</a>.</p>
+
+<h2>Four ways to deliver the same event twice</h2>
+<div class="tw"><table>
+<tr><th>Scenario</th><th>What happens</th></tr>
+<tr><td><code>duplicate</code></td><td>the same event arrives twice, one after the other</td></tr>
+<tr><td><code>timeout_retry</code></td><td>the handler finishes, its reply is replaced by a timeout, and a scripted agent retries the same tool call with the same arguments</td></tr>
+<tr><td><code>crash_before_ack</code></td><td>the handler finishes, the acknowledgement is lost, and the event is redelivered: the queue's or webhook sender's view (the lost ack is simulated with an exception; no process is killed)</td></tr>
+<tr><td><code>concurrent</code></td><td>eight deliveries at once: threads released together by a barrier, or eight tasks on one event loop for <code>async def</code> handlers</td></tr>
+</table></div>
+<p>The verdict does not come from the handler's return value. You give the drill an
+<code>effects(key)</code> function that counts what was actually committed, such as rows in
+the refund ledger for that order, and a trial passes only if the count is exactly one.</p>
+
+<h2>Four handlers, one ledger</h2>
+<p>The repository ships SQLite versions of a refund tool and a <code>payment.succeeded</code>
+webhook, each written four ways:</p>
+<ul>
+<li><strong>naive</strong> writes the refund every time.</li>
+<li><strong>check_then_act</strong> reads the ledger, and writes only if nothing is there.</li>
+<li><strong>guarded_raises</strong> claims the order id in a table with a unique key, in the same
+transaction as the refund. A second claim raises an integrity error.</li>
+<li><strong>guarded</strong> makes the same claim with <code>INSERT OR IGNORE</code> and returns
+&ldquo;already applied&rdquo; when the claim was already taken.</li>
+</ul>
+
+<h2>The result</h2>
+<p>Refund flow, three runs. The sequential scenarios are one trial per run; the concurrent
+scenario is 200 trials per run, each with eight overlapping deliveries. All three runs gave
+the same verdict in every cell; how many times the refund landed inside a race varied from run
+to run.</p>
+<div class="tw"><table>
+<tr><th>Handler</th><th>duplicate</th><th>timeout_retry</th><th>crash_before_ack</th><th>concurrent (200 trials)</th></tr>
+<tr><td>naive</td><td class="fail">paid twice</td><td class="fail">paid twice</td><td class="fail">paid twice</td><td class="fail">200 paid twice or more</td></tr>
+<tr><td>check_then_act</td><td class="pass">once</td><td class="pass">once</td><td class="pass">once</td><td class="fail">200 paid twice or more</td></tr>
+<tr><td>guarded_raises</td><td>once, but raised</td><td>once, but raised</td><td>once, but raised</td><td>once, raised in all 200</td></tr>
+<tr><td>guarded</td><td class="pass">once</td><td class="pass">once</td><td class="pass">once</td><td class="pass">once in all 200</td></tr>
+</table></div>
+<p>The webhook flow and an <code>async</code> version of the refund tool gave the same verdicts,
+cell for cell. Measured with replay-twice 0.2.0 on Linux, Python 3.11, eight threads, seed 0.</p>
+
+<h2>Why looking first is not enough</h2>
+<p>Reading before writing handles every retry that arrives after the first delivery has
+finished. That covers three of the four scenarios, and it is why the pattern survives code
+review: test it by calling the handler twice and it passes.</p>
+<p>It fails when two deliveries overlap. Both read an empty ledger, both decide nothing has been
+paid, both write. A webhook sender that retries quickly, two workers pulling the same message,
+or an agent loop that fires a tool call while the previous one is still running will all
+produce that overlap.</p>
+<p>The read here takes no lock, and adding one is harder than it sounds. At the default
+isolation level of most databases, wrapping the read and the write in one transaction still lets
+both deliveries see an empty ledger, and <code>SELECT &hellip; FOR UPDATE</code> cannot lock a row
+that does not exist yet. A unique constraint on the key is the guard the database will actually
+enforce.</p>
+<p>One honest caveat about the 200 out of 200. The example handler sleeps for one millisecond
+between its read and its write, and the drill releases all eight deliveries at the same instant;
+both widen the gap on purpose, so this is not a failure rate you
+should expect in production. It shows that the gap exists, and that a test which only calls
+the handler twice in sequence will never find it.</p>
+
+<h2>Once is not the whole answer either</h2>
+<p><code>guarded_raises</code> never paid twice. It still has a bug. Every redelivery hits the
+unique key and raises, which in a web handler usually becomes a 500, and the sender, seeing an
+error, retries again. The money moved once; the retries do not stop.</p>
+<p>So the drill reports handler errors separately from the effect count. By default it passes
+with a warning; with <code>redelivery_errors="fail"</code> it fails. The difference between
+<code>guarded_raises</code> and <code>guarded</code> is one statement and an early return: claim
+the key with <code>INSERT OR IGNORE</code> and return &ldquo;already applied&rdquo; instead of
+raising. A production handler would usually store the first result and return that.</p>
+<pre><code>with connection:
+    claimed = connection.execute(
+        "INSERT OR IGNORE INTO claims VALUES (?, ?)", (kind, key)
+    ).rowcount
+    if not claimed:
+        return "already_applied"
+    connection.execute("INSERT INTO ledger VALUES (?, ?, ?)", (kind, key, amount))
+return "applied"</code></pre>
+<p>Here the claim and the ledger row commit in one transaction, so a crash between them cannot
+leave a claim with no refund behind it. A real refund is usually a call to a payment API, which
+cannot join your database transaction. The same idea still applies: derive the key from the
+order rather than generating a new one per attempt, and pass it as the provider's idempotency
+key, so a retry gets the first refund back instead of creating a second. Providers keep these keys
+for a limited time, so check how long. The local claim then needs a pending and a done state:
+a crash between the claim and the API call should be retried with the same key, not left as a
+claim with no refund. The drill does not care how you do it; it only counts what landed.</p>
+
+<h2>What this does not test</h2>
+<p>Everything above runs in one process against SQLite. The drill does not cover several servers
+racing each other, your real database's isolation level, distributed locks, broker delivery
+policies, effects committed after the handler returns, duplicates on the payment provider's
+side, real process crashes and power loss, network partitions, effects your observer cannot see,
+or a handler that never returns (use your test runner's timeout). It also cannot help if the key itself is wrong: two partial refunds on one order need two
+identities. A pass means the schedules that ran were safe, not that every schedule is.</p>
+
+<h2>Try it on your handler</h2>
+<pre><code>pip install "replay-twice @ git+https://github.com/jigonyoo/replay-twice"</code></pre>
+<pre><code>from uuid import uuid4
+from replay_twice import ReplayCase, SCENARIOS
+
+def test_refund_happens_once(replay, db):
+    def fresh_case():
+        order_id = uuid4().hex
+        return ReplayCase(
+            handler=refund_tool,
+            effects=lambda key: db.count_refunds(key),
+            event={"order_id": order_id, "amount": 800},
+            key=order_id,
+        )
+    replay(case_factory=fresh_case, scenarios=SCENARIOS)</code></pre>
+<p>Point it at a test database, not production: the handler is really called. By default the
+concurrent drill runs once; add <code>--replay-repeats=200</code> to run it as many times as the
+table above. <code>async def</code>
+handlers work too. The table above reproduces with <code>replay-twice report</code> in about four
+minutes, and the raw observations are committed in the repository.</p>
+<div class="svcbox"><p><strong>Want this run against your own handler or agent tool?</strong> I offer this as a fixed-scope <a href="https://jigonyoo.com/#services">Duplicate side-effect diagnostic</a>: a failing test that reproduces the duplicate in your code, a report on the cause, a proposed fix as a pull request, and proof the test passes after it. From $800, usually 5 business days, all in writing.</p></div>
+<p><em>Written with AI assistance. Every number comes from the committed reports in the repository.</em></p>
+</article>
+  <div class="foot">Original on jigonyoo.com. <a href="../index.html">More projects and writing &#8599;</a></div>
+</div>
+</body>
+</html>
