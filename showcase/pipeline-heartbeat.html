@@ -14,6 +14,7 @@
 <meta property="og:type" content="website">
 <meta property="og:image" content="https://jigonyoo.com/assets/og-default.png">
 <meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../assets/cta.css">
 </head>
 <body><main class="wrap">
 <header class="top"><div><div class="eyebrow">Data engineering · pipeline monitoring</div><h1>pipeline-heartbeat</h1><p class="lead">A scheduler can die without throwing an exception. This monitor reads the run ledger and asks whether expected work actually happened.</p><span class="badge">Public &middot; synthetic demo</span></div><nav class="actions"><a class="btn" href="https://github.com/jigonyoo/pipeline-heartbeat" target="_blank" rel="noopener">GitHub Code &#8599;</a><a class="btn" href="../index.html">&larr; Back to hub</a></nav></header>
@@ -38,6 +39,7 @@ Heartbeat result: CRITICAL empty_success</pre></section>
 <section><div class="label">How it's verified</div><h2>The checker cannot read the planted answer map.</h2><p>The problem and control ledgers are evaluated before the scoring map is loaded. The checker package never imports or mentions that map. Repeated runs with the same ledger and evaluation time produce byte-identical report directories, and the healthy control exits 0 with 0 findings.</p></section>
 
 <section><div class="label">Honest limitations</div><h2>Eight caught patterns are fixture coverage, not a field detection rate.</h2><div class="card"><ul><li>The generator places one planted pattern against each declared detector. Catching 8 of 8 shows those paths execute; it does not cover unknown production failures.</li><li>The control produced 0 findings because every declared field and threshold was constructed to pass. That is not an estimated false-positive rate.</li><li>The synthetic period does not model holidays, daylight-saving changes, or arbitrary cron expressions.</li><li>The ledger can show that a schema changed. It cannot prove which deployment or upstream event caused the change.</li><li>File-based finding state needs external coordination if multiple monitor processes write concurrently.</li></ul></div></section>
+<aside class="cta-box" aria-label="Work with me"><p class="cta-title">Want this check on your system?</p><p class="cta-svc">Related service: <b>Data load quality gate</b></p><a class="cta-link" href="/#contact">Describe your problem &rarr;</a></aside>
 
 <div class="foot">Offline ledger checks with committed evidence. <a href="https://jigonyoo.com">jigonyoo.com</a> &middot; <a href="../index.html">Back to hub</a></div>
 </main></body></html>

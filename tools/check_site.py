@@ -15,6 +15,7 @@ import xml.etree.ElementTree as ET
 HOSTS = {'jigonyoo.com', 'www.jigonyoo.com', 'jigonyoo.vercel.app'}
 LATEST = ('writing/check-then-act-paid-twice.html', 'writing/unique-not-null-3-of-17.html')
 TOKEN = re.compile(r'github_pat_|ghp_|sk-ant-|AKIA[A-Z0-9]{16}|-----BEGIN (?:[A-Z ]+ )?PRIVATE KEY-----')
+CONTACT = '/#contact'
 COUNTS = re.compile(r'\b(\d+)\s+public\s+repos(?:itories)?\b|\bAll\s+(\d+)\s+projects\s+are\s+public\b|공개\s*저장소\s*(\d+)\s*개|(\d+)\s*개(?:의)?\s*공개\s*저장소', re.I)
 
 
@@ -30,11 +31,20 @@ class Page(HTMLParser):
         self.canonical = False
         self.links = []
         self.og_images = []
+        self.cta = None
+        self.cta_link = None
+        self.cta_contact = False
         self.feed(source)
         self.close()
 
     def handle_starttag(self, tag, attrs):
         attrs = dict(attrs)
+        if self.cta:
+            self.cta[1] += tag == self.cta[0]
+            if tag == 'a' and attrs.get('href', '').strip() == CONTACT:
+                self.cta_link = []
+        elif 'cta-box' in (attrs.get('class') or '').split():
+            self.cta = [tag, 1]
         if tag == 'h1':
             self.h1 += 1
         if tag == 'title':
@@ -52,12 +62,21 @@ class Page(HTMLParser):
                 self.links.append(attrs[attr])
 
     def handle_endtag(self, tag):
+        if self.cta and tag == 'a' and self.cta_link is not None:
+            self.cta_contact |= 'describe your problem' in ' '.join(''.join(self.cta_link).split()).lower()
+            self.cta_link = None
+        if self.cta and tag == self.cta[0]:
+            self.cta[1] -= 1
+            if not self.cta[1]:
+                self.cta = None
         if tag == 'title':
             self.in_title = False
         if tag in ('script', 'style'):
             self.hidden = max(0, self.hidden - 1)
 
     def handle_data(self, data):
+        if self.cta_link is not None:
+            self.cta_link.append(data)
         if self.in_title:
             self.title.append(data)
         if not self.hidden:
@@ -132,6 +151,8 @@ def inspect(root):
                 valid = False
             if not valid:
                 add(name, 'internal-link', 'Internal URL does not resolve to a file')
+        if name.parent == Path('showcase') and not page.cta_contact:
+            add(name, 'contact-cta', f'Missing cta-box linking {CONTACT} (Describe your problem)')
         if count is not None:
             for match in COUNTS.finditer(' '.join(page.text)):
                 actual = int(next(g for g in match.groups() if g is not None))

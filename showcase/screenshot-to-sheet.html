@@ -14,6 +14,7 @@
 <meta property="og:type" content="website">
 <meta property="og:image" content="https://jigonyoo.com/assets/og-default.png">
 <meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../assets/cta.css">
 </head>
 <body><main class="wrap">
 <header class="top"><div><div class="eyebrow">Document AI &middot; screenshots to spreadsheet</div><h1>screenshot-to-sheet</h1><p class="lead">Screenshots become spreadsheet rows only after per-field confidence gates, type checks, and a totals reconciliation.</p><span class="badge">Public &middot; synthetic demo &middot; stdlib only</span></div><nav class="actions"><a class="btn" href="https://github.com/jigonyoo/screenshot-to-sheet" target="_blank" rel="noopener">GitHub Code &#8599;</a><a class="btn" href="../index.html">&larr; Back to hub</a></nav></header>
@@ -73,6 +74,7 @@ Fields with no value at all: 8   (cropped screenshots)</pre>
 <p><strong>Twelve screenshots is a small sample, from one layout.</strong> Field anchoring is the part most likely to break on a real client's captures, and that cannot be assessed without them.</p>
 <p><strong>The reconciliation rule is layout-specific.</strong> <code>subtotal + tax = total</code> holds here. Discounts, shipping, rounding rules and multiple currencies all break that identity, and it has to be rewritten to match the client's data before it means anything at all.</p>
 <p><strong>Nothing can see the answers.</strong> The ground-truth file is used for scoring only; no module in the pipeline reads it, and the run loads it only after every routing decision is made. A test fails the build if that ever stops being true.</p></section>
+<aside class="cta-box" aria-label="Work with me"><p class="cta-title">Want this check on your system?</p><p class="cta-svc">Related service: <b>Data load quality gate</b></p><a class="cta-link" href="/#contact">Describe your problem &rarr;</a></aside>
 
 <div class="foot">Synthetic data throughout &mdash; no real company, customer, or order. Standard library only on the demo path. <a href="https://jigonyoo.com">jigonyoo.com</a> &middot; <a href="../index.html">Back to hub</a></div>
 </main></body></html>

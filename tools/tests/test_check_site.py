@@ -134,6 +134,26 @@ class SiteTests(unittest.TestCase):
                 self.assertEqual(main(), 0)
             self.assertIn('고쳐짐: index.html [internal-link]', output.getvalue())
 
+    def test_showcase_pages_need_contact_box(self):
+        box = ('<aside class="cta-box"><p>Want this check on your system?</p>'
+               '<a href="/#contact">Describe your <b>problem</b> &rarr;</a></aside>')
+        self.write('showcase/ok.html', self.source + box)
+        self.write('showcase/assets/nested/page.html', self.source)
+        self.write('writing/no-box.html', self.source)
+        self.sitemap()
+        self.assertEqual(self.keys(), set())
+        bad = {
+            'missing': '',
+            'outside box': '<a href="/#contact">Describe your problem</a>',
+            'wrong href': box.replace('/#contact', '#contact'),
+            'wrong text': box.replace('Describe your <b>problem</b>', 'Email me'),
+            'box closed': '<aside class="cta-box"><div></div></aside><a href="/#contact">Describe your problem</a>',
+        }
+        for label, html in bad.items():
+            with self.subTest(label):
+                self.write('showcase/ok.html', self.source + html)
+                self.assertEqual(self.keys(), {('showcase/ok.html', 'contact-cta')})
+
     def test_missing_facts_and_zero_h1(self):
         (self.root / 'data/facts.json').unlink()
         self.write('index.html', self.source.replace('<h1>Test</h1>', ''))
