@@ -29,6 +29,7 @@ class Page(HTMLParser):
         self.description = False
         self.canonical = False
         self.links = []
+        self.og_images = []
         self.feed(source)
         self.close()
 
@@ -42,6 +43,8 @@ class Page(HTMLParser):
             self.hidden += 1
         if tag == 'meta' and attrs.get('name', '').lower() == 'description':
             self.description |= bool(attrs.get('content', '').strip())
+        if tag == 'meta' and attrs.get('property', '').lower() == 'og:image':
+            self.og_images.append(attrs.get('content', '').strip())
         if tag == 'link' and 'canonical' in attrs.get('rel', '').lower().split():
             self.canonical |= bool(attrs.get('href', '').strip())
         for attr in ('href', 'src', 'action', 'poster'):
@@ -113,6 +116,14 @@ def inspect(root):
             add(name, 'description', 'Missing nonempty meta description')
         if not page.canonical:
             add(name, 'canonical', 'Missing canonical link')
+        for image in page.og_images:
+            try:
+                target = local_target(root, name, image)
+                valid = bool(image) and (target is None or (target.is_relative_to(root) and target.is_file()))
+            except ValueError:
+                valid = False
+            if not valid:
+                add(name, 'og-image', 'Open Graph image URL does not resolve to a file')
         for link in page.links:
             try:
                 target = local_target(root, name, link)
@@ -138,7 +149,7 @@ def inspect(root):
             targets = {local_target(root, Path('index.html'), node.text.strip())
                        for node in tree.iter() if node.tag.split('}')[-1] == 'loc' and node.text}
             for path in pages:
-                if path not in targets:
+                if path.relative_to(root) != Path('404.html') and path not in targets:
                     add(path.relative_to(root), 'sitemap-coverage', 'Page absent from sitemap.xml')
         except (ET.ParseError, ValueError):
             add('@site', 'sitemap', 'Invalid sitemap.xml')

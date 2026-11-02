@@ -62,6 +62,36 @@ class SiteTests(unittest.TestCase):
         (self.root / 'writing/check-then-act-paid-twice.html').unlink()
         self.assertIn(('writing/check-then-act-paid-twice.html', 'required-page'), self.keys())
 
+    def test_404_exempt_from_sitemap_but_other_pages_required(self):
+        self.write('404.html', self.source)
+        self.assertEqual(self.keys(), set())
+        self.write('other.html', self.source)
+        self.assertEqual(self.keys(), {('other.html', 'sitemap-coverage')})
+
+    def test_og_images_resolve_same_site_files(self):
+        self.write('assets/share.png', 'image fixture')
+        for url in ('/assets/share.png', 'https://jigonyoo.com/assets/share.png?x=1#preview',
+                    '//www.jigonyoo.com/assets/share.png',
+                    'https://jigonyoo.vercel.app/assets/share.png',
+                    '../assets/%73hare.png', 'https://example.org/external.png'):
+            with self.subTest(url=url):
+                self.write('writing/check-then-act-paid-twice.html', self.source +
+                           f'<meta property="og:image" content="{url}">')
+                self.assertEqual(self.keys(), set())
+        for url in ('/missing.png', 'https://jigonyoo.com/missing.png',
+                    '//www.jigonyoo.com/missing.png', '../missing.png',
+                    '/../../escape.png', '', 'https://[invalid'):
+            with self.subTest(url=url):
+                self.write('writing/check-then-act-paid-twice.html', self.source +
+                           f'<meta property="og:image" content="{url}">')
+                self.assertEqual(self.keys(), {('writing/check-then-act-paid-twice.html', 'og-image')})
+
+    def test_every_og_image_is_checked(self):
+        self.write('index.html', self.source +
+                   '<meta property="og:image" content="https://example.org/ok.png">'
+                   '<meta property="og:image" content="/missing.png">')
+        self.assertEqual(self.keys(), {('index.html', 'og-image')})
+
     def test_counts_across_markup(self):
         self.write('index.html', self.source + '<p>All <b>79</b> projects are public</p>')
         self.assertIn(('index.html', 'public-repos'), self.keys())
