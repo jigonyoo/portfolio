@@ -1,12 +1,5 @@
 [
   {
-    "page": "index.html",
-    "rule": "public-repos",
-    "details": [
-      "Copy says 79; facts say 94"
-    ]
-  },
-  {
     "page": "showcase/llm-guardrails.html",
     "rule": "secret-token",
     "details": [
