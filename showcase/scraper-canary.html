@@ -14,6 +14,7 @@
 <meta property="og:type" content="website">
 <meta property="og:image" content="https://jigonyoo.com/assets/og-default.png">
 <meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../assets/cta.css">
 </head>
 <body><main class="wrap">
 <header class="top"><div><div class="eyebrow">Data engineering · extraction monitoring</div><h1>scraper-canary</h1><p class="lead">A scraper that crashes gets attention. This one catches the costlier failure: a job that exits cleanly while the extracted data is wrong or incomplete.</p><span class="badge">Public &middot; synthetic demo</span></div><nav class="actions"><a class="btn" href="https://github.com/jigonyoo/scraper-canary" target="_blank" rel="noopener">GitHub Code &#8599;</a><a class="btn" href="../index.html">&larr; Back to hub</a></nav></header>
@@ -33,6 +34,7 @@
 <section><div class="label">How it's verified</div><h2>The answer key is loaded only after every decision.</h2><p>The canary package never reads or mentions <code>planted_breakages.json</code>. The standard-library runner evaluates all eight snapshots first, then loads the answer key for scoring. Seventeen tests cover parsing, median+MAD behavior, all seven invariants, severity, imports, and truth isolation.</p></section>
 
 <section><div class="label">Honest limitations</div><h2>Five synthetic breakages are a test fixture, not a production error rate.</h2><div class="card"><ul><li>The baseline has three accepted days. It does not model weekly or seasonal catalogue volume.</li><li>All pages are committed snapshots of a fictional target. No live site or terms-of-service boundary is tested.</li><li>Structure drift identifies a candidate cause, not which deployment changed the page.</li><li>The run missed 0 planted breakages and produced 0 false positives in eight days. Those zeros do not estimate performance on unseen production drift.</li><li>Freshness trusts the page timestamp. A source can advance that stamp while serving old records.</li></ul></div></section>
+<aside class="cta-box" aria-label="Work with me"><p class="cta-title">Want this check on your system?</p><p class="cta-svc">Related service: <b>Data load quality gate</b></p><a class="cta-link" href="/#contact">Describe your problem &rarr;</a></aside>
 
 <div class="foot">Synthetic snapshots, offline execution, and committed evidence. <a href="https://jigonyoo.com">jigonyoo.com</a> &middot; <a href="../index.html">Back to hub</a></div>
 </main></body></html>

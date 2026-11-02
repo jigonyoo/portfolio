@@ -14,6 +14,7 @@
 <meta property="og:type" content="website">
 <meta property="og:image" content="https://jigonyoo.com/assets/og-default.png">
 <meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../assets/cta.css">
 </head>
 <body><main class="wrap">
 <header class="top"><div><div class="eyebrow">RAG · citation · refusal · evaluation</div><h1>rag-grounded-qa</h1><p class="lead">Question answering over fictional company policies that cites its evidence, refuses unsupported questions, and measures both behaviors.</p><span class="badge">Public · fictional corpus</span></div><nav class="actions"><a class="btn" href="https://github.com/jigonyoo/rag-grounded-qa" target="_blank" rel="noopener">GitHub Code ↗</a><a class="btn" href="../index.html">← Back to hub</a></nav></header>
@@ -32,6 +33,7 @@ Evaluation set: 11 answerable + 3 out-of-scope questions.</pre></section>
 <section><div class="label">How it's verified</div><h2>The evaluation harness is the moat.</h2><p>The labelled set measures whether the expected source appears in the top three results, whether in-scope questions are answered and out-of-scope questions refused, and whether every accepted answer includes a citation. The bundled harness exposed two silent retrieval failures during development and turned them into regression guards.</p></section>
 
 <section><div class="label">Honest limitations</div><div class="card"><ul><li>The corpus is four fictional policy documents and the evaluation set contains only 14 questions; scores do not generalize to an unseen production corpus.</li><li>Offline retrieval uses lexical TF-IDF. Paraphrases and domain terminology can require embeddings and a larger, representative eval set.</li><li>The in-memory implementation is a demonstration; larger corpora need a persistent vector store and operational monitoring.</li><li>Citations and refusal reduce risk but do not replace human review for consequential policy decisions.</li></ul></div></section>
+<aside class="cta-box" aria-label="Work with me"><p class="cta-title">Want this check on your system?</p><p class="cta-svc">Related service: <b>RAG citation &amp; refusal tests</b></p><a class="cta-link" href="/#contact">Describe your problem &rarr;</a></aside>
 
 <footer class="foot">This is a synthetic sample demonstrating the method. <a href="https://github.com/jigonyoo/rag-grounded-qa" target="_blank" rel="noopener">Inspect the code and evaluation report ↗</a></footer>
 </main></body></html>

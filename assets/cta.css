@@ -1,0 +1,6 @@
+/* Contact box at the end of case pages and articles. Works on light and dark pages. */
+.cta-box{margin:28px 0;padding:18px 20px;border:1px solid var(--line,rgba(127,127,127,.35));border-left:4px solid var(--green,#2f9e6e);border-radius:12px;background:var(--panel,transparent);color:inherit}
+.cta-box p{margin:0 0 6px}
+.cta-box .cta-title{font-size:1.1em;font-weight:700}
+.cta-box .cta-svc{color:var(--muted,inherit)}
+.cta-box .cta-link{display:inline-block;margin-top:6px;font-weight:700;color:var(--green,inherit);text-decoration:underline;text-underline-offset:3px}

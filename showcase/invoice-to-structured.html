@@ -14,6 +14,7 @@
 <meta property="og:type" content="website">
 <meta property="og:image" content="https://jigonyoo.com/assets/og-default.png">
 <meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../assets/cta.css">
 </head>
 <body><main class="wrap">
 <header class="top"><div><div class="eyebrow">Document AI · verified extraction</div><h1>invoice-to-structured</h1><p class="lead">Invoices, purchase orders, and bank statements become structured records only after deterministic math and reconciliation checks.</p><span class="badge">Public · synthetic demo</span></div><nav class="actions"><a class="btn" href="https://github.com/jigonyoo/invoice-to-structured" target="_blank" rel="noopener">GitHub Code ↗</a><a class="btn" href="../index.html">← Back to hub</a></nav></header>
@@ -38,6 +39,7 @@
 <section><div class="label">How it's verified</div><h2>Rules—not an LLM—make the decision.</h2><p>Line totals, subtotals, grand totals, date ordering, running balances, duplicates, and required fields are checked in deterministic Python. Extraction confidence is calibrated with the validation signal; every flag carries a reason and timestamped audit entry.</p></section>
 
 <section><div class="label">Honest limitations</div><div class="card"><ul><li>Offline PO and bank-statement extraction accepts normalized JSON; arbitrary scans need the optional LLM/OCR front end and human QC.</li><li>Currency validation checks one uppercase ISO-style code and does not convert exchange rates.</li><li>Duplicate detection is exact: date + amount + description. Fuzzy duplicates need domain-specific rules.</li><li>Synthetic samples demonstrate the method, not production accuracy on a customer's document distribution.</li></ul></div></section>
+<aside class="cta-box" aria-label="Work with me"><p class="cta-title">Want this check on your system?</p><p class="cta-svc">Related service: <b>Model &amp; prompt switch check</b></p><a class="cta-link" href="/#contact">Describe your problem &rarr;</a></aside>
 
 <footer class="foot">This is a synthetic sample demonstrating the method. <a href="https://github.com/jigonyoo/invoice-to-structured" target="_blank" rel="noopener">Inspect the code and committed outputs ↗</a></footer>
 </main></body></html>

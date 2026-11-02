@@ -14,6 +14,7 @@
 <meta property="og:type" content="website">
 <meta property="og:image" content="https://jigonyoo.com/assets/og-default.png">
 <meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../assets/cta.css">
 </head>
 <body><main class="wrap">
 <header class="top"><div><div class="eyebrow">Data engineering · multi-source normalization</div><h1>hardware-parts-data-pipeline</h1><p class="lead">Two robotics retailers describe the same motor in two different vocabularies. This pipeline collapses 192 distinct spec labels into one typed schema of 380 products, then loads it into SQLite so re-runs never duplicate.</p><span class="badge">Public · live retailer data</span></div><nav class="actions"><a class="btn" href="https://github.com/jigonyoo/hardware-parts-data-pipeline" target="_blank" rel="noopener">GitHub Code ↗</a><a class="btn" href="../index.html">← Back to hub</a></nav></header>
@@ -83,6 +84,7 @@ spec_count          11        &lt;-- traceability: raw specs kept in raw_specs_j
 <li>Voltage-parameterized specs are collapsed to each product's rated voltage. Figures at other voltages remain in <code>raw_specs_json</code> but are not columns.</li>
 <li>Two retailers is a demonstration, not a market. Adding a third source means new label mappings, and that work is explicit rather than automatic.</li>
 </ul></div></section>
+<aside class="cta-box" aria-label="Work with me"><p class="cta-title">Want this check on your system?</p><p class="cta-svc">Related service: <b>Data load quality gate</b></p><a class="cta-link" href="/#contact">Describe your problem &rarr;</a></aside>
 
 <footer class="foot">A working sample built on public retailer data; no client data is included. <a href="https://github.com/jigonyoo/hardware-parts-data-pipeline" target="_blank" rel="noopener">Inspect the code, schema, and catalogue ↗</a></footer>
 </main></body></html>
